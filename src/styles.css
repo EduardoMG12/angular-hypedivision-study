@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background-500: #0E0E15;
-  --color-portage: #9B87F5;
-  --color-alabaster: #FAFAFA;
-  --color-santas-gray: #A1A1AA;
-  --color-wood-smoke: #16161D;
-  --color-charade: #2E2E38;
+  --color-background-500: #0e0e15;
+  --color-portage: #9b87f5;
+  --color-alabaster: #fafafa;
+  --color-santas-gray: #a1a1aa;
+  --color-wood-smoke: #16161d;
+  --color-charade: #2e2e38;
 
   --font-display: "Inter", sans-serif;
+}
+
+::selection {
+  background-color: #9b87f5;
+  color: white;
 }
