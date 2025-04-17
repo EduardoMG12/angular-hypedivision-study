@@ -2,15 +2,15 @@
   (ngSubmit)="onSubmit()"
   class="w-[28rem] flex flex-col justify-center items-start gap-[1.188rem]"
 >
-  <app-input label="Email" type="email" [(value)]="email" class="w-full"/>
-  <app-input-password label="Password" [(value)]="password" forgotLink="/forgot-password" [showEye]="true" class="w-full"/>
-  <label class="flex items-center gap-2 cursor-pointer">
-    <input type="checkbox" name="" id="remember" class="hidden peer" />
-    <span
-      class="w-5 h-5 border-2 border-portage rounded-full peer-checked:bg-portage transition-colors duration-200"
-    ></span>
-    <span class="text-alabaster text-[0.827rem]">Lembrar de mim</span>
-  </label>
+  <app-input label="Email" type="email" [(value)]="email" class="w-full" />
+  <app-input-password
+    label="Senha"
+    [(value)]="password"
+    forgotLink="/forgot-password"
+    [showEye]="true"
+    class="w-full"
+  />
+  <app-checkbox label="Lembrar de mim" [(value)]="checkbox" />
   <button
     type="submit"
     class="w-full h-[2.5rem] flex justify-center items-center bg-portage rounded-[0.625rem] cursor-pointer gap-4"
