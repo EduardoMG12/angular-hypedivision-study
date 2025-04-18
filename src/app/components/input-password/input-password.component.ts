@@ -14,7 +14,7 @@ export class InputPasswordComponent {
   @Input() showEye = false;
   @Input() forgotLink: string | null = null;
   @Input() value = "";
-  @Output() valueChange = new EventEmitter<string>(); // Para emitir mudanças no valor
+  @Output() valueChange = new EventEmitter<string>();
 
   showPassword = false;
 
@@ -24,6 +24,6 @@ export class InputPasswordComponent {
 
   onValueChange(newValue: string) {
     this.value = newValue;
-    this.valueChange.emit(this.value); // Emite o novo valor para o pai
+    this.valueChange.emit(this.value);
   }
 }
