@@ -1,0 +1,211 @@
+<main class="bg-background-500 max-w-screen min-h-screen relative">
+  <app-header />
+  <div
+    class="w-[64rem] pt-[6.375rem] p-8 flex flex-col justify-baseline items-start gap-8 mx-auto"
+  >
+    <div class="w-full flex flex-col gap-2 justify-center items-start">
+      <h1 class="text-portage textPurpleShadow font-bold text-medium">
+        Desenvolvimento do HypeDivision/Study
+      </h1>
+      <p class="text-santas-gray text-small">
+        Um mergulho no processo de criação desta aplicação de flashcards para
+        estudo
+      </p>
+      <hr class="w-full border-t border-santas-gray mt-8" />
+    </div>
+    <app-card
+      title="Visão Geral do Projeto"
+      iconTitle="rocket.svg"
+      text="HypeDivision é uma aplicação web moderna para criação e gestão de flashcards de estudo, desenvolvida com React e
+      TypeScript. O projeto combina funcionalidades práticas para estudantes com um visual cyberpunk/neon distinto, criando uma
+      experiência de estudo envolvente e eficiente. Este projeto demonstra minhas habilidades em desenvolvimento frontend, design
+      de UI/UX, e implementação de funcionalidades complexas em uma aplicação web."
+    />
+    <div class="w-full gap-8">
+      <app-card title="Cronologia do Desenvolvimento" iconTitle="clock.svg" />
+      <div class="w-full gap-6">
+        <app-card
+          subtitle="Planejamento e Design"
+          iconSubtitle="pen.svg"
+          descriptionSubtitle="Nesta fase, defini a arquitetura do aplicativo, selecionei as tecnologias e estabeleci o estilo visual do HypeDivision."
+          [items]="[
+            'Design da interface com tema neon/cyberpunk',
+            'Escolha do Angular para desenvolvimento pois é oque a mátéria da faculdade propos',
+            'Planejamento da estrutura de componentes',
+            'Definição do sistema de rotas'
+          ]"
+        />
+
+        <app-card
+          subtitle="Infraestrutura e Fundação"
+          iconSubtitle="table-window.svg"
+          descriptionSubtitle="Estabeleci a estrutura base do aplicativo e integrei as bibliotecas e ferramentas essenciais."
+          [items]="[
+            'Configuração do Tailwind CSS para estilização',
+            'Integração da biblioteca shadcn/ui para componentes',
+            'Implementação do sistema de temas dark mode',
+            'Setup do React Router para navegação'
+          ]"
+        />
+
+        <app-card
+          subtitle="Desenvolvimento de Componentes"
+          iconSubtitle="puzzle.svg"
+          descriptionSubtitle="Criei componentes reutilizáveis para construir uma UI consistente em todo o aplicativo."
+          [items]="[
+            'Sidebar responsiva com animação hover',
+            'Cards de flashcard com efeito de flip',
+            'Formulários de criação e edição',
+            'Sistema de notificações com toasts'
+          ]"
+        />
+      </div>
+
+      <app-card
+        subtitle="Implementação de Funcionalidades"
+        iconSubtitle="code.svg"
+        descriptionSubtitle="Desenvolvi o núcleo funcional do aplicativo para gerenciar flashcards e decks."
+        [items]="[
+          'Sistema de criação de flashcards',
+          'Importação de flashcards via JSON',
+          'Visualização e navegação de decks',
+          'Estatísticas de estudo e progresso'
+        ]"
+      />
+
+      <app-card
+        subtitle="Autenticação e Segurança"
+        iconSubtitle="person-check.svg"
+        descriptionSubtitle="Implementei um sistema de autenticação robusto com múltiplas opções de login."
+        [items]="[
+          'Login com email e senha',
+          'Integração de autenticação social (Google, GitHub)',
+          'Proteção de rotas e validação de formulários',
+          'Gestão segura de sessões de usuário'
+        ]"
+      />
+
+      <app-card
+        subtitle="Testes e Otimização"
+        iconSubtitle="check-rounded.svg"
+        descriptionSubtitle="Realizei testes para garantir a qualidade e otimizei o desempenho do aplicativo."
+        [items]="[
+          'Testes de componentes e funcionalidades',
+          'Otimização de renderização e carregamento',
+          'Validação de acessibilidade',
+          'Compatibilidade cross-browser'
+        ]"
+      />
+    </div>
+    <div class="w-full">
+      <app-card title="Principais Aprendizados" iconTitle="open-book.svg" />
+      <div class="w-full flex justify-between items-center">
+        <app-card
+          subtitle="Gestão de Estado"
+          descriptionSubtitle="Aprendi técnicas avançadas para gerenciar o estado do aplicativo
+      usando React Query e Context API, evitando prop drilling e
+      mantendo um código mais limpo."
+          class="flex-1"
+        />
+        <app-card
+          subtitle="Design System"
+          descriptionSubtitle="Desenvolvi habilidades na criação e manutenção de um design
+          system consistente usando Tailwind CSS e componentes
+          reutilizáveis."
+          class="flex-1"
+        />
+      </div>
+      <div class="w-full flex justify-between items-center">
+        <app-card
+          subtitle="Animações e Microinterações"
+          descriptionSubtitle="Implementei animações suaves e microinterações que melhoram a
+          experiência do usuário sem comprometer o desempenho."
+          class="flex-1"
+        />
+        <app-card
+          subtitle="Arquitetura de Componentes"
+          descriptionSubtitle="Criei uma arquitetura de componentes escalável que permite fácil
+          manutenção e extensão do aplicativo."
+          class="flex-1"
+        />
+      </div>
+    </div>
+    <div class="w-full">
+      <app-card title="Stack Tecnológico" iconTitle="branch.svg" />
+      <div class="flex flex-wrap gap-2">
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Framework:</p>
+          <p class="text-alabaster text-xsmall font-bold">React</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Linguagem:</p>
+          <p class="text-alabaster text-xsmall font-bold">TypeScript</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Bundler:</p>
+          <p class="text-alabaster text-xsmall font-bold">Vite</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Estilização:</p>
+          <p class="text-alabaster text-xsmall font-bold">Tailwind CSS</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Bibilhoteca UI:</p>
+          <p class="text-alabaster text-xsmall font-bold">shadcn/ui</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">
+            Gerenciamento de Estados:
+          </p>
+          <p class="text-alabaster text-xsmall font-bold">Zustand</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Roteamento:</p>
+          <p class="text-alabaster text-xsmall font-bold">React Router</p>
+        </div>
+        <div
+          class="bg-[#29293D]/30 border border-portage/30 px-3 py-2 rounded-md flex items-center gap-1"
+        >
+          <p class="text-portage font-bold text-xsmall">Iconografia:</p>
+          <p class="text-alabaster text-xsmall font-bold">Lucide Icons</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <app-card title="Desafios e Soluções" iconTitle="lamp.svg" />
+      <div
+        class="w-full p-6 bg-[#16161D]/50 rounded-lg border border-portage/20 flex flex-col justify-center items-start gap-4"
+      >
+        <div class="flex flex-col justify-center items-start gap-1">
+          <h3 class="text-alabaster text-base font-normal">Tema visual consistente</h3>
+          <p class="text-santas-gray text-small font-semibold" >O design neon/cyberpunk exigiu uma abordagem cuidadosa para manter uma experiência visual coesa. Resolvi isso criando um sistema de
+            design baseado em variáveis CSS e utilitários Tailwind personalizados.</p>
+        </div>
+        <div class="flex flex-col justify-center items-start gap-1">
+          <h3 class="text-alabaster text-base font-normal">Animações performáticas</h3>
+          <p class="text-santas-gray text-small font-semibold" >Implementei animações para os flashcards que funcionam bem mesmo em dispositivos menos potentes, utilizando transforms CSS e gerenciando
+            cuidadosamente as renderizações.</p>
+        </div>
+        <div class="flex flex-col justify-center items-start gap-1">
+          <h3 class="text-alabaster text-base font-normal">Gerenciamento de estado</h3>
+          <p class="text-santas-gray text-small font-semibold" >Para gerenciar o estado dos flashcards e decks, implementei React Query para operações de dados e Context API para estado global, resultando
+            em um código mais limpo e manutenível.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,7 +1,8 @@
-import { Routes } from '@angular/router';
+import type { Routes } from '@angular/router';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
+import { DevelopmentComponent } from './pages/development/development.component';
 
 export const routes: Routes = [
      // In future i want implement lazyLoading
@@ -9,5 +10,6 @@ export const routes: Routes = [
     // { path: 'register', loadChildren: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
     { path: '', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
+    { path: 'development', component: DevelopmentComponent },
     { path: '**', component: NotFoundComponent }
 ];
