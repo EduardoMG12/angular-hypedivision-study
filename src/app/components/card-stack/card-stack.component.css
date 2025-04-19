@@ -1,0 +1,47 @@
+/* Optimize performance for transform animations */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Animation for Card 1 */
+@keyframes card1 {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(-4deg); }
+}
+
+/* Animation for Card 2 */
+@keyframes card2 {
+  0%, 100% { transform: rotate(2deg); }
+  50% { transform: rotate(0deg); }
+}
+
+/* Animation for Card 3 */
+@keyframes card3 {
+  0%, 100% { transform: rotate(6deg); }
+  50% { transform: rotate(4deg); }
+}
+
+@keyframes icon {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(0deg); }
+}
+
+/* Apply animations to cards */
+.animate-card1 {
+  animation: card1 5s ease-in-out infinite;
+}
+
+
+
+.animate-card2 {
+  animation: card2 5s ease-in-out infinite 0.2s; /* Reduced delay for smoother overlap */
+}
+
+.animate-card3 {
+  animation: card3 5s ease-in-out infinite 0.4s; /* Reduced delay */
+}
+
+.animate-icon {
+  animation: icon 5s ease-in-out infinite, fadeSpot 4s ease-in-out infinite;
+}
+
