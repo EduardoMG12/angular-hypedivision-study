@@ -1,0 +1,6 @@
+<div class="p-6 bg-wood-smoke/50 rounded-lg border border-portage/20 flex flex-col justify-center items-start gap-4">
+  <div *ngFor="let challenge of challenges" class="flex flex-col justify-center items-start gap-1">
+    <h3 class="text-alabaster text-base font-normal">{{ challenge.subtitle }}</h3>
+    <p class="text-santas-gray text-small font-semibold">{{ challenge.description }}</p>
+  </div>
+</div>
