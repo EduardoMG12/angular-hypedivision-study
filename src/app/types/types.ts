@@ -16,3 +16,4 @@ export type HTMLInputTypeAttribute =
 	| "password"
 	| "radio"
 	| "range";
+
