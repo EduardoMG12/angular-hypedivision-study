@@ -31,15 +31,14 @@
     0 0 20px rgba(155, 135, 245, 0.5);
 }
 
-
-
-/* // Mapeamento de tamanhos em px mapei em rem */
-  /* xl2: '26px',
-  xl: '22px',
-  lg2: '20px',
-  lg: '18px',
-  md: '16px',
-  sm3: '14px',
-  sm2: '12px',
-  sm: '10px', */
-/* }; */
+@keyframes fadeSpot {
+  0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 1;
+	}
+}
