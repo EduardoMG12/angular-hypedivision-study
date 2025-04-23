@@ -33,12 +33,16 @@
 
 @keyframes fadeSpot {
   0% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-	100% {
-		opacity: 1;
-	}
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.only-fade-spot {
+  animation: fadeSpot 4s ease-in-out infinite;
 }
