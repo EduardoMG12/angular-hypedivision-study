@@ -1,17 +1,44 @@
 <section class="w-full p-6 flex flex-col justify-center items-start gap-6">
   <div *ngIf="title" class="flex items-center gap-2 mb-4">
-    <img *ngIf="iconTitle" [src]="iconTitle" alt="Icon" class="only-fade-spot" />
-    <h2 *ngIf="title" class="text-alabaster text-heading font-bold">{{ title }}</h2>
+    <img
+      *ngIf="iconTitle"
+      [src]="iconTitle"
+      alt="Icon"
+      class="only-fade-spot"
+    />
+    <h2 *ngIf="title" class="text-alabaster text-heading font-bold">
+      {{ title }}
+    </h2>
   </div>
 
-
-  <div *ngIf="subtitle || iconSubtitle || descriptionSubtitle || text || items.length > 0" class="w-full p-6 bg-[#16161D]/50 rounded-lg border border-portage/20">
+  <div
+    *ngIf="
+      subtitle ||
+      iconSubtitle ||
+      descriptionSubtitle ||
+      text ||
+      items.length > 0
+    "
+    class="w-full p-6 bg-[#16161D]/50 rounded-lg border border-portage/20"
+  >
     <p class="text-alabaster text-small">{{ text }}</p>
     <div class="flex items-center justify-baseline w-full mb-4 gap-3">
-      <img *ngIf="iconSubtitle" [src]="iconSubtitle" alt="Icon" class="only-fade-spot ghost-animation"/>
-      <h3 *ngIf="subtitle" class="text-alabaster text-medium font-semibold">{{ subtitle }}</h3>
+      <img
+        *ngIf="iconSubtitle"
+        [src]="iconSubtitle"
+        alt="Icon"
+        class="only-fade-spot ghost-animation"
+      />
+      <h3 *ngIf="subtitle" class="text-alabaster text-medium font-semibold">
+        {{ subtitle }}
+      </h3>
     </div>
-    <p *ngIf="descriptionSubtitle" class="text-santas-gray text-small font-semibold mb-4">{{ descriptionSubtitle }}</p>
+    <p
+      *ngIf="descriptionSubtitle"
+      class="text-santas-gray text-small font-semibold mb-4"
+    >
+      {{ descriptionSubtitle }}
+    </p>
     <ul class="list-disc pl-5 space-y-2">
       <li *ngFor="let item of items" class="text-santas-gray text-base">
         {{ item }}

@@ -35,9 +35,8 @@
 	}
 }
 
-
 .spot {
-  position: absolute;
+	position: absolute;
 	width: 384px;
 	height: 384px;
 	background-color: rgba(155, 135, 245, 0.1);
