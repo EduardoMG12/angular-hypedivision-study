@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { CardStackComponent } from '../../components/card-stack/card-stack.component';
-import { HeaderComponent } from '../../components/header/header.component';
-import { FooterComponent } from '../../components/footer/footer.component';
+import { SideBarComponent } from '../../components/side-bar/side-bar.component';
 
 @Component({
   selector: 'app-home',
-  imports: [HeaderComponent, CardStackComponent,FooterComponent],
+  standalone:true,
+  imports: [SideBarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

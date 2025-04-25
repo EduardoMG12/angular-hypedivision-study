@@ -1,0 +1,134 @@
+/* Define a animação de fade */
+@keyframes fadeSpot {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.sidebar {
+  width: 80px; /* Largura inicial (w-20) */
+  background-color: #1F1F2A; /* Cor de fundo (substitua bg-sidebar) */
+  transition: width 0.3s ease-in-out; /* Adiciona transição para a largura */
+}
+
+/* Estiliza os links */
+.sidebar a {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%; /* Ocupa toda a largura disponível */
+  padding-left: 16px; /* Espaçamento à esquerda */
+  padding-right: 16px; /* Espaçamento à direita para o fundo roxo */
+  position: relative; /* Necessário para position: absolute nos textos e wrapper do ícone */
+  overflow: hidden; /* Esconde o texto transbordando quando recolhido */
+}
+
+/* Contêiner para animar a troca de ícones */
+.icon-wrapper {
+  position: relative;
+  width: 24px; /* Largura do seu ícone */
+  height: 24px; /* Altura do seu ícone */
+  display: flex; /* Use flexbox para centralizar o ícone dentro do wrapper se necessário */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Posiciona os ícones um sobre o outro */
+.icon-wrapper app-closed-book-icon,
+.icon-wrapper app-open-book-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Transição para opacidade e transformação */
+}
+
+/* Estado inicial (sidebar recolhida): livro fechado visível (animação aplicada), livro aberto invisível (sem animação) */
+.icon-wrapper .icon-closed {
+  opacity: 1;
+   transform: rotateY(0deg); /* Estado inicial da rotação (opcional) */
+   /* Aplica a animação quando o ícone fechado está visível */
+   animation: fadeSpot 4s ease-in-out infinite;
+}
+
+.icon-wrapper .icon-open {
+  opacity: 0;
+   transform: rotateY(-180deg); /* Estado inicial da rotação (opcional, para animação 3D) */
+   /* A animação será aplicada na regra .sidebar.expanded quando o ícone aberto estiver visível */
+   animation: none; /* Garante que a animação não está rodando quando invisível */
+}
+
+
+/* Estiliza os contêineres dos ícones */
+.sidebar .p-3 {
+   /* Mantido conforme seu código original */
+}
+
+/* Estiliza os textos */
+.sidebar .label {
+  position: absolute; /* Sempre fora do fluxo normal */
+  left: 48px; /* Posiciona à direita do ícone (16px de padding do 'a' + 24px do wrapper/ícone + 8px de margem) */
+  opacity: 0; /* Invisível por padrão */
+  transform: translateX(-10px); /* Começa deslocado à esquerda */
+  color: #D1D5DB; /* Cinza claro */
+  font-size: 14px; /* Tamanho da fonte */
+  margin-left: 8px; /* Espaço entre ícone e texto */
+  white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; /* Adiciona transição para os textos */
+}
+
+/* Centralização padrão para contêineres flex no estado recolhido */
+.sidebar .flex {
+  width: 100%; /* Ocupa toda a largura disponível */
+  justify-content: center; /* Centraliza o conteúdo por padrão */
+   transition: justify-content 0.3s ease-in-out; /* Adiciona transição para justify-content */
+}
+
+/* Estilos quando a sidebar está expandida (classe 'expanded' presente) */
+.sidebar.expanded {
+   width: 260px; /* Largura expandida */
+}
+
+/* No estado expandido, TODOS os itens flex são alinhados à esquerda por default */
+.sidebar.expanded .flex {
+  justify-content: flex-start; /* Alinha todos à esquerda quando expandido */
+}
+
+/* No estado expandido: livro fechado invisível (animação removida), livro aberto visível (animação aplicada) */
+.sidebar.expanded .icon-wrapper .icon-closed {
+  opacity: 0;
+   transform: rotateY(180deg); /* Animação de rotação ao esconder (opcional) */
+   animation: none; /* Remove a animação quando o ícone fechado está escondido */
+}
+
+.sidebar.expanded .icon-wrapper .icon-open {
+  opacity: 1;
+   transform: rotateY(0deg); /* Animação de rotação ao mostrar (opcional) */
+   /* Aplica a animação quando o ícone aberto está visível */
+   animation: fadeSpot 4s ease-in-out infinite;
+}
+
+
+/* Estiliza a rota ativa */
+.sidebar a.active {
+  background-color: #4B3F72; /* Roxo claro, como na imagem */
+  border-radius: 8px; /* Bordas arredondadas */
+}
+
+/* Estiliza o ícone da rota ativa */
+.sidebar a.active .p-3 app-home-icon,
+.sidebar a.active .p-3 app-side-books-icon,
+.sidebar a.active .p-3 app-plus-icon,
+.sidebar a.active .p-3 app-chart-icon,
+.sidebar a.active .p-3 app-settings-icon,
+.sidebar a.active .icon-wrapper .icon-closed,
+.sidebar a.active .icon-wrapper .icon-open {
+   stroke: white !important;
+}
