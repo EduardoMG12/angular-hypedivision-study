@@ -1,11 +1,15 @@
+import { CommonModule } from '@angular/common';
 import { CardStackComponent } from './../../components/card-stack/card-stack.component';
 import { Component } from "@angular/core";
 import { SideBarComponent } from "../../components/side-bar/side-bar.component";
+import { OpenBookIconComponent } from '../../components/icons/open-book-icon/open-book-icon.component';
+import { AlbumIconComponent } from '../../components/icons/album-icon/album-icon.component';
+import { BookMarkIconComponent } from '../../components/icons/book-mark-icon/book-mark-icon.component';
 
 @Component({
 	selector: "app-home",
 	standalone: true,
-	imports: [SideBarComponent,CardStackComponent],
+	imports: [CommonModule, SideBarComponent,CardStackComponent, OpenBookIconComponent, AlbumIconComponent, BookMarkIconComponent],
 	templateUrl: "./home.component.html",
 	styleUrl: "./home.component.css",
 })

@@ -1,42 +1,104 @@
-<main class="h-[120vh]">
+<main class="h-[120vh] bg-[#0E0E15]">
   <app-side-bar />
-  <div>
-    <h1>HypeDivision Study</h1>
-    <p>Plataforma de flashcards para potencializar seu aprendizadop
-    </p>
-  </div>
-  <div>
-    <div>
-      <p>Acelere seu aprendizado com flashcards</p>
-      <p>Crie cartões de estudo personalizados, teste seu conhecimento com quizzes e acompanhe
-        seu progresso para aprender de forma eficiente.</p>
-        <div>
-          <a href=""><p>Ver Decks</p></a>
-          <a href=""><p>+ Criar Flashcards</p></a>
+  <div class="px-[25rem] pt-6 flex flex-col gap-12">
+    <section class="w-full flex flex-col gap-8">
+      <div class="w-full flex flex-col justify-baseline items-start gap-2">
+        <div class="flex justify-baseline items-center gap-2">
+          <h1 class="text-portage text-medium textPurpleShadow font-bold">
+            HypeDivision
+          </h1>
+          <h1 class="text-alabaster text-medium textPurpleShadow font-bold">
+            Study
+          </h1>
         </div>
-    </div>
+        <p class="text-santas-gray">
+          Plataforma de flashcards para potencializar seu aprendizado
+        </p>
+      </div>
+      <div
+        class="w-full flex justify-between items-center bg-gradient-to-br from-[#9B87F5]/20 to-[#D946EF]/10 rounded-[2rem] p-[2rem] min-h-[200px] shadow-[0_0_20px_rgba(217,70,239,0.3)] backdrop-blur-sm"
+      >
+        <div class="flex flex-col gap-4 text-white py-20">
+          <p class="text-small font-semibold text-portage textPurpleShadow">
+            Acelere seu aprendizado com flashcards
+          </p>
+          <p class="text-sm text-santas-gray">
+            Crie cartões de estudo personalizados, teste seu conhecimento com
+            quizzes e acompanhe seu progresso para aprender de forma eficiente.
+          </p>
+          <div class="flex gap-4 mt-2">
+            <a
+              href=""
+              class="bg-[#ae46ef] text-white px-4 py-2 rounded-lg hover:bg-[#9B87F5] transition"
+              >Ver Decks</a
+            >
+            <a
+              href=""
+              class="border border-portage/50 text-white px-4 py-2 rounded-lg bg-sidebar hover:bg-white hover:text-black transition"
+              >+ Criar Flashcards</a
+            >
+          </div>
+        </div>
+        <div class="bg-transparent">
+          <app-card-stack />
+        </div>
+      </div>
+    </section>
+    <section class="w-full flex flex-col gap-8">
+      <div class="text-white">filter all / today / toMonth</div>
+      <div class="text-white flex justify-center items-center">
+        <div
+          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
+        >
+          <div class="p-3.5 bg-sidebar rounded-full">
+            <app-open-book-icon [stroke]="'#3B82F6'" />
+          </div>
+          <div>
+            <p class="text-santas-gray font-medium text-base">
+              Cartões Estudados
+            </p>
+            <p class="text-alabaster text-large font-bold">324</p>
+          </div>
+        </div>
+        <div
+          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
+        >
+          <div class="p-3.5 bg-sidebar rounded-full">
+            <app-book-mark-icon [stroke]="'#9F63E9'" />
+          </div>
+          <div>
+            <p class="text-santas-gray font-medium text-base">
+              Decks Criados
+            </p>
+            <p class="text-alabaster text-large font-bold">12</p>
+          </div>
+        </div>
+        <div
+          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
+        >
+          <div class="p-3.5 bg-sidebar rounded-full">
+            <app-album-icon [stroke]="'#22C55E'" />
+          </div>
+          <div>
+            <p class="text-santas-gray font-medium text-base">
+              Taxa de Acerto
+            </p>
+            <p class="text-alabaster text-large font-bold">78%</p>
+          </div>
+        </div>
+      </div>
+    </section>
     <div>
-    <app-card-stack/>
-    </div>
-  </div>
-  <div>
-    <div>filter all / today / toMonth</div>
-    <div>
-<div class="Cartões Estudados"></div>
-<div class="Decks Criados"></div>
-<div class="Taxa de Acerto"></div>
-    </div>
-  </div>
-  <div>
-    <div>
-      <p>Decks recentes</p>
-      <p>Ver todos</p>
-    </div>
-    <div>
-      <div class="ProgramaçãoJavaScript"></div>
-      <div class="InglêsAvançado"></div>
-      <div class="HistóriaMundial"></div>
-      <div class="CriarNovoDeck"></div>
+      <div class="w-full text-white flex justify-between items-center">
+        <p>Decks recentes</p>
+        <p>Ver todos</p>
+      </div>
+      <div class="text-white">
+        <div>ProgramaçãoJavaScript</div>
+        <div>InglêsAvançado</div>
+        <div>HistóriaMundial</div>
+        <div>CriarNovoDeck</div>
+      </div>
     </div>
   </div>
 </main>
