@@ -46,46 +46,28 @@
     </section>
     <section class="w-full flex flex-col gap-8">
       <div class="text-white">filter all / today / toMonth</div>
-      <div class="text-white flex justify-center items-center">
-        <div
-          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
-        >
-          <div class="p-3.5 bg-sidebar rounded-full">
-            <app-open-book-icon [stroke]="'#3B82F6'" />
-          </div>
-          <div>
-            <p class="text-santas-gray font-medium text-base">
-              Cartões Estudados
-            </p>
-            <p class="text-alabaster text-large font-bold">324</p>
-          </div>
-        </div>
-        <div
-          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
-        >
-          <div class="p-3.5 bg-sidebar rounded-full">
-            <app-book-mark-icon [stroke]="'#9F63E9'" />
-          </div>
-          <div>
-            <p class="text-santas-gray font-medium text-base">
-              Decks Criados
-            </p>
-            <p class="text-alabaster text-large font-bold">12</p>
-          </div>
-        </div>
-        <div
-          class="w-full bg-wood-smoke mx-3 py-6 pl-6 flex rounded-lg border border-charade gap-4"
-        >
-          <div class="p-3.5 bg-sidebar rounded-full">
-            <app-album-icon [stroke]="'#22C55E'" />
-          </div>
-          <div>
-            <p class="text-santas-gray font-medium text-base">
-              Taxa de Acerto
-            </p>
-            <p class="text-alabaster text-large font-bold">78%</p>
-          </div>
-        </div>
+      <div class="w-full text-white flex justify-center items-center gap-6">
+        <app-card-with-icon
+          class="w-full"
+          title="Cartões Estudados"
+          value="324"
+          icon="open-book"
+          strokeColor="#3B82F6"
+        ></app-card-with-icon>
+        <app-card-with-icon
+          class="w-full"
+          title="Decks Criados"
+          value="12"
+          icon="book-mark"
+          strokeColor="#9F63E9"
+        ></app-card-with-icon>
+        <app-card-with-icon
+          class="w-full"
+          title="Taxa de Acerto"
+          value="78%"
+          icon="album"
+          strokeColor="#22C55E"
+        ></app-card-with-icon>
       </div>
     </section>
     <div>
