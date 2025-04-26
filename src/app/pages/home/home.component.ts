@@ -6,11 +6,12 @@ import { OpenBookIconComponent } from '../../components/icons/open-book-icon/ope
 import { AlbumIconComponent } from '../../components/icons/album-icon/album-icon.component';
 import { BookMarkIconComponent } from '../../components/icons/book-mark-icon/book-mark-icon.component';
 import { CardWihtIconComponent } from "../../components/card-with-icon/card-with-icon.component";
+import { RecentDeckCardComponent } from '../../components/recent-deck-card/recent-deck-card.component';
 
 @Component({
 	selector: "app-home",
 	standalone: true,
-	imports: [CommonModule, SideBarComponent, CardStackComponent, CardWihtIconComponent],
+	imports: [CommonModule, SideBarComponent, CardStackComponent, CardWihtIconComponent, RecentDeckCardComponent],
 	templateUrl: "./home.component.html",
 	styleUrl: "./home.component.css",
 })
