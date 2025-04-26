@@ -45,7 +45,7 @@
       </div>
     </section>
     <section class="w-full flex flex-col gap-8">
-      <div class="text-white">filter all / today / toMonth</div>
+      <!-- <div class="text-white">filter all / today / toMonth</div> -->
       <div class="w-full text-white flex justify-center items-center gap-6">
         <app-card-with-icon
           class="w-full"
@@ -70,12 +70,14 @@
         ></app-card-with-icon>
       </div>
     </section>
-    <div>
+    <div class="flex justify-center items-center flex-col gap-6">
       <div class="w-full text-white flex justify-between items-center">
-        <p>Decks recentes</p>
-        <p>Ver todos</p>
+        <p class="font-bold text-alabaster text-large">Decks recentes</p>
+        <p class="text-base text-portage">Ver todos</p>
       </div>
-      <div class="w-full text-white flex flex-wrap justify-center items-center gap-6">
+      <div
+        class="w-full text-white flex flex-wrap justify-center items-center gap-6"
+      >
         <app-recent-deck-card
           class="flex-1 min-w-[15.625rem] max-w-[36.25rem]"
           title="ProgramaçãoJavaScript"
@@ -94,6 +96,15 @@
           cardsCount="38"
           studyTime="3 dias"
         ></app-recent-deck-card>
+        <div
+          class="flex-1 min-w-[15.625rem] max-w-[36.25rem] bg-sidebar/50 py-6 px-[1.5rem] pl-6 flex rounded-lg border border-[#2E2E38] gap-4 flex-col justify-center items-center"
+        >
+          <div class="bg-sidebar rounded-full p-3">
+            <app-plus-icon [stroke]="'#BA8FEF'" />
+          </div>
+
+          <p class="text-santas-gray text-small font-normal">Criar novo deck</p>
+        </div>
       </div>
     </div>
   </div>
