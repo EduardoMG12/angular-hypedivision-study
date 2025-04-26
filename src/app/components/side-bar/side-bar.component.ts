@@ -7,11 +7,13 @@ import { SettingsIconComponent } from "../icons/settings-icon/settings-icon.comp
 import { SideBooksIconComponent } from "../icons/side-books-icon/side-books-icon.component";
 import { OpenBookIconComponent } from "../icons/open-book-icon/open-book-icon.component";
 import { ClosedBookIconComponent } from "../icons/closed-book-icon/closed-book-icon.component";
+import { RouterModule } from "@angular/router";
 
 @Component({
 	selector: "app-side-bar",
 	standalone: true,
 	imports: [
+    RouterModule,
 		HomeIconComponent,
 		PlusIconComponent,
 		ChartIconComponent,
@@ -39,9 +41,9 @@ export class SideBarComponent {
 	setInitialStyles() {
 		const labels = this.sidebar.nativeElement.querySelectorAll(".label");
 		const flexContainers = this.sidebar.nativeElement.querySelectorAll(".flex");
-	  
-	  
-	  
+
+
+
 		if (labels && labels instanceof NodeList && labels.length > 0) {
 		  for (const label of labels) {
 			const htmlLabel = label as HTMLElement;
@@ -51,7 +53,7 @@ export class SideBarComponent {
 		  }
 		} else {
 		}
-	  
+
 		if (flexContainers && flexContainers instanceof NodeList && flexContainers.length > 0) {
 		  for (const flex of flexContainers) {
 			const htmlFlex = flex as HTMLElement;
@@ -59,10 +61,10 @@ export class SideBarComponent {
 		  }
 		} else {
 		}
-	  
+
 		this.sidebar.nativeElement.style.width = "80px";
 		this.sidebar.nativeElement.style.transition = "none";
-	  
+
 		this.sidebar.nativeElement.classList.remove("expanded");
 		this.isExpanded = false;
 	  }
