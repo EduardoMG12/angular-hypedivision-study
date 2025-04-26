@@ -39,25 +39,33 @@ export class SideBarComponent {
 	setInitialStyles() {
 		const labels = this.sidebar.nativeElement.querySelectorAll(".label");
 		const flexContainers = this.sidebar.nativeElement.querySelectorAll(".flex");
-
-		for (const label of labels) {
+	  
+	  
+	  
+		if (labels && labels instanceof NodeList && labels.length > 0) {
+		  for (const label of labels) {
 			const htmlLabel = label as HTMLElement;
 			htmlLabel.style.opacity = "0";
 			htmlLabel.style.transform = "translateX(-10px)";
 			htmlLabel.style.transition = "none";
+		  }
+		} else {
 		}
-
-		for (const flex of flexContainers) {
+	  
+		if (flexContainers && flexContainers instanceof NodeList && flexContainers.length > 0) {
+		  for (const flex of flexContainers) {
 			const htmlFlex = flex as HTMLElement;
 			htmlFlex.style.justifyContent = "center";
+		  }
+		} else {
 		}
-
+	  
 		this.sidebar.nativeElement.style.width = "80px";
 		this.sidebar.nativeElement.style.transition = "none";
-
+	  
 		this.sidebar.nativeElement.classList.remove("expanded");
 		this.isExpanded = false;
-	}
+	  }
 
 	onMouseEnter() {
 		clearTimeout(this.retractTimer);
