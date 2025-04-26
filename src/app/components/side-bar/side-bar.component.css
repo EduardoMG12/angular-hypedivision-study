@@ -111,3 +111,9 @@
 .sidebar a.active .icon-wrapper .icon-open {
 	stroke: white !important;
 }
+
+.sidebar a.active {
+  border: 1px solid rgba(94, 129, 244, 0.5);
+  background-color: rgba(186, 143, 239, 0.2);
+  border-radius: 8px;
+}
