@@ -1,7 +1,7 @@
 <main class="min-h-[100vh] bg-[#0E0E15]">
   <app-side-bar />
   <div class="px-[25rem] pt-6 pb-8 flex flex-col gap-8">
-    <section class="w-full flex flex-col gap-8">
+    <section *ngIf="!showJsonImport" @slideAnimation class="w-full flex flex-col gap-8">
       <div class="w-full flex flex-col justify-baseline items-start gap-2">
         <div class="flex justify-baseline items-center gap-2">
           <h1 class="text-portage text-medium textPurpleShadow font-bold">
@@ -13,12 +13,21 @@
         </p>
       </div>
       <div class="flex flex-col justify-center items-center gap-4">
-        <button
-          class="flex justify-center items-center gap-2 px-4 py-2.5 bg-sidebar border border-charade rounded-lg cursor-pointer self-end"
-        >
-          <app-import-icon />
-          <p class="text-small text-alabaster">Importar JSON</p>
-        </button>
+        <div class="w-full flex flex-row justify-end items-center gap-2">
+          <button
+            class="flex justify-center items-center gap-2 px-4 py-2.5 border border-charade rounded-lg cursor-pointer self-end"
+          >
+            <app-robot-icon />
+            <p class="text-small text-alabaster">Criar com IA</p>
+          </button>
+          <button
+            (click)="toggleJsonImport()"
+            class="flex justify-center items-center gap-2 px-4 py-2.5 bg-sidebar border border-charade rounded-lg cursor-pointer self-end"
+          >
+            <app-import-icon />
+            <p class="text-small text-alabaster">Importar JSON</p>
+          </button>
+        </div>
         <form class="w-full flex flex-col gap-7">
           <div
             class="w-full p-6 bg-wood-smoke border border-charade rounded-lg flex flex-col gap-8"
@@ -46,7 +55,7 @@
               ></textarea>
             </div>
           </div>
-          <div>
+          <div class="w-full flex flex-col gap-4">
             <p class="text-medium text-alabaster font-bold">Flashcards</p>
             <div
               class="w-full p-6 bg-wood-smoke border border-charade rounded-lg flex flex-row gap-4"
@@ -116,15 +125,33 @@
             <app-plus-icon />
             <p class="text-alabaster text-base">Adicionar Card</p>
           </div>
+          <div
+            class="w-full border bg-sidebar border-charade cursor-pointer rounded-lg py-3 flex justify-center items-center gap-2"
+          >
+            <app-eye-icon />
+            <p class="text-alabaster text-base">Visualizar Cards</p>
+          </div>
           <div class="w-full flex justify-end items-center gap-4">
-            <button class="bg-sidebar border border-charade rounded-lg px-6 py-3">
+            <button
+              class="bg-sidebar border border-charade rounded-lg px-6 py-3"
+            >
               <p class="text-alabaster text-base">Cancelar</p>
-            </button><button class="bg-[#BA8FEF]/80 border border-portage/50 rounded-lg px-6 py-3">
+            </button>
+            <button
+              class="bg-[#BA8FEF]/80 border border-portage/50 rounded-lg px-6 py-3"
+            >
               <p class="text-alabaster text-base">Salvar Deck</p>
             </button>
           </div>
         </form>
       </div>
     </section>
+
+    <app-create-flashcards-with-json
+    *ngIf="showJsonImport"
+    @slideInFromRight
+    (cancel)="onJsonImportCancelled()"
+    (import)="onJsonImported($event)"
+    ></app-create-flashcards-with-json>
   </div>
 </main>
