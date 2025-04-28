@@ -21,30 +21,28 @@ interface Deck {
 @Component({
 	selector: "app-create-flashcards-with-json",
 	standalone: true,
-	imports: [ ArrowLeftIconComponent, FormsModule],
+	imports: [ArrowLeftIconComponent, FormsModule],
 	templateUrl: "./create-flashcards-with-json.component.html",
 	styleUrl: "./create-flashcards-with-json.component.css",
 })
 export class CreateFlashcardsWithJsonComponent implements OnInit {
-	ngOnInit(): void {
-		console.log("CreateFlashcardsWithJsonComponent initialized");
+	ngOnInit(): void {}
+
+	jsonString = "";
+
+	@Output() cancel = new EventEmitter<void>();
+	@Output() import = new EventEmitter();
+
+	onImport() {
+		try {
+			const parsedJson = JSON.parse(this.jsonString);
+			this.import.emit(parsedJson);
+		} catch (error) {
+			console.error("Invalid JSON:", error);
+		}
 	}
 
-  jsonString = '';
-
-  @Output() cancel = new EventEmitter<void>();
-  @Output() import = new EventEmitter();
-
-  onImport() {
-    try {
-      const parsedJson = JSON.parse(this.jsonString);
-      this.import.emit(parsedJson);
-    } catch (error) {
-      console.error('Invalid JSON:', error);
-    }
-  }
-
-  onCancel() {
-    this.cancel.emit();
-  }
+	onCancel() {
+		this.cancel.emit();
+	}
 }
