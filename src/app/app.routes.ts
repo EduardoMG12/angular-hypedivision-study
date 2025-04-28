@@ -7,7 +7,7 @@ import { WelcomeComponent } from "./pages/welcome/welcome.component";
 import { HomeComponent } from "./pages/home/home.component";
 import { DecksComponent } from "./pages/decks/decks.component";
 import { CreateFlashcardComponent } from "./pages/create-flashcard/create-flashcard.component";
-import { CreateFlashcardsWithJsonComponent } from "./components/create-flashcards-with-json/create-flashcards-with-json.component";
+import { StatisticsComponent } from "./pages/statistics/statistics.component";
 
 export const routes: Routes = [
 	// In future i want implement lazyLoading
@@ -21,8 +21,7 @@ export const routes: Routes = [
 	{ path: "development", component: DevelopmentComponent },
   { path: 'decks', component: DecksComponent },
   { path: 'create-flashcard', component: CreateFlashcardComponent },
-  { path: 'create-flashcard-with-json', component: CreateFlashcardsWithJsonComponent },
-  // { path: 'statistics', component: StatisticsComponent },
+  { path: 'statistics', component: StatisticsComponent, data: { ssr: false } },
   // { path: 'settings', component: SettingsComponent },
 	{ path: "**", component: NotFoundComponent },
 ];

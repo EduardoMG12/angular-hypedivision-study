@@ -8,9 +8,11 @@ import {
 	provideClientHydration,
 	withEventReplay,
 } from "@angular/platform-browser";
+import { provideCharts, withDefaultRegisterables } from "ng2-charts";
 
 export const appConfig: ApplicationConfig = {
 	providers: [
+    provideCharts(withDefaultRegisterables()),
 		provideZoneChangeDetection({ eventCoalescing: true }),
 		provideRouter(routes),
 		provideClientHydration(withEventReplay()),
