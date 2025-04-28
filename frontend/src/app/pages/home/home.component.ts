@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from "@angular/common";
-import { CardStackComponent } from "./../../components/card-stack/card-stack.component";
+import { CardStackComponent } from "../../components/card-stack/card-stack.component";
 import { Component, Inject, PLATFORM_ID } from "@angular/core";
 import { SideBarComponent } from "../../components/side-bar/side-bar.component";
 import { CardWihtIconComponent } from "../../components/card-with-icon/card-with-icon.component";
