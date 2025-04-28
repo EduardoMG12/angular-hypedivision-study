@@ -1,0 +1,70 @@
+<div
+  #sidebar
+  class="sidebar w-20 bg-sidebar border-r border-r-[#2E2E38] h-screen fixed pt-7 pb-6 flex flex-col justify-between items-center"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+  [class.expanded]="isExpanded"
+>
+  <div class="flex flex-col justify-center items-center gap-10 px-3">
+    <div class="flex flex-row justify-center items-center first-item-container">
+      <a
+        class="flex flex-row items-center"
+        routerLink="/home"
+      >
+        <div class="icon-wrapper p-3">
+          <app-closed-book-icon class="icon-closed" />
+          <app-open-book-icon class="icon-open" />
+        </div>
+        <p class="label">HypeDivision</p>
+      </a>
+    </div>
+    <div class="flex flex-col items-center justify-baseline gap-4">
+      <a
+        class="flex flex-row items-center"
+        routerLink="/home"
+        routerLinkActive="active"
+      >
+        <app-home-icon class="p-3" [stroke]="'#D1D5DB'" />
+        <p class="label">Home</p>
+      </a>
+      <a
+        class="flex flex-row items-center"
+        routerLink="/decks"
+        routerLinkActive="active"
+      >
+        <app-side-books-icon class="p-3" [stroke]="'#D1D5DB'" />
+        <p class="label">Decks</p>
+      </a>
+      <a
+        class="flex flex-row items-center"
+        routerLink="/create-flashcard"
+        routerLinkActive="active"
+      >
+        <app-plus-icon class="p-3" [stroke]="'#D1D5DB'" />
+        <p class="label">Criar Flashcard</p>
+      </a>
+      <a
+        class="flex flex-row items-center"
+        routerLink="/statistics"
+        routerLinkActive="active"
+      >
+        <app-chart-icon class="p-3" [stroke]="'#D1D5DB'" />
+        <p class="label">Estatísticas</p>
+      </a>
+      <a
+        class="flex flex-row items-center"
+        routerLink="/settings"
+        routerLinkActive="active"
+      >
+        <app-settings-icon class="p-3" [stroke]="'#D1D5DB'" />
+        <p class="label">Configurações</p>
+      </a>
+    </div>
+  </div>
+  <div class="flex flex-row justify-center items-center pb-8">
+    <a class="flex flex-row items-center">
+      <div class="w-8 h-8 rounded-full bg-portage"></div>
+      <p class="label">Study Hub</p>
+    </a>
+  </div>
+</div>

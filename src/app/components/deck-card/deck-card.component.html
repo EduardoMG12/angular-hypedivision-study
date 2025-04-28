@@ -1,0 +1,17 @@
+<div class="flex flex-col justify-between items-center rounded-lg border rounded-bl-lg border-charade bg-wood-smoke">
+  <div class="w-full flex flex-col justify-center gap-2 items-start p-6">
+    <p>{{title}}</p>
+    <p>{{ resumeDescription}}</p>
+    <p>{{amountOfCards}} cartões</p>
+  </div>
+  <div class="w-full flex justify-center items-center gap-0">
+    <a [routerLink]="['/study', Deck.id]"
+      class="w-full flex justify-center items-center text-portage text-base flex-1 border rounded-bl-lg border-charade py-3">
+      <p class="text-portage text-base">Estudar</p>
+    </a>
+    <a [routerLink]="['/edit', Deck.id]"
+      class="w-full flex justify-center items-center text-santas-gray text-base flex-1 border rounded-bl-lg border-charade py-3">
+      <p class="text-santas-gray text-base">Editar</p>
+    </a>
+  </div>
+</div>
