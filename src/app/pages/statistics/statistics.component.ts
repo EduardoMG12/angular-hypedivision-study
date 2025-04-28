@@ -58,12 +58,14 @@ export class StatisticsComponent implements OnInit {
     },
   };
 
-  // constructor(@Inject(PLATFORM_ID) private platformId: unknown) {
-  //   this.isBrowser = isPlatformBrowser(this.platformId);
-  // }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
 
   ngOnInit() {
-    this.loadChartData();
+    if (this.isBrowser) {
+      this.loadChartData();
+    }
   }
 
   private loadChartData() {

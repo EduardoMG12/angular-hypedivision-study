@@ -1,27 +1,15 @@
 import type { Routes } from "@angular/router";
-import { NotFoundComponent } from "./pages/not-found/not-found.component";
-import { RegisterComponent } from "./pages/register/register.component";
-import { LoginComponent } from "./pages/login/login.component";
-import { DevelopmentComponent } from "./pages/development/development.component";
-import { WelcomeComponent } from "./pages/welcome/welcome.component";
-import { HomeComponent } from "./pages/home/home.component";
-import { DecksComponent } from "./pages/decks/decks.component";
-import { CreateFlashcardComponent } from "./pages/create-flashcard/create-flashcard.component";
-import { StatisticsComponent } from "./pages/statistics/statistics.component";
 
 export const routes: Routes = [
-	// In future i want implement lazyLoading
-	// { path: '', loadChildren: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
-	// { path: 'register', loadChildren: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
-	{ path: '', redirectTo: '/welcome', pathMatch: 'full' },
-  {path:"welcome", component: WelcomeComponent},
-	{ path: "home", component: HomeComponent },
-	{ path: "login", component: LoginComponent },
-	{ path: "register", component: RegisterComponent },
-	{ path: "development", component: DevelopmentComponent },
-  { path: 'decks', component: DecksComponent },
-  { path: 'create-flashcard', component: CreateFlashcardComponent },
-  { path: 'statistics', component: StatisticsComponent, data: { ssr: false } },
-  // { path: 'settings', component: SettingsComponent },
-	{ path: "**", component: NotFoundComponent },
+	{ path: "", redirectTo: "/welcome", pathMatch: "full" },
+  { path: "welcome", loadComponent: () => import("./pages/welcome/welcome.component").then(m => m.WelcomeComponent) },
+	{ path: "home", loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
+	{ path: "login", loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
+	{ path: "register", loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent) },
+	{ path: "development", loadComponent: () => import('./pages/development/development.component').then(m => m.DevelopmentComponent) },
+	{ path: "decks", loadComponent: () => import('./pages/decks/decks.component').then(m => m.DecksComponent) },
+	{ path: "create-flashcard", loadComponent: () => import('./pages/create-flashcard/create-flashcard.component').then(m => m.CreateFlashcardComponent) },
+	{ path: "statistics", loadComponent: () => import('./pages/statistics/statistics.component').then(m => m.StatisticsComponent), data: { ssr: false } },
+	// { path: 'settings', component: SettingsComponent },
+	{ path: "**", loadComponent: () => import('./pages/not-found/not-found.component').then(m => m.NotFoundComponent) },
 ];
