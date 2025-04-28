@@ -1,0 +1,58 @@
+.glow-animation {
+	animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+	0% {
+		opacity: 1;
+		text-shadow: 0 0 10px rgba(141, 148, 255, 0.8), 0 0 20px
+			rgba(141, 148, 255, 0.6);
+	}
+	50% {
+		opacity: 0.5;
+		text-shadow: 0 0 5px rgba(141, 148, 255, 0.4);
+	}
+	100% {
+		opacity: 1;
+		text-shadow: 0 0 10px rgba(141, 148, 255, 0.8), 0 0 20px
+			rgba(141, 148, 255, 0.6);
+	}
+}
+
+.ghost-animation {
+	animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+	0% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-15px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+
+.spot {
+	position: absolute;
+	width: 384px;
+	height: 384px;
+	background-color: rgba(155, 135, 245, 0.1);
+	border-radius: 50%;
+	filter: blur(64px);
+	animation: fadeSpot 2s ease-in-out infinite;
+}
+
+.spot-left {
+	top: 0%;
+	left: -100px;
+	transform: translateY(-50%);
+}
+
+.spot-right {
+	top: 100%;
+	right: -100px;
+	transform: translateY(-50%);
+}

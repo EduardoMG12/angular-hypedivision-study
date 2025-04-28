@@ -1,0 +1,19 @@
+<label class="flex items-center gap-2 cursor-pointer">
+  <input
+    type="checkbox"
+    name=""
+    id="remember"
+    class="hidden peer"
+    [ngModel]="value"
+  />
+  <span
+    class="w-5 h-5 border-2 border-portage rounded-full peer-checked:bg-portage transition-colors duration-200"
+  ></span>
+  <span class="text-alabaster text-[0.827rem] flex justify-center items-center"
+    >{{ label }}
+
+    <a *ngIf="url && urlLabel" [href]="url" alt="show password"
+      ><p class="text-portage underline">{{ urlLabel }}</p></a
+    >
+  </span>
+</label>
