@@ -24,13 +24,6 @@ export class RecentDeckCardComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		console.log("");
-		console.log("");
-		console.log("");
-		console.log("");
-		console.log("");
-
-		console.log(this.Deck.name);
 		if (this.isBrowser && this.Deck) {
 			this.title = this.Deck.name;
 			this.resumeDescription = this.shortenDescription(
@@ -41,7 +34,6 @@ export class RecentDeckCardComponent implements OnInit {
 			this.studyTime = this.Deck.studyTime
 				? `${this.Deck.studyTime} min`
 				: "45 minutos";
-			console.log("RecentDeckCardComponent ngOnInit - Deck:", this.Deck);
 		}
 	}
 

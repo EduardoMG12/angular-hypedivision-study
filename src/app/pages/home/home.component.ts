@@ -35,11 +35,5 @@ export class HomeComponent {
 
 	ngOnInit() {
 		this.decksDataSliced = this.decksData.slice(0, 3);
-		console.log("HomeComponent ngOnInit - decksData:", this.decksData);
-		console.log(
-			"HomeComponent ngOnInit - decksDataSliced:",
-			this.decksDataSliced,
-		);
-		console.log("HomeComponent ngOnInit - isBrowser:", this.isBrowser);
 	}
 }

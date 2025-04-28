@@ -21,7 +21,5 @@ export class FormularyLoginComponent {
 	password = "";
 	checkbox = false;
 
-	onSubmit() {
-		console.log("Form Data:", { email: this.email, password: this.password });
-	}
+	onSubmit() {}
 }
