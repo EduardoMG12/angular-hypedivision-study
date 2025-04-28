@@ -1,39 +1,35 @@
 <header
-  class="fixed w-full h-20 flex flex-row items-center justify-between px-[21.5rem] bg-[#2E2E38]/10 bg-opacity-10 backdrop-blur-sm z-10"
->
-  <div class="flex flex-row gap-2 items-center justify-center">
-    <img src="closed-book.svg" alt="Logo" />
-    <h1
-      class="textPurpleShadow text-portage text-tiny font-bold text-shadow-md"
-    >
-      HypeDivision/Study
-    </h1>
-  </div>
+  class="fixed w-full h-20 flex flex-row items-center justify-between px-[21.5rem] bg-[#2E2E38]/10 bg-opacity-10 backdrop-blur-sm z-10">
+  <a [routerLink]="['/']">
+    <div class="flex flex-row gap-2 items-center justify-center">
+
+      <img src="closed-book.svg" alt="Logo" />
+      <h1 class="textPurpleShadow text-portage text-tiny font-bold text-shadow-md">
+        HypeDivision/Study
+      </h1>
+    </div>
+  </a>
   <nav class="flex flex-row gap-6">
-    <a href="/">
+    <a [routerLink]="['/home']">
       <p class="text-santas-gray text-base">Home</p>
     </a>
-    <a href="/development">
+    <a [routerLink]="['/development']">
       <p class="text-santas-gray text-base">Desenvolvimento</p>
     </a>
-    <a href="/resources">
+    <a [routerLink]="['/development']">
       <p class="text-santas-gray text-base">Recursos</p>
     </a>
   </nav>
   <div class="flex flex-row gap-4">
-    <a
-      href="/login"
-      class="flex flex-row gap-0.5 px-3 py-2 border border-portage hover:bg-portage rounded-lg"
-    >
+    <a [routerLink]="['/login']"
+      class="flex flex-row gap-0.5 px-3 py-2 border border-portage hover:bg-portage rounded-lg">
       <img src="login.svg" alt="" />
-      <p class="text-alabaster text-xsmall">Entrar</p></a
-    >
-    <a
-      href="/login"
-      class="flex flex-row justify-center items-center gap-0.5 px-3 py-2 border bg-portage text-alabaster hover:bg-inherit hover:border-portage rounded-lg"
-    >
+      <p class="text-alabaster text-xsmall">Entrar</p>
+    </a>
+    <a [routerLink]="['/register']"
+      class="flex flex-row justify-center items-center gap-0.5 px-3 py-2 border bg-portage text-alabaster hover:bg-inherit hover:border-portage rounded-lg">
       <img src="/register.svg" alt="" />
-      <p class="text-xsmall">Registrar</p></a
-    >
+      <p class="text-xsmall">Registrar</p>
+    </a>
   </div>
 </header>

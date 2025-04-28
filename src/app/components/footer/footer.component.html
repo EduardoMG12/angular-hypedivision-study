@@ -1,22 +1,19 @@
 <footer
-  class="w-full h-20 flex flex-row items-center justify-between px-[21.5rem] bg-opacity-10 backdrop-blur-sm z-10 border-t border-portage/30"
->
+  class="w-full h-20 flex flex-row items-center justify-between px-[21.5rem] bg-opacity-10 backdrop-blur-sm z-10 border-t border-portage/30">
   <div class="flex flex-row gap-2 items-center justify-center">
     <img src="closed-book.svg" alt="Logo" />
-    <h1
-      class="textPurpleShadow text-portage text-base font-bold text-shadow-md"
-    >
+    <h1 class="textPurpleShadow text-portage text-base font-bold text-shadow-md">
       HypeDivision/Study
     </h1>
   </div>
   <nav class="flex flex-row gap-6">
-    <a href="/">
+    <a [routerLink]="['/home']">
       <p class="text-santas-gray text-base">Home</p>
     </a>
-    <a href="/development">
+    <a [routerLink]="['/development']">
       <p class="text-santas-gray text-base">Desenvolvimento</p>
     </a>
-    <a href="/resources">
+    <a [routerLink]="['/development']">
       <p class="text-santas-gray text-base">Recursos</p>
     </a>
   </nav>

@@ -6,6 +6,7 @@ import { DeckCardComponent } from "../../components/deck-card/deck-card.componen
 import type { IDeckData } from "../../common/api/types/decks";
 import { mockStaticDecks } from "../../common/mock/decks";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
+import { RouterLink } from "@angular/router";
 
 @Component({
 	selector: "app-decks",
@@ -15,6 +16,7 @@ import { CommonModule, isPlatformBrowser } from "@angular/common";
 		PlusIconComponent,
 		LupeIconComponent,
 		DeckCardComponent,
+		RouterLink,
 	],
 	templateUrl: "./decks.component.html",
 	styleUrl: "./decks.component.css",

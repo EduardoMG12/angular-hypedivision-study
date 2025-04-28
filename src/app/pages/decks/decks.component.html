@@ -6,7 +6,8 @@
         <h1 class="text-base text-portage textPurpleShadow font-bold">
           Decks de Estudo
         </h1>
-        <a href="" class="flex items-center justify-center gap-1 px-4 py-2.5 bg-[#BA8FEF]/70 rounded-lg">
+        <a [routerLink]="['/create-flashcard']"
+          class="flex items-center justify-center gap-1 px-4 py-2.5 bg-[#BA8FEF]/70 rounded-lg">
           <app-plus-icon />
           <p class="text-base text-alabaster">Novo Deck</p>
         </a>
@@ -24,8 +25,8 @@
       </div>
       <div class="w-full text-white flex flex-wrap justify-center items-center gap-6">
         <app-deck-card *ngFor="let deck of decksData" [Deck]="deck" class="flex-1 min-w-[20.625rem] max-w-[36.25rem]" />
-        <a
-          class="flex-1 min-w-[20.625rem] max-w-[36.25rem] py-[3.75rem] flex flex-col justify-center items-center border rounded-lg border-charade bg-sidebar/50 gap-2 cursor-pointer">
+        <a [routerLink]="['/create-flashcard']" class=" flex-1 min-w-[20.625rem] max-w-[36.25rem] py-[3.75rem] flex flex-col justify-center items-center
+          border rounded-lg border-charade bg-sidebar/50 gap-2 cursor-pointer">
           <div class="bg-sidebar rounded-full p-3">
             <app-plus-icon [stroke]="'#BA8FEF'" />
           </div>
