@@ -1,0 +1,39 @@
+<main class="min-h-[100vh] bg-[#0E0E15]">
+  <app-side-bar />
+  <div class="px-[22.5rem] pt-6 pb-8 flex flex-col gap-8">
+    <section class="w-full flex flex-col gap-8">
+      <div class="flex justify-between items-center">
+        <h1 class="text-base text-portage textPurpleShadow font-bold">
+          Decks de Estudo
+        </h1>
+        <a [routerLink]="['/create-flashcard']"
+          class="flex items-center justify-center gap-1 px-4 py-2.5 bg-[#BA8FEF]/70 rounded-lg">
+          <app-plus-icon />
+          <p class="text-base text-alabaster">Novo Deck</p>
+        </a>
+      </div>
+      <div class="flex justify-between items-center gap-4">
+        <div class="w-full relative">
+          <app-lupe-icon class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5" />
+          <input type="search" placeholder="Buscar deck..." name="" id=""
+            class="flex-1 w-full bg-sidebar border border-charade placeholder:text-santas-gray rounded-lg p-2.5 pl-10 text-alabaster" />
+        </div>
+        <div class="flex items-center justify-center gap-1 px-4 py-2.5 bg-sidebar border border-charade rounded-lg">
+          <app-plus-icon />
+          <p class="text-base text-alabaster">Filtrar</p>
+        </div>
+      </div>
+      <div class="w-full text-white flex flex-wrap justify-center items-center gap-6">
+        <app-deck-card *ngFor="let deck of decksData" [Deck]="deck" class="flex-1 min-w-[20.625rem] max-w-[36.25rem]" />
+        <a [routerLink]="['/create-flashcard']" class=" flex-1 min-w-[20.625rem] max-w-[36.25rem] py-[3.75rem] flex flex-col justify-center items-center
+          border rounded-lg border-charade bg-sidebar/50 gap-2 cursor-pointer">
+          <div class="bg-sidebar rounded-full p-3">
+            <app-plus-icon [stroke]="'#BA8FEF'" />
+          </div>
+
+          <p class="text-santas-gray text-small font-normal">Criar novo deck</p>
+        </a>
+      </div>
+    </section>
+  </div>
+</main>

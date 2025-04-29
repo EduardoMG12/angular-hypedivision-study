@@ -1,0 +1,157 @@
+<main class="min-h-[100vh] bg-[#0E0E15]">
+  <app-side-bar />
+  <div class="px-[25rem] pt-6 pb-8 flex flex-col gap-8">
+    <section *ngIf="!showJsonImport" @slideAnimation class="w-full flex flex-col gap-8">
+      <div class="w-full flex flex-col justify-baseline items-start gap-2">
+        <div class="flex justify-baseline items-center gap-2">
+          <h1 class="text-portage text-medium textPurpleShadow font-bold">
+            Criar Flashcards
+          </h1>
+        </div>
+        <p class="text-santas-gray">
+          Crie um novo deck de flashcards para estudo
+        </p>
+      </div>
+      <div class="flex flex-col justify-center items-center gap-4">
+        <div class="w-full flex flex-row justify-end items-center gap-2">
+          <button
+            class="flex justify-center items-center gap-2 px-4 py-2.5 border border-charade rounded-lg cursor-pointer self-end"
+          >
+            <app-robot-icon />
+            <p class="text-small text-alabaster">Criar com IA</p>
+          </button>
+          <button
+            (click)="toggleJsonImport()"
+            class="flex justify-center items-center gap-2 px-4 py-2.5 bg-sidebar border border-charade rounded-lg cursor-pointer self-end"
+          >
+            <app-import-icon />
+            <p class="text-small text-alabaster">Importar JSON</p>
+          </button>
+        </div>
+        <form class="w-full flex flex-col gap-7">
+          <div
+            class="w-full p-6 bg-wood-smoke border border-charade rounded-lg flex flex-col gap-8"
+          >
+            <p class="text-medium text-alabaster font-bold">
+              Informações do Deck
+            </p>
+            <div class="w-full gap-2">
+              <p class="text-medium text-alabaster">Nome do deck</p>
+              <input
+                type="text"
+                name=""
+                id=""
+                class="w-full bg-sidebar border border-[#2E2E38] placeholder:text-santas-gray rounded-lg py-3 px-4 text-alabaster"
+                placeholder="Ex: Vocabulário de Inglês"
+              />
+            </div>
+            <div class="w-full gap-2">
+              <p class="text-medium text-alabaster">Descrição</p>
+              <textarea
+                name=""
+                id=""
+                class="w-full min-h-20 bg-sidebar border border-[#2E2E38] placeholder:text-santas-gray rounded-lg py-3 px-4 text-alabaster resize-y"
+                placeholder="Uma breve descrição do deck..."
+              ></textarea>
+            </div>
+          </div>
+          <div class="w-full flex flex-col gap-4">
+            <p class="text-medium text-alabaster font-bold">Flashcards</p>
+            <div
+              class="w-full p-6 bg-wood-smoke border border-charade rounded-lg flex flex-row gap-4"
+            >
+              <div class="w-full">
+                <div>
+                  <p class="text-medium text-alabaster">Pergunta / Frente</p>
+                  <textarea
+                    name=""
+                    id=""
+                    class="w-full min-h-20 bg-sidebar border border-[#2E2E38] placeholder:text-santas-gray rounded-lg py-3 px-4 text-alabaster resize-y"
+                    placeholder="Pergunta ou conteúdo da frente do card"
+                  ></textarea>
+                </div>
+                <div class="flex flex-col justify-baseline gap-1">
+                  <p class="text-medium text-alabaster">Tipo de Flashcard</p>
+                  <div
+                    class="flex flex-row gap-4 justify-baseline items-center"
+                  >
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="flashcard-type"
+                        id="basic"
+                        value="basic"
+                        class="hidden peer"
+                      />
+                      <span
+                        class="w-5 h-5 border-2 border-portage rounded-full peer-checked:bg-portage transition-colors duration-200"
+                      ></span>
+                      <span class="text-base text-alabaster"
+                        >Básico (Frente e Verso)</span
+                      >
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="flashcard-type"
+                        id="multiple-choice"
+                        value="multiple-choice"
+                        class="hidden peer"
+                      />
+                      <span
+                        class="w-5 h-5 border-2 border-portage rounded-full peer-checked:bg-portage transition-colors duration-200"
+                      ></span>
+                      <span class="text-base text-alabaster"
+                        >Múltipla Escolha</span
+                      >
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full">
+                <p class="text-medium text-alabaster">Resposta / Verso</p>
+                <textarea
+                  name=""
+                  id=""
+                  class="w-full min-h-20 bg-sidebar border border-[#2E2E38] placeholder:text-santas-gray rounded-lg py-3 px-4 text-alabaster resize-y"
+                  placeholder="Resposta ou conteúdo do verso do card"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div
+            class="w-full border border-charade rounded-lg py-3 flex justify-center items-center gap-2"
+          >
+            <app-plus-icon />
+            <p class="text-alabaster text-base">Adicionar Card</p>
+          </div>
+          <div
+            class="w-full border bg-sidebar border-charade cursor-pointer rounded-lg py-3 flex justify-center items-center gap-2"
+          >
+            <app-eye-icon />
+            <p class="text-alabaster text-base">Visualizar Cards</p>
+          </div>
+          <div class="w-full flex justify-end items-center gap-4">
+            <button
+              class="bg-sidebar border border-charade rounded-lg px-6 py-3"
+            >
+              <p class="text-alabaster text-base">Cancelar</p>
+            </button>
+            <button
+              class="bg-[#BA8FEF]/80 border border-portage/50 rounded-lg px-6 py-3"
+            >
+              <p class="text-alabaster text-base">Salvar Deck</p>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <app-create-flashcards-with-json
+    *ngIf="showJsonImport"
+    @slideInFromRight
+    (cancel)="onJsonImportCancelled()"
+    (import)="onJsonImported($event)"
+    ></app-create-flashcards-with-json>
+  </div>
+</main>
