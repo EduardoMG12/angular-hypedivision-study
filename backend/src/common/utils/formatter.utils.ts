@@ -1,0 +1,35 @@
+export namespace FormatterUtils {
+	export function cpfECnpj(value: string): string {
+		const cleanedValue = value.replace(/\D/g, "");
+
+		if (cleanedValue.length === 11) {
+			return `${cleanedValue.substring(0, 3)}.${cleanedValue.substring(3, 6)}.${cleanedValue.substring(6, 9)}-${cleanedValue.substring(9, 11)}`;
+		}
+		if (cleanedValue.length === 14) {
+			return `${cleanedValue.substring(0, 2)}.${cleanedValue.substring(2, 5)}.${cleanedValue.substring(5, 8)}/${cleanedValue.substring(8, 12)}-${cleanedValue.substring(12, 14)}`;
+		}
+
+		return "CPF ou CNPJ inválido";
+	}
+
+	export function phoneNumber(phoneNumber: string): string {
+		const cleanedPhoneNumber = phoneNumber.replace(/\D/g, "");
+
+		if (cleanedPhoneNumber.length < 10 || cleanedPhoneNumber.length > 11) {
+			return "Número de telefone inválido";
+		}
+
+		const areaCode = cleanedPhoneNumber.substring(0, 2);
+		const numberPart = cleanedPhoneNumber.substring(2);
+
+		if (numberPart.length === 8) {
+			return `(${areaCode})${numberPart.substring(0, 4)}-${numberPart.substring(4)}`;
+		}
+
+		if (numberPart.length === 9) {
+			return `(${areaCode})${numberPart.substring(0, 5)}-${numberPart.substring(5)}`;
+		}
+
+		return "Número de telefone inválido";
+	}
+}
