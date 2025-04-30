@@ -24,7 +24,7 @@
       },
       "recommended": true,
       "style": {
-        "useImportType": "warn"
+        "useImportType": "info"
       }
     }
   },
