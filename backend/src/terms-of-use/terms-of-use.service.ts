@@ -8,12 +8,18 @@ import { Repository } from "typeorm";
 import { TermsOfUse } from "src/entities/termsOfUse.entity";
 import { CreateTermsOfUseDto } from "./dto/create-terms-of-use.dto";
 import { errorMessages } from "src/common/errors/errors-message";
+import { AcceptTermsDto } from "./dto/accept-terms.dto";
+import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export class TermsOfUseService {
 	constructor(
 		@InjectRepository(TermsOfUse)
 		private readonly termsRepository: Repository<TermsOfUse>,
+		@InjectRepository(UserTermsAcceptance)
+		private readonly acceptanceRepository: Repository<UserTermsAcceptance>,
+		private readonly usersService: UsersService,
 	) {}
 
 	async create(dto: CreateTermsOfUseDto): Promise<TermsOfUse> {
@@ -53,5 +59,43 @@ export class TermsOfUseService {
 			throw new NotFoundException(errorMessages.NO_ACTIVE_TERMS_FOUND["pt-BR"]);
 		}
 		return terms;
+	}
+
+	async acceptTerms(dto: AcceptTermsDto): Promise<UserTermsAcceptance> {
+		const user = await this.usersService.findById(dto.userId);
+
+		const terms = await this.termsRepository.findOne({
+			where: { id: dto.termsOfUseId },
+		});
+		if (!terms) {
+			throw new NotFoundException(errorMessages.TERMS_NOT_FOUND);
+		}
+
+		const acceptance = this.acceptanceRepository.create({
+			user,
+			termsOfUse: terms,
+			termsVersion: terms.version,
+		});
+
+		return this.acceptanceRepository.save(acceptance);
+	}
+
+	async acceptLastTerms(userId: string): Promise<UserTermsAcceptance> {
+		const user = await this.usersService.findById(userId);
+
+		const terms = await this.termsRepository.findOne({
+			where: { isActive: true },
+		});
+		if (!terms) {
+			throw new NotFoundException(errorMessages.NO_ACTIVE_TERMS_FOUND["pt-BR"]);
+		}
+
+		const acceptance = this.acceptanceRepository.create({
+			user,
+			termsOfUse: terms,
+			termsVersion: terms.version,
+		});
+
+		return this.acceptanceRepository.save(acceptance);
 	}
 }

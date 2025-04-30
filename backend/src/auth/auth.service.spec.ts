@@ -9,20 +9,46 @@ import { BcryptAdapter } from "../common/adapter/bcrypt.adapter";
 import { BadRequestException } from "@nestjs/common";
 import { LoginDto } from "./dto/login.dto";
 import { User } from "../entities/user.entity";
+import { Auth, Repository } from "typeorm";
+
+const makeUser = () => {
+	const registerDto: RegisterDto = {
+		email: "teste@teste.com",
+		password: "senhaSegura123",
+		phone: "99999999999",
+		cpfOrCnpj: "12345678900",
+		fullName: "Teste da Silva",
+		birthdate: new Date("1990-01-01"),
+		accept_terms: true,
+	};
+
+	const fakeUser: User = {
+		...registerDto,
+		id: "fake-id",
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		created_at: new Date(),
+		updated_at: new Date(),
+		deleted_at: null,
+	} as User;
+	return { registerDto, fakeUser };
+};
 
 describe("AuthService", () => {
 	let service: AuthService;
-	let mockUsersService: {
-		createUser: jest.Mock<Promise<SafeUser>, [RegisterDto]>;
-		findByEmail: jest.Mock<Promise<SafeUser | null>, [string]>;
-	};
-	let mockJwtService: {
-		sign: jest.Mock<string, [AccessToken]>;
-	};
-	let mockBcrypt: {
-		hash: jest.Mock<Promise<string>, [string]>;
-		compare: jest.Mock<Promise<boolean>, [string, string]>;
-	};
+	let authRepository: jest.Mocked<Repository<Auth>>;
+
+	// let mockUsersService: {
+	// 	createUser: jest.Mock<Promise<SafeUser>, [RegisterDto]>;
+	// 	findByEmail: jest.Mock<Promise<SafeUser | null>, [string]>;
+	// };
+	// let mockJwtService: {
+	// 	sign: jest.Mock<string, [AccessToken]>;
+	// };
+	// let mockBcrypt: {
+	// 	hash: jest.Mock<Promise<string>, [string]>;
+	// 	compare: jest.Mock<Promise<boolean>, [string, string]>;
+	// };
 
 	beforeEach(async () => {
 		mockUsersService = {

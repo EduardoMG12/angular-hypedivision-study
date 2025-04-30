@@ -13,7 +13,6 @@ import { SanitizerUtils } from "src/common/utils/sanitize";
 import { SafeUserWithJwt } from "./dto/safeUserWithJwt";
 import { AcceptTermsDto } from "./dto/user-terms-acceptance.dto";
 import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
-import { UserTermsAcceptanceService } from "src/terms-of-use/user-terms-acceptance.service";
 import { TermsOfUseService } from "src/terms-of-use/terms-of-use.service";
 import { errorMessages } from "src/common/errors/errors-message";
 import { ErrorCode } from "src/common/errors/error-codes.enum";
@@ -24,7 +23,6 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly bcryptAdapter: BcryptAdapter,
-		private readonly userTermsAcceptanceService: UserTermsAcceptanceService,
 		private readonly termsOfUseService: TermsOfUseService,
 	) {}
 
@@ -123,7 +121,7 @@ export class AuthService {
 	): Promise<UserTermsAcceptance> {
 		const terms = await this.termsOfUseService.findById(dto.termsOfUseId);
 
-		const acceptanceTerm = await this.userTermsAcceptanceService.acceptTerms({
+		const acceptanceTerm = await this.termsOfUseService.acceptTerms({
 			termsOfUseId: terms.id,
 			userId,
 		});
