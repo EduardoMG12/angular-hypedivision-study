@@ -1,8 +1,29 @@
 <header
-  class="fixed w-full h-20 flex flex-row items-center justify-between px-[21.5rem] bg-[#2E2E38]/10 bg-opacity-10 backdrop-blur-sm z-10">
+  class="fixed w-full h-20  items-center justify-between px-[3rem] flex md:hidden min-[850px]:px-[5rem] 2xl:px-[21.5rem] bg-[#2E2E38]/10 bg-opacity-10 backdrop-blur-sm z-10"
+>
+  <div class="flex flex-row gap-2 items-center justify-center">
+    <a [routerLink]="['/']">
+      <div class="flex flex-row gap-2 items-center justify-center">
+        <img src="closed-book.svg" alt="Logo" />
+        <h1 class="textPurpleShadow text-portage text-tiny font-bold text-shadow-md">
+          HypeDivision/Study
+        </h1>
+      </div>
+    </a>
+  </div>
+  <button (click)="toggleMobileMenu()" class="md:hidden">
+    <svg class="w-6 h-6 text-santas-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+    </svg>
+  </button>
+  <app-hamburguer-menu *ngIf="isMobileMenuOpen"/>
+</header>
+
+<header
+  class="fixed w-full h-20 hidden md:flex items-center justify-between px-[3rem] min-[850px]:px-[5rem] 2xl:px-[21.5rem] bg-[#2E2E38]/10 bg-opacity-10 backdrop-blur-sm z-10"
+>
   <a [routerLink]="['/']">
     <div class="flex flex-row gap-2 items-center justify-center">
-
       <img src="closed-book.svg" alt="Logo" />
       <h1 class="textPurpleShadow text-portage text-tiny font-bold text-shadow-md">
         HypeDivision/Study

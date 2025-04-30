@@ -1,0 +1,23 @@
+<div *ngIf="isOpen" class="absolute top-20 right-0 px-10 bg-[#2E2E38]/50 bg-opacity-50 backdrop-blur-sm flex flex-col items-center gap-4 py-8 z-50">
+    <a [routerLink]="['/home']" class="w-full text-center">
+      <p class="text-santas-gray text-base">Home</p>
+    </a>
+    <a [routerLink]="['/development']" class="w-full text-center">
+      <p class="text-santas-gray text-base">Desenvolvimento</p>
+    </a>
+    <a [routerLink]="['/development']" class="w-full text-center">
+      <p class="text-santas-gray text-base">Recursos</p>
+    </a>
+    <div class="flex flex-row justify-center items-center gap-4 w-full">
+      <a [routerLink]="['/login']"
+        class="flex flex-row gap-0.5 px-3 py-2 border border-portage hover:bg-portage rounded-lg">
+        <img src="login.svg" alt="" />
+        <p class="text-alabaster text-xsmall">Entrar</p>
+      </a>
+      <a [routerLink]="['/register']"
+        class="flex flex-row justify-center items-center gap-0.5 px-3 py-2 border bg-portage text-alabaster hover:bg-inherit hover:border-portage rounded-lg">
+        <img src="/register.svg" alt="" />
+        <p class="text-xsmall">Registrar</p>
+      </a>
+    </div>
+  </div>
