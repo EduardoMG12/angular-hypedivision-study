@@ -9,11 +9,12 @@ import { User } from "../entities/user.entity";
 import { RegisterDto } from "src/auth/dto/register.dto";
 import { SafeUser } from "src/auth/dto/safeUser.dto";
 import { ValidateUniquenessDto } from "./dto/validateUniqueness.dto";
-import { SanitizerUtils } from "src/common/utils/sanitize";
+import { SanitizerUtils } from "../common/utils/sanitize";
 import { errorMessages } from "src/common/errors/errors-message";
+import { IUserService } from "./interfaces/IUsersService";
 
 @Injectable()
-export class UsersService {
+export class UsersService implements IUserService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,

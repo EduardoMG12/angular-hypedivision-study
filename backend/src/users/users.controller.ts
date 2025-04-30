@@ -9,11 +9,12 @@ import {
 import { SafeUser } from "../auth/dto/safeUser.dto";
 import { toPlainToInstance } from "../common/utils/toPlainToInstance";
 import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { IUsersController } from "./interfaces/IUsersController";
 
 @ApiTags("Users")
 @ApiBearerAuth("User")
 @Controller("users")
-export class UsersController {
+export class UsersController implements IUsersController {
 	constructor(private usersService: UsersService) {}
 
 	@Get("me")
