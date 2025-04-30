@@ -1,4 +1,13 @@
 import type { Routes } from "@angular/router";
+import { WelcomeResolver } from "./resolver/seo/welcome/welcome.resolver";
+import { DeckResolver } from "./resolver/seo/deck/deck.resolver";
+import { HomeResolver } from "./resolver/seo/home/home.resolver";
+import { LoginResolver } from "./resolver/seo/login/login.resolver";
+import { RegisterResolver } from "./resolver/seo/register/register.resolver";
+import { DevelopmentResolver } from "./resolver/seo/development/development.resolver";
+import { CreateFlashcardResolver } from "./resolver/seo/create-flashcard/create-flashcard.resolver";
+import { StatisticsResolver } from "./resolver/seo/statistics/statistics.resolver";
+import { NotFoundResolver } from "./resolver/seo/not-found/not-found.resolver";
 
 export const routes: Routes = [
 	{ path: "", redirectTo: "/welcome", pathMatch: "full" },
@@ -8,16 +17,25 @@ export const routes: Routes = [
 			import("./pages/welcome/welcome.component").then(
 				(m) => m.WelcomeComponent,
 			),
+		resolve: {
+			seo: WelcomeResolver,
+		},
 	},
 	{
 		path: "home",
 		loadComponent: () =>
 			import("./pages/home/home.component").then((m) => m.HomeComponent),
+		resolve: {
+			seo: HomeResolver,
+		},
 	},
 	{
 		path: "login",
 		loadComponent: () =>
 			import("./pages/login/login.component").then((m) => m.LoginComponent),
+		resolve: {
+			seo: LoginResolver,
+		},
 	},
 	{
 		path: "register",
@@ -25,6 +43,9 @@ export const routes: Routes = [
 			import("./pages/register/register.component").then(
 				(m) => m.RegisterComponent,
 			),
+		resolve: {
+			seo: RegisterResolver,
+		},
 	},
 	{
 		path: "development",
@@ -32,12 +53,18 @@ export const routes: Routes = [
 			import("./pages/development/development.component").then(
 				(m) => m.DevelopmentComponent,
 			),
+		resolve: {
+			seo: DevelopmentResolver,
+		},
 	},
 	{
 		path: "decks",
 		loadComponent: () =>
 			import("./pages/decks/decks.component").then((m) => m.DecksComponent),
-		data: { ssr: false },
+		// data: { ssr: false },
+		resolve: {
+			seo: DeckResolver,
+		},
 	},
 	{
 		path: "create-flashcard",
@@ -45,6 +72,9 @@ export const routes: Routes = [
 			import("./pages/create-flashcard/create-flashcard.component").then(
 				(m) => m.CreateFlashcardComponent,
 			),
+		resolve: {
+			seo: CreateFlashcardResolver,
+		},
 	},
 	{
 		path: "statistics",
@@ -53,6 +83,9 @@ export const routes: Routes = [
 				(m) => m.StatisticsComponent,
 			),
 		data: { ssr: false },
+		resolve: {
+			seo: StatisticsResolver,
+		},
 	},
 	// { path: 'settings', component: SettingsComponent },
 	{
@@ -61,5 +94,8 @@ export const routes: Routes = [
 			import("./pages/not-found/not-found.component").then(
 				(m) => m.NotFoundComponent,
 			),
+		resolve: {
+			seo: NotFoundResolver,
+		},
 	},
 ];
