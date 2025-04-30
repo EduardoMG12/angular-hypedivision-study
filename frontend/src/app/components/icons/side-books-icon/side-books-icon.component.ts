@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, Input } from "@angular/core";
-import { SvgStrokeDirective } from "../../../directive/svg-stroke.directive";
+import { SvgStrokeDirective } from "../../../directive/svgStroke/svg-stroke.directive";
 
 @Component({
 	selector: "app-side-books-icon",

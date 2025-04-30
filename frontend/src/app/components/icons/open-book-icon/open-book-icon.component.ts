@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { SvgStrokeDirective } from "../../../directive/svg-stroke.directive";
+import { SvgStrokeDirective } from "../../../directive/svgStroke/svg-stroke.directive";
 import { CommonModule } from "@angular/common";
 
 @Component({
