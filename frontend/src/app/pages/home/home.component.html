@@ -1,7 +1,7 @@
 <main class="min-h-[120vh] bg-[#0E0E15]">
   <app-side-bar />
-  <div class="px-[25rem] pt-6 pb-8 flex flex-col gap-12">
-    <section class="w-full flex flex-col gap-8">
+  <div class="px-[6rem] pr-[3rem] p min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-6 pb-8 flex flex-col gap-12 z-10">
+    <section class="w-full flex flex-col gap-8 ">
       <div class="w-full flex flex-col justify-baseline items-start gap-2">
         <div class="flex justify-baseline items-center gap-2">
           <h1 class="text-portage text-medium textPurpleShadow font-bold">
@@ -16,8 +16,8 @@
         </p>
       </div>
       <div
-        class="w-full flex justify-between items-center bg-gradient-to-br from-[#9B87F5]/20 to-[#D946EF]/10 rounded-[2rem] p-[2rem] min-h-[200px] shadow-[0_0_20px_rgba(217,70,239,0.3)] backdrop-blur-sm">
-        <div class="flex flex-col gap-4 text-white py-20">
+        class="w-full flex max-[1117px]:flex-col-reverse justify-between items-center bg-gradient-to-br from-[#9B87F5]/20 to-[#D946EF]/10 rounded-[2rem] p-[2rem] min-h-[200px] shadow-[0_0_20px_rgba(217,70,239,0.3)] backdrop-blur-sm">
+        <div class="flex flex-col gap-4 text-white py-20 max-[770px]:py-4">
           <p class="text-small font-semibold text-portage textPurpleShadow">
             Acelere seu aprendizado com flashcards
           </p>
@@ -25,7 +25,7 @@
             Crie cartões de estudo personalizados, teste seu conhecimento com
             quizzes e acompanhe seu progresso para aprender de forma eficiente.
           </p>
-          <div class="flex gap-4 mt-2">
+          <div class="flex gap-4 mt-2 max-[590px]:flex-col">
             <a [routerLink]="['/decks']"
               class="bg-[#ae46ef] text-white px-4 py-2 rounded-lg hover:bg-[#9B87F5] transition">Ver Decks</a>
             <a [routerLink]="['/create-flashcard']"
@@ -34,12 +34,12 @@
           </div>
         </div>
         <div class="bg-transparent">
-          <app-card-stack />
+          <app-card-stack class=" hidden min-[770px]:block mb-10 lg:mb-0" />
         </div>
       </div>
     </section>
     <section class="w-full flex flex-col gap-8">
-      <div class="w-full text-white flex justify-center items-center gap-6">
+      <div class="w-full text-white flex flex-col min-[800px]:flex-row justify-center items-center gap-6">
         <app-card-with-icon class="w-full" title="Cartões Estudados" value="324" icon="open-book"
           strokeColor="#3B82F6" />
         <app-card-with-icon class="w-full" title="Decks Criados" value="12" icon="book-mark" strokeColor="#9F63E9" />
