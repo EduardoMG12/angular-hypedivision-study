@@ -1,67 +1,82 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
+
+import { User } from "src/entities/user.entity";
+import { SafeUser } from "src/auth/dto/safeUser.dto";
+import { makeUser } from "src/common/mock/test/mock-users.mock";
 import { NotFoundException } from "@nestjs/common";
-import {
-	mockUsersService,
-	MockUsersServiceType,
-	createExpectedSafeUser,
-} from "../common/mock/test/mock-users.mock";
 
 describe("UsersController", () => {
-	let controller: UsersController;
-	let mockUsersServiceInstance: MockUsersServiceType;
+	let usersController: UsersController;
+	let usersService: UsersService;
 
 	beforeEach(async () => {
-		mockUsersServiceInstance = mockUsersService();
-
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [UsersController],
 			providers: [
 				{
 					provide: UsersService,
-					useValue: mockUsersServiceInstance,
+					useValue: {
+						createUser: jest.fn(),
+						findByEmail: jest.fn(),
+						findById: jest.fn(),
+						findByCpfOrCnpj: jest.fn(),
+						findByPhone: jest.fn(),
+						validateUserUniqueness: jest.fn(),
+					} as Partial<Record<keyof UsersService, jest.Mock>>,
 				},
 			],
 		}).compile();
 
-		controller = module.get<UsersController>(UsersController);
+		usersController = module.get<UsersController>(UsersController);
+
+		usersService = module.get<UsersService>(
+			UsersService,
+		) as jest.Mocked<UsersService>;
 	});
 
 	it("should be defined", () => {
-		expect(controller).toBeDefined();
+		expect(usersController).toBeDefined();
+		expect(usersService).toBeDefined();
 	});
 
 	describe("getProfile", () => {
-		it("should return the user profile", async () => {
-			const userId = "some-user-id";
-			const expectedSafeUser = createExpectedSafeUser({ id: userId });
-			mockUsersServiceInstance.findById.mockResolvedValue(expectedSafeUser);
+		it("should return the user profile as SafeUser", async () => {
+			const { fakeUser } = makeUser();
+			const userId = fakeUser.id;
 
-			const mockRequest = { user: { id: userId } };
+			jest.spyOn(usersService, "findById").mockResolvedValue(fakeUser as User);
 
-			// 2. Act (Ação)
-			const result = await controller.getProfile(mockRequest);
+			const expectedSafeUser: SafeUser = {
+				id: fakeUser.id,
+				email: fakeUser.email,
+				fullName: fakeUser.fullName,
+				phone: fakeUser.phone,
+				cpfOrCnpj: fakeUser.cpfOrCnpj,
+				birthdate: fakeUser.birthdate,
+				created_at: fakeUser.created_at,
+			};
 
-			// 3. Assert (Verificações)
-			expect(mockUsersServiceInstance.findById).toHaveBeenCalledWith(userId);
-			expect(result).toEqual(expectedSafeUser);
+			const result = await usersController.getProfile(userId);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+
+			expect(result).toEqual(expect.objectContaining(expectedSafeUser));
 		});
-	});
 
-	describe("getProfile", () => {
 		it("should throw NotFoundException if user is not found", async () => {
 			const userId = "nonexistent-user-id";
-			mockUsersServiceInstance.findById.mockRejectedValue(
-				new NotFoundException(),
-			);
 
-			const mockRequest = { user: { id: userId } };
+			jest
+				.spyOn(usersService, "findById")
+				.mockRejectedValue(new NotFoundException());
 
-			await expect(controller.getProfile(mockRequest)).rejects.toThrowError(
+			await expect(usersController.getProfile(userId)).rejects.toThrow(
 				NotFoundException,
 			);
-			expect(mockUsersServiceInstance.findById).toHaveBeenCalledWith(userId);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
 		});
 	});
 });
