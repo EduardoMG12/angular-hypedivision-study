@@ -1,0 +1,5 @@
+.hamburguer-menu-bg {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    background-color: rgba(46, 46, 56, 0.2);
+  }

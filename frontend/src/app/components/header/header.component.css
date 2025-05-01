@@ -1,0 +1,33 @@
+.hamburguer-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out; /* Transição suave para a rotação do botão (opcional) */
+  }
+  
+  .hamburguer-line {
+    width: 100%;
+    height: 2px;
+    background-color: #99A3A4; /* Cor das linhas (santas-gray) */
+    border-radius: 2px;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transição suave para rotação e opacidade das linhas */
+  }
+  
+  .hamburguer-button.open {
+    transform: rotate(90deg); /* Opcional: Rotaciona o botão em si */
+  }
+  
+  .hamburguer-button.open .hamburguer-line:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  
+  .hamburguer-button.open .hamburguer-line:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .hamburguer-button.open .hamburguer-line:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }

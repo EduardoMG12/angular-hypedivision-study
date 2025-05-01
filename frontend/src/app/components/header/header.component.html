@@ -11,11 +11,11 @@
       </div>
     </a>
   </div>
-  <button (click)="toggleMobileMenu()" class="md:hidden">
-    <svg class="w-6 h-6 text-santas-gray/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-    </svg>
-  </button>
+<button (click)="toggleMobileMenu()" class="md:hidden absolute right-6 hamburguer-button" [class.open]="isMobileMenuOpen">
+  <span class="hamburguer-line"></span>
+  <span class="hamburguer-line"></span>
+  <span class="hamburguer-line"></span>
+</button>
   <app-hamburguer-menu *ngIf="isMobileMenuOpen"/>
 </header>
 
