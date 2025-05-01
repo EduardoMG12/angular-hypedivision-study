@@ -28,6 +28,9 @@
 			"recommended": true,
 			"style": {
 				"useImportType": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "info"
 			}
 		}
 	},
