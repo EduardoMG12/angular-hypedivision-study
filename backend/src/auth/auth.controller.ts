@@ -127,7 +127,10 @@ export class AuthController {
 		},
 	})
 	async login(@Body() loginDto: LoginDto): Promise<AccessToken> {
-		return toPlainToInstance(AccessToken, this.authService.login(loginDto));
+		return toPlainToInstance(
+			AccessToken,
+			await this.authService.login(loginDto),
+		);
 	}
 
 	@Get("validate-token")

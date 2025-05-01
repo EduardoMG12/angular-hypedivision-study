@@ -1,187 +1,495 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { AuthService } from "./auth.service";
-import { UsersService } from "../users/users.service";
+import {
+	BadRequestException,
+	NotFoundException,
+	UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { RegisterDto } from "./dto/register.dto";
-import { SafeUser } from "./dto/safeUser.dto";
-import { AccessToken } from "./dto/accessToken.dto";
+import { UsersService } from "../users/users.service";
 import { BcryptAdapter } from "../common/adapter/bcrypt.adapter";
-import { BadRequestException } from "@nestjs/common";
+import { TermsOfUseService } from "../terms-of-use/terms-of-use.service";
+import { AuthService } from "./auth.service";
+import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
-import { User } from "../entities/user.entity";
-import { Auth, Repository } from "typeorm";
+import { SanitizerUtils } from "src/common/utils/sanitize";
+import { User } from "src/entities/user.entity";
+import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { AcceptTermsDto } from "./dto/user-terms-acceptance.dto";
+import { errorMessages } from "src/common/errors/errors-message";
+import { ErrorCode } from "src/common/errors/error-codes.enum";
 
-const makeUser = () => {
-	const registerDto: RegisterDto = {
-		email: "teste@teste.com",
-		password: "senhaSegura123",
-		phone: "99999999999",
-		cpfOrCnpj: "12345678900",
-		fullName: "Teste da Silva",
-		birthdate: new Date("1990-01-01"),
-		accept_terms: true,
-	};
+import { makeUser } from "src/common/mock/test/mock-users.mock";
 
-	const fakeUser: User = {
-		...registerDto,
-		id: "fake-id",
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		created_at: new Date(),
-		updated_at: new Date(),
-		deleted_at: null,
-	} as User;
-	return { registerDto, fakeUser };
-};
+const makeTermsOfUse = (
+	id = "fake-terms-id",
+	version = "1.0",
+	content = "Termos de Uso Fake",
+): TermsOfUse => ({
+	id,
+	version,
+	content,
+	isActive: true,
+	createdAt: new Date(),
+	updatedAt: new Date(),
+});
+
+const makeUserTermsAcceptance = (
+	userId: string,
+	termsOfUseId: string,
+	termsVersion: string,
+	id = "fake-acceptance-id",
+): UserTermsAcceptance => ({
+	id,
+	user: { id: userId } as User,
+	termsOfUse: { id: termsOfUseId, version: termsVersion } as TermsOfUse,
+	termsVersion,
+	acceptedAt: new Date(),
+});
 
 describe("AuthService", () => {
-	let service: AuthService;
-	let authRepository: jest.Mocked<Repository<Auth>>;
-
-	// let mockUsersService: {
-	// 	createUser: jest.Mock<Promise<SafeUser>, [RegisterDto]>;
-	// 	findByEmail: jest.Mock<Promise<SafeUser | null>, [string]>;
-	// };
-	// let mockJwtService: {
-	// 	sign: jest.Mock<string, [AccessToken]>;
-	// };
-	// let mockBcrypt: {
-	// 	hash: jest.Mock<Promise<string>, [string]>;
-	// 	compare: jest.Mock<Promise<boolean>, [string, string]>;
-	// };
+	let authService: AuthService;
+	let usersService: jest.Mocked<UsersService>;
+	let jwtService: jest.Mocked<JwtService>;
+	let bcryptAdapter: jest.Mocked<BcryptAdapter>;
+	let termsOfUseService: jest.Mocked<TermsOfUseService>;
+	let sanitizerUtilsSpy: {
+		cpfOrCnpj: jest.SpyInstance;
+		phoneNumber: jest.SpyInstance;
+	};
 
 	beforeEach(async () => {
-		mockUsersService = {
-			createUser: jest.fn(),
-			findByEmail: jest.fn(),
-		};
-		mockJwtService = {
-			sign: jest.fn(),
-		};
-		mockBcrypt = {
-			hash: jest.fn(),
-			compare: jest.fn(),
-		};
-
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
 				AuthService,
 				{
 					provide: UsersService,
-					useValue: mockUsersService,
+					useValue: {
+						findByEmail: jest
+							.fn<Promise<User | null>, [string, boolean?]>()
+							.mockResolvedValue(null),
+						validateUserUniqueness: jest.fn(),
+						createUser: jest.fn(),
+						findById: jest.fn(),
+					},
 				},
 				{
 					provide: JwtService,
-					useValue: mockJwtService,
+					useValue: {
+						sign: jest.fn(),
+						verifyAsync: jest.fn(),
+					},
 				},
 				{
 					provide: BcryptAdapter,
-					useValue: mockBcrypt,
+					useValue: {
+						hash: jest.fn(),
+						compare: jest.fn(),
+					},
+				},
+				{
+					provide: TermsOfUseService,
+					useValue: {
+						findActive: jest.fn(),
+						findById: jest.fn(),
+						acceptTerms: jest.fn(),
+					},
 				},
 			],
 		}).compile();
 
-		service = module.get<AuthService>(AuthService);
+		authService = module.get<AuthService>(AuthService);
+		usersService = module.get(UsersService) as jest.Mocked<UsersService>;
+		jwtService = module.get(JwtService) as jest.Mocked<JwtService>;
+		bcryptAdapter = module.get(BcryptAdapter) as jest.Mocked<BcryptAdapter>;
+		termsOfUseService = module.get(
+			TermsOfUseService,
+		) as jest.Mocked<TermsOfUseService>;
+
+		sanitizerUtilsSpy = {
+			cpfOrCnpj: jest
+				.spyOn(SanitizerUtils, "cpfOrCnpj")
+				.mockImplementation((input: string) => input.replace(/[\D]/g, "")),
+			phoneNumber: jest
+				.spyOn(SanitizerUtils, "phoneNumber")
+				.mockImplementation((input: string) => input.replace(/[\D]/g, "")),
+		};
+	});
+
+	afterEach(() => {
+		sanitizerUtilsSpy.cpfOrCnpj.mockRestore();
+		sanitizerUtilsSpy.phoneNumber.mockRestore();
+
+		jest.clearAllMocks();
 	});
 
 	it("should be defined", () => {
-		expect(service).toBeDefined();
+		expect(authService).toBeDefined();
+		expect(usersService).toBeDefined();
+		expect(jwtService).toBeDefined();
+		expect(bcryptAdapter).toBeDefined();
+		expect(termsOfUseService).toBeDefined();
+		expect(sanitizerUtilsSpy.cpfOrCnpj).toBeDefined();
+		expect(sanitizerUtilsSpy.phoneNumber).toBeDefined();
 	});
 
 	describe("register", () => {
-		it("should register a new user and return SafeUser", async () => {
-			const registerDto: RegisterDto = {
-				email: "testexample@example.com",
-				fullName: "Example Test Of Silva",
-				password: "testTestTest123",
-				birthdate: new Date("1990-12-17"),
-				phone: "(99) 99999-9999",
-				cpfOrCnpj: "123.456.789-00",
-				accept_terms: true,
-			};
-			const hashedPassword = "hashedPasswordExample";
-			const expectedSafeUser: SafeUser = {
-				id: "some-user-id",
-				email: registerDto.email,
-				fullName: registerDto.fullName,
-				created_at: new Date(),
-				birthdate: registerDto.birthdate,
-				phone: registerDto.phone,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
-				client: null, // Add appropriate value for 'client' if needed
-			};
-
-			mockBcrypt.hash.mockResolvedValue(hashedPassword);
-			mockUsersService.createUser.mockResolvedValue(expectedSafeUser);
-
-			const result = await service.register(registerDto);
-
-			expect(mockBcrypt.hash).toHaveBeenCalledWith(registerDto.password);
-			expect(mockUsersService.createUser).toHaveBeenCalledWith({
-				...registerDto,
-				password: hashedPassword,
-			});
-			expect(result).toEqual(expectedSafeUser);
-		});
-
-		it("should login user and return AccessToken", async () => {
-			const loginDto: LoginDto = {
-				email: "testexample@example.com",
-				password: "testTestTest123",
-			};
-			const mockUserFromService = {
-				id: "some-user-id",
-				email: loginDto.email,
-				fullName: "Test User",
-				created_at: new Date(),
-				birthdate: new Date("1990-01-01"),
-				cpfOrCnpj: "123.456.789-00",
-				phone: "(99) 99999-9999",
-				password: "hashedPasswordExample",
-			} as User;
-			const expectedAccessToken: AccessToken = {
-				access_token: "mocked-access-token",
-			};
-
-			mockUsersService.findByEmail.mockResolvedValue(mockUserFromService);
-			mockBcrypt.compare.mockResolvedValue(true);
-			mockJwtService.sign.mockReturnValue(expectedAccessToken.access_token);
-
-			const result = await service.login(loginDto);
-
-			expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
-			expect(mockBcrypt.compare).toHaveBeenCalledWith(
-				loginDto.password,
-				mockUserFromService.password,
+		it("should successfully register a user and return SafeUserWithJwt", async () => {
+			const { registerDto, fakeUser } = makeUser();
+			const fakeTerms = makeTermsOfUse("fake-terms-id", "1.0", "Fake Content");
+			const fakeAccessToken = "fake-jwt-token";
+			const fakeAcceptance = makeUserTermsAcceptance(
+				fakeUser.id,
+				fakeTerms.id,
+				fakeTerms.version,
 			);
-			expect(mockJwtService.sign).toHaveBeenCalledWith({
-				id: mockUserFromService.id,
-				email: mockUserFromService.email,
+
+			usersService.validateUserUniqueness.mockResolvedValue(undefined);
+
+			termsOfUseService.findActive.mockResolvedValue(fakeTerms);
+
+			termsOfUseService.findById.mockResolvedValue(fakeTerms);
+
+			bcryptAdapter.hash.mockResolvedValue("hashed_password");
+			usersService.createUser.mockResolvedValue(fakeUser as User);
+			termsOfUseService.acceptTerms.mockResolvedValue(fakeAcceptance);
+			jwtService.sign.mockReturnValue(fakeAccessToken);
+
+			const result = await authService.register(registerDto);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(
+				registerDto.email,
+				false,
+			);
+			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
+				email: registerDto.email,
+				cpfOrCnpj: registerDto.cpfOrCnpj,
+				phone: registerDto.phone,
 			});
-			expect(result).toEqual(expectedAccessToken);
+			expect(sanitizerUtilsSpy.cpfOrCnpj).toHaveBeenCalledWith(
+				registerDto.cpfOrCnpj,
+			);
+			expect(sanitizerUtilsSpy.phoneNumber).toHaveBeenCalledWith(
+				registerDto.phone,
+			);
+			expect(termsOfUseService.findActive).toHaveBeenCalled();
+
+			expect(termsOfUseService.findById).toHaveBeenCalledWith(fakeTerms.id);
+			expect(bcryptAdapter.hash).toHaveBeenCalledWith(registerDto.password);
+
+			expect(usersService.createUser).toHaveBeenCalledWith({
+				...registerDto,
+				password: "hashed_password",
+				cpfOrCnpj: SanitizerUtils.cpfOrCnpj(registerDto.cpfOrCnpj),
+				phone: SanitizerUtils.phoneNumber(registerDto.phone),
+			} as RegisterDto);
+
+			expect(termsOfUseService.acceptTerms).toHaveBeenCalledWith({
+				termsOfUseId: fakeTerms.id,
+				userId: fakeUser.id,
+			});
+
+			expect(jwtService.sign).toHaveBeenCalledWith({
+				id: fakeUser.id,
+				email: fakeUser.email,
+			});
+
+			const expectedSafeUser: Omit<User, "password"> = (({
+				password,
+				...rest
+			}) => rest)(fakeUser);
+
+			expect(result).toEqual({
+				...expectedSafeUser,
+				access_token: fakeAccessToken,
+			});
 		});
 
-		it("should throw BadRequestException if email already exists", async () => {
-			const registerDto: RegisterDto = {
-				email: "existing@example.com",
-				fullName: "Existing User",
-				password: "testTestTest123",
-				birthdate: new Date("1990-01-01"),
-				phone: "(99) 99999-9999",
-				cpfOrCnpj: "123.456.789-00",
-				accept_terms: true,
-			};
+		it("should throw BadRequestException if user uniqueness validation fails", async () => {
+			const { registerDto } = makeUser();
+			const validationError = new BadRequestException("Duplicate user data");
 
-			mockUsersService.findByEmail.mockResolvedValue({
-				id: "some-user-id",
-				email: registerDto.email,
-				fullName: "Existing User",
-				created_at: new Date(),
-			} as SafeUser);
+			usersService.validateUserUniqueness.mockRejectedValue(validationError);
 
-			await expect(service.register(registerDto)).rejects.toThrow(
+			await expect(authService.register(registerDto)).rejects.toThrow(
 				BadRequestException,
 			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(
+				registerDto.email,
+				false,
+			);
+			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
+				email: registerDto.email,
+				cpfOrCnpj: registerDto.cpfOrCnpj,
+				phone: registerDto.phone,
+			});
+
+			expect(termsOfUseService.findActive).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+			expect(bcryptAdapter.hash).not.toHaveBeenCalled();
+			expect(usersService.createUser).not.toHaveBeenCalled();
+			expect(termsOfUseService.acceptTerms).not.toHaveBeenCalled();
+			expect(jwtService.sign).not.toHaveBeenCalled();
+		});
+
+		it("should throw BadRequestException if accept_terms is false", async () => {
+			const { registerDto } = makeUser();
+			const dtoWithTermsFalse: RegisterDto = {
+				...registerDto,
+				accept_terms: false,
+			};
+
+			usersService.validateUserUniqueness.mockResolvedValue(undefined);
+
+			await expect(authService.register(dtoWithTermsFalse)).rejects.toThrow(
+				new BadRequestException(
+					errorMessages[ErrorCode.MISSING_ACCEPT_TERMS]["pt-BR"],
+				),
+			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(
+				dtoWithTermsFalse.email,
+				false,
+			);
+			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
+				email: dtoWithTermsFalse.email,
+				cpfOrCnpj: dtoWithTermsFalse.cpfOrCnpj,
+				phone: dtoWithTermsFalse.phone,
+			});
+
+			expect(termsOfUseService.findActive).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+			expect(bcryptAdapter.hash).not.toHaveBeenCalled();
+			expect(usersService.createUser).not.toHaveBeenCalled();
+			expect(termsOfUseService.acceptTerms).not.toHaveBeenCalled();
+			expect(jwtService.sign).not.toHaveBeenCalled();
+		});
+
+		it("should throw an error if no active terms of use are found", async () => {
+			const { registerDto } = makeUser();
+			const errorFindingTerms = new NotFoundException("No active terms found");
+
+			usersService.validateUserUniqueness.mockResolvedValue(undefined);
+			termsOfUseService.findActive.mockRejectedValue(errorFindingTerms);
+
+			await expect(authService.register(registerDto)).rejects.toThrow(
+				errorFindingTerms,
+			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(
+				registerDto.email,
+				false,
+			);
+			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
+				email: registerDto.email,
+				cpfOrCnpj: registerDto.cpfOrCnpj,
+				phone: registerDto.phone,
+			});
+
+			expect(termsOfUseService.findActive).toHaveBeenCalled();
+
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+			expect(bcryptAdapter.hash).not.toHaveBeenCalled();
+			expect(usersService.createUser).not.toHaveBeenCalled();
+			expect(termsOfUseService.acceptTerms).not.toHaveBeenCalled();
+			expect(jwtService.sign).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("login", () => {
+		it("should successfully login a user and return AccessToken", async () => {
+			const loginDto: LoginDto = {
+				email: "test@example.com",
+				password: "correct_password",
+			};
+			const fakeUser: User = {
+				...makeUser().fakeUser,
+				email: loginDto.email,
+				password: "hashed_password_from_db",
+			};
+			const fakeAccessToken = "fake-login-jwt-token";
+
+			usersService.findByEmail.mockResolvedValue(fakeUser);
+
+			bcryptAdapter.compare.mockResolvedValue(true);
+
+			jwtService.sign.mockReturnValue(fakeAccessToken);
+
+			const result = await authService.login(loginDto);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+
+			expect(bcryptAdapter.compare).toHaveBeenCalledWith(
+				loginDto.password,
+				fakeUser.password,
+			);
+
+			expect(jwtService.sign).toHaveBeenCalledWith({
+				id: fakeUser.id,
+				email: fakeUser.email,
+			});
+
+			expect(result).toEqual({ access_token: fakeAccessToken });
+
+			expect(usersService.validateUserUniqueness).not.toHaveBeenCalled();
+			expect(usersService.createUser).not.toHaveBeenCalled();
+			expect(termsOfUseService.findActive).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+			expect(termsOfUseService.acceptTerms).not.toHaveBeenCalled();
+		});
+
+		it("should throw UnauthorizedException if user is not found", async () => {
+			const loginDto: LoginDto = {
+				email: "nonexistent@example.com",
+				password: "any_password",
+			};
+
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				new UnauthorizedException(
+					errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+				),
+			);
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+
+			expect(bcryptAdapter.compare).not.toHaveBeenCalled();
+			expect(jwtService.sign).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+		});
+
+		it("should throw UnauthorizedException if password is invalid", async () => {
+			const loginDto: LoginDto = {
+				email: "test@example.com",
+				password: "incorrect_password",
+			};
+			const fakeUser: User = {
+				...makeUser().fakeUser,
+				email: loginDto.email,
+				password: "hashed_password_from_db",
+			};
+
+			usersService.findByEmail.mockResolvedValue(fakeUser);
+			bcryptAdapter.compare.mockResolvedValue(false);
+
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				new UnauthorizedException(
+					errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+				),
+			);
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+			expect(bcryptAdapter.compare).toHaveBeenCalledWith(
+				loginDto.password,
+				fakeUser.password,
+			);
+
+			expect(jwtService.sign).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+		});
+
+		it("should throw UnauthorizedException for any underlying error during login", async () => {
+			const loginDto: LoginDto = {
+				email: "test@example.com",
+				password: "any_password",
+			};
+			const underlyingError = new Error("Some unexpected database error");
+
+			usersService.findByEmail.mockRejectedValue(underlyingError);
+
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				new UnauthorizedException(
+					errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+				),
+			);
+			await expect(authService.login(loginDto)).rejects.toThrow(
+				errorMessages[ErrorCode.LOGIN_FAILED]["pt-BR"],
+			);
+
+			expect(usersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
+
+			expect(bcryptAdapter.compare).not.toHaveBeenCalled();
+			expect(jwtService.sign).not.toHaveBeenCalled();
+			expect(termsOfUseService.findById).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("validateToken", () => {
+		it("should return true for a valid token", async () => {
+			const token = "a_valid_jwt_token";
+
+			jwtService.verifyAsync.mockResolvedValue({});
+
+			const result = await authService.validateToken(token);
+
+			expect(jwtService.verifyAsync).toHaveBeenCalledWith(token);
+			expect(result).toBe(true);
+		});
+
+		it("should return false for an invalid token", async () => {
+			const token = "an_invalid_jwt_token";
+			const verificationError = new Error("Invalid token signature");
+
+			jwtService.verifyAsync.mockRejectedValue(verificationError);
+
+			const result = await authService.validateToken(token);
+
+			expect(jwtService.verifyAsync).toHaveBeenCalledWith(token);
+			expect(result).toBe(false);
+		});
+	});
+
+	describe("acceptTerms", () => {
+		it("should successfully accept terms for a user", async () => {
+			const { fakeUser } = makeUser();
+			const userId = fakeUser.id;
+			const termsId = "terms-id-456";
+			const termsVersion = "1.0";
+			const acceptTermsDto: AcceptTermsDto = { termsOfUseId: termsId };
+			const fakeTerms = makeTermsOfUse(termsId, termsVersion);
+			const fakeAcceptance = makeUserTermsAcceptance(
+				userId,
+				fakeTerms.id,
+				fakeTerms.version,
+			);
+
+			termsOfUseService.findById.mockResolvedValue(fakeTerms);
+
+			termsOfUseService.acceptTerms.mockResolvedValue(fakeAcceptance);
+
+			const result = await authService.acceptTerms(acceptTermsDto, userId);
+
+			expect(termsOfUseService.findById).toHaveBeenCalledWith(termsId);
+
+			expect(termsOfUseService.acceptTerms).toHaveBeenCalledWith({
+				termsOfUseId: termsId,
+				userId: userId,
+			});
+
+			expect(result).toEqual(fakeAcceptance);
+		});
+
+		it("should throw an error if terms of use are not found during acceptance", async () => {
+			const userId = "user-id-123";
+			const termsId = "nonexistent-terms-id";
+			const acceptTermsDto: AcceptTermsDto = { termsOfUseId: termsId };
+			const notFoundError = new NotFoundException("Terms not found");
+
+			termsOfUseService.findById.mockRejectedValue(notFoundError);
+
+			await expect(
+				authService.acceptTerms(acceptTermsDto, userId),
+			).rejects.toThrow(notFoundError);
+
+			expect(termsOfUseService.findById).toHaveBeenCalledWith(termsId);
+
+			expect(termsOfUseService.acceptTerms).not.toHaveBeenCalled();
 		});
 	});
 });
