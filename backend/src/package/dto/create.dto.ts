@@ -1,18 +1,21 @@
 import { Expose } from "class-transformer";
-import { IsString, IsUUID, MaxLength } from "class-validator";
+import {
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	IsUUID,
+	MaxLength,
+} from "class-validator";
 
 export class CreatePackageDto {
-	@Expose()
 	@IsString()
 	@MaxLength(100)
+	@IsNotEmpty()
+	@Expose()
 	title: string;
 
-	@Expose()
-	@IsString()
 	@MaxLength(1000)
-	description?: string;
-
+	@IsOptional()
 	@Expose()
-	@IsUUID()
-	ownerId: string;
+	description?: string;
 }

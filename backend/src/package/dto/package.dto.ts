@@ -1,5 +1,6 @@
 import { Expose } from "class-transformer";
 import { IsString, IsUUID, MaxLength } from "class-validator";
+import { User } from "src/entities/user.entity";
 
 export class PackageDto {
 	@Expose()
@@ -22,8 +23,7 @@ export class PackageDto {
 	status: string;
 
 	@Expose()
-	@IsUUID()
-	ownerId: string;
+	owner: User;
 
 	@Expose()
 	createdAt: Date;
