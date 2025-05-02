@@ -252,7 +252,7 @@ describe("PackageService", () => {
 			const userId = "user-owner-id";
 			const changeStatusDto: ChangePackageStatusDto = {
 				id: "package-id",
-				status: "WORKING",
+				status: PackageStatus.Concluded,
 			};
 			const owner = makeMockUser(userId);
 			const existingPackage = makeMockPackage(
@@ -289,7 +289,7 @@ describe("PackageService", () => {
 			const userId = "nonexistent-user-id";
 			const changeStatusDto: ChangePackageStatusDto = {
 				id: "package-id",
-				status: "DONE",
+				status: PackageStatus.Concluded,
 			};
 
 			usersService.findById.mockRejectedValue(
@@ -311,7 +311,7 @@ describe("PackageService", () => {
 			const userId = "user-owner-id";
 			const changeStatusDto: ChangePackageStatusDto = {
 				id: "nonexistent-id",
-				status: "DONE",
+				status: PackageStatus.Concluded,
 			};
 			const owner = makeMockUser(userId);
 
