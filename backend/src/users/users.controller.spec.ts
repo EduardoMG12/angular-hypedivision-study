@@ -21,7 +21,6 @@ describe("UsersController", () => {
 						createUser: jest.fn(),
 						findByEmail: jest.fn(),
 						findById: jest.fn(),
-						findByCpfOrCnpj: jest.fn(),
 						findByPhone: jest.fn(),
 						validateUserUniqueness: jest.fn(),
 					} as Partial<Record<keyof UsersService, jest.Mock>>,
@@ -53,7 +52,6 @@ describe("UsersController", () => {
 				email: fakeUser.email,
 				fullName: fakeUser.fullName,
 				phone: fakeUser.phone,
-				cpfOrCnpj: fakeUser.cpfOrCnpj,
 				birthdate: fakeUser.birthdate,
 				created_at: fakeUser.created_at,
 			};

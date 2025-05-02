@@ -19,10 +19,6 @@ export class User {
 
 	@Column({ length: 14, unique: true })
 	@Column()
-	cpfOrCnpj: string; // i will remove
-
-	@Column({ length: 14, unique: true })
-	@Column()
 	phone: string;
 
 	@Column({ length: 100, unique: true })

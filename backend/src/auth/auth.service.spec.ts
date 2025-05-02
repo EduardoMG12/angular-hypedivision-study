@@ -54,7 +54,6 @@ describe("AuthService", () => {
 	let bcryptAdapter: jest.Mocked<BcryptAdapter>;
 	let termsOfUseService: jest.Mocked<TermsOfUseService>;
 	let sanitizerUtilsSpy: {
-		cpfOrCnpj: jest.SpyInstance;
 		phoneNumber: jest.SpyInstance;
 	};
 
@@ -107,9 +106,6 @@ describe("AuthService", () => {
 		) as jest.Mocked<TermsOfUseService>;
 
 		sanitizerUtilsSpy = {
-			cpfOrCnpj: jest
-				.spyOn(SanitizerUtils, "cpfOrCnpj")
-				.mockImplementation((input: string) => input.replace(/[\D]/g, "")),
 			phoneNumber: jest
 				.spyOn(SanitizerUtils, "phoneNumber")
 				.mockImplementation((input: string) => input.replace(/[\D]/g, "")),
@@ -117,7 +113,6 @@ describe("AuthService", () => {
 	});
 
 	afterEach(() => {
-		sanitizerUtilsSpy.cpfOrCnpj.mockRestore();
 		sanitizerUtilsSpy.phoneNumber.mockRestore();
 
 		jest.clearAllMocks();
@@ -129,7 +124,7 @@ describe("AuthService", () => {
 		expect(jwtService).toBeDefined();
 		expect(bcryptAdapter).toBeDefined();
 		expect(termsOfUseService).toBeDefined();
-		expect(sanitizerUtilsSpy.cpfOrCnpj).toBeDefined();
+
 		expect(sanitizerUtilsSpy.phoneNumber).toBeDefined();
 	});
 
@@ -163,12 +158,10 @@ describe("AuthService", () => {
 			);
 			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
+
 				phone: registerDto.phone,
 			});
-			expect(sanitizerUtilsSpy.cpfOrCnpj).toHaveBeenCalledWith(
-				registerDto.cpfOrCnpj,
-			);
+
 			expect(sanitizerUtilsSpy.phoneNumber).toHaveBeenCalledWith(
 				registerDto.phone,
 			);
@@ -180,7 +173,7 @@ describe("AuthService", () => {
 			expect(usersService.createUser).toHaveBeenCalledWith({
 				...registerDto,
 				password: "hashed_password",
-				cpfOrCnpj: SanitizerUtils.cpfOrCnpj(registerDto.cpfOrCnpj),
+
 				phone: SanitizerUtils.phoneNumber(registerDto.phone),
 			} as RegisterDto);
 
@@ -221,7 +214,7 @@ describe("AuthService", () => {
 			);
 			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
+
 				phone: registerDto.phone,
 			});
 
@@ -254,7 +247,7 @@ describe("AuthService", () => {
 			);
 			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
 				email: dtoWithTermsFalse.email,
-				cpfOrCnpj: dtoWithTermsFalse.cpfOrCnpj,
+
 				phone: dtoWithTermsFalse.phone,
 			});
 
@@ -283,7 +276,7 @@ describe("AuthService", () => {
 			);
 			expect(usersService.validateUserUniqueness).toHaveBeenCalledWith({
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
+
 				phone: registerDto.phone,
 			});
 

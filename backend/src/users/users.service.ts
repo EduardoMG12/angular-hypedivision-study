@@ -45,28 +45,6 @@ export class UsersService implements IUserService {
 		return user;
 	}
 
-	async findByCpfOrCnpj(cpfOrCnpj: string, throwNotFound: true): Promise<User>;
-	async findByCpfOrCnpj(
-		cpfOrCnpj: string,
-		throwNotFound: false,
-	): Promise<User | null>;
-	async findByCpfOrCnpj(cpfOrCnpj: string): Promise<User | null>;
-	async findByCpfOrCnpj(
-		cpfOrCnpj: string,
-		throwNotFound = true,
-	): Promise<User | null> {
-		const sanittizerCpfOrCnpj = SanitizerUtils.phoneNumber(cpfOrCnpj);
-		const user = await this.usersRepository.findOne({
-			where: { cpfOrCnpj: sanittizerCpfOrCnpj },
-		});
-
-		if (!user && throwNotFound) {
-			throw new NotFoundException(errorMessages.USER_NOT_FOUND["pt-BR"]);
-		}
-
-		return user;
-	}
-
 	async findByPhone(phone: string, throwNotFound: true): Promise<User>;
 	async findByPhone(phone: string, throwNotFound: false): Promise<User | null>;
 	async findByPhone(phone: string): Promise<User | null>;
@@ -86,9 +64,8 @@ export class UsersService implements IUserService {
 	async validateUserUniqueness(
 		validateData: ValidateUniquenessDto,
 	): Promise<void> {
-		const [userByEmail, userByCpf, userByPhone] = await Promise.all([
+		const [userByEmail, userByPhone] = await Promise.all([
 			this.findByEmail(validateData.email, false),
-			this.findByCpfOrCnpj(validateData.cpfOrCnpj, false),
 			this.findByPhone(validateData.phone, false),
 		]);
 
@@ -97,11 +74,7 @@ export class UsersService implements IUserService {
 				errorMessages.EMAIL_ALREADY_EXISTS["pt-BR"],
 			);
 		}
-		if (userByCpf) {
-			throw new BadRequestException(
-				errorMessages.CPF_OR_CNPJ_ALREADY_EXISTS["pt-BR"],
-			);
-		}
+
 		if (userByPhone) {
 			throw new BadRequestException(
 				errorMessages.PHONE_NUMBER_ALREADY_EXISTS["pt-BR"],

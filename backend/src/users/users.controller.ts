@@ -46,7 +46,6 @@ export class UsersController implements IUsersController {
 					id: "123e4567-e89b-12d3-a456-426614174000",
 					fullName: "João Silva",
 					email: "joao.silva@example.com",
-					cpfOrCnpj: "123.456.789-01",
 					phone: "(11) 98765-4321",
 					birthdate: "1990-01-01",
 					privilege: "USER",

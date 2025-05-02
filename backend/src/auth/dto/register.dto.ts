@@ -2,7 +2,6 @@ import { IsBoolean, IsDate, IsPhoneNumber, IsString } from "class-validator";
 import { LoginDto } from "./login.dto";
 import { Expose, Transform } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsCpfOrCnpj } from "src/common/decorators/is-cpf-cnpj.decorator";
 
 export class RegisterDto extends LoginDto {
 	@ApiProperty({
@@ -41,17 +40,6 @@ export class RegisterDto extends LoginDto {
 	})
 	@Expose()
 	phone: string;
-
-	@ApiProperty({
-		description: "User CPF or CNPJ / CPF ou CNPJ do usuário",
-		type: String,
-		example: "123.456.789-01",
-	})
-	@IsCpfOrCnpj({
-		message: "O CPF ou CNPJ deve ser válido / The CPF or CNPJ must be valid",
-	})
-	@Expose()
-	cpfOrCnpj: string;
 
 	@ApiProperty({
 		description:

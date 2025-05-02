@@ -31,7 +31,6 @@ export class AuthService {
 
 		const validateData = {
 			email: registerDto.email,
-			cpfOrCnpj: registerDto.cpfOrCnpj,
 			phone: registerDto.phone,
 		};
 
@@ -47,14 +46,11 @@ export class AuthService {
 
 		const hashedPassword = await this.bcryptAdapter.hash(registerDto.password);
 
-		const sanitizedCpf = SanitizerUtils.cpfOrCnpj(registerDto.cpfOrCnpj);
-
 		const newUser: RegisterDto = {
 			...registerDto,
 		};
 
 		newUser.password = hashedPassword;
-		newUser.cpfOrCnpj = SanitizerUtils.cpfOrCnpj(registerDto.cpfOrCnpj);
 		newUser.phone = SanitizerUtils.phoneNumber(registerDto.phone);
 
 		const createUser = await this.usersService.createUser(newUser);

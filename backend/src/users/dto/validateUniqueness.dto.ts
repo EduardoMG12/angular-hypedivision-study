@@ -1,6 +1,5 @@
 import { Expose } from "class-transformer";
 import { IsEmail, IsPhoneNumber } from "class-validator";
-import { IsCpfOrCnpj } from "src/common/decorators/is-cpf-cnpj.decorator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class ValidateUniquenessDto {
@@ -16,18 +15,6 @@ export class ValidateUniquenessDto {
 	)
 	@Expose()
 	email: string;
-
-	@ApiProperty({
-		description:
-			"CPF or CNPJ to check for uniqueness / CPF ou CNPJ para verificar unicidade",
-		type: String,
-		example: "123.456.789-01",
-	})
-	@IsCpfOrCnpj({
-		message: "O CPF ou CNPJ deve ser válido / The CPF or CNPJ must be valid",
-	})
-	@Expose()
-	cpfOrCnpj: string;
 
 	@ApiProperty({
 		description:

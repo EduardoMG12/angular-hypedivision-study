@@ -44,14 +44,6 @@ export class SafeUser {
 	phone: string;
 
 	@ApiProperty({
-		description: "User CPF or CNPJ / CPF ou CNPJ do usuário",
-		type: String,
-		example: "123.456.789-01",
-	})
-	@Expose()
-	cpfOrCnpj: string;
-
-	@ApiProperty({
 		description: "User creation timestamp / Data de criação do usuário",
 		type: String,
 		example: "2025-04-15T10:00:00Z",

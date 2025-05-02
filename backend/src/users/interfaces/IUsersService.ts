@@ -13,16 +13,6 @@ export interface IUserService {
 
 	findById(id: string): Promise<SafeUser>;
 
-	findByCpfOrCnpj(cpfOrCnpj: string, throwNotFound: true): Promise<User>;
-	findByCpfOrCnpj(
-		cpfOrCnpj: string,
-		throwNotFound: false,
-	): Promise<User | null>;
-	findByCpfOrCnpj(
-		cpfOrCnpj: string,
-		throwNotFound?: boolean,
-	): Promise<User | null>;
-
 	findByPhone(phone: string, throwNotFound: true): Promise<User>;
 	findByPhone(phone: string, throwNotFound: false): Promise<User | null>;
 	findByPhone(phone: string, throwNotFound?: boolean): Promise<User | null>;

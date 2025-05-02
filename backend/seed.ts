@@ -23,7 +23,6 @@ export async function runSeed(
 			email: adminEmail,
 			password: hashedPassword,
 			birthdate: new Date(),
-			cpfOrCnpj: "12345678900",
 			phone: "123456789",
 			accept_terms: true,
 		});

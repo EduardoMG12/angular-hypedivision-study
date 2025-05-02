@@ -19,7 +19,6 @@ import { User } from "src/entities/user.entity";
 // 	created_at: new Date(),
 // 	birthdate: new Date(), // Provide a default value for birthdate
 // 	phone: "123-456-7890", // Provide a default value for phone
-// 	cpfOrCnpj: "default-cpfOrCnpj-value", // Provide a default value for CPF
 // 	...overrides,
 // });
 
@@ -28,7 +27,6 @@ export const makeUser = () => {
 		email: "teste@teste.com",
 		password: "senhaSegura123",
 		phone: "99999999999",
-		cpfOrCnpj: "12345678900",
 		fullName: "Teste da Silva",
 		birthdate: new Date("1990-01-01"),
 		accept_terms: true,

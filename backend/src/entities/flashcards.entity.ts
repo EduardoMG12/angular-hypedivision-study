@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { User } from "./user.entity";
 import { Package } from "./package.entity";
+import { PackageStatus } from "./common/enums/packageStatus.enum";
 
 @Entity("flashcards")
 export class Flashcard {
@@ -26,8 +27,8 @@ export class Flashcard {
 	@ManyToOne(() => Package, { nullable: true })
 	package: Package;
 
-	@Column({ type: "varchar", length: 20, default: "active" })
-	status: string;
+	@Column({ type: "varchar", length: 20, default: PackageStatus.Active })
+	status: PackageStatus;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

@@ -54,7 +54,6 @@ export class AuthController {
 			email: "joao.silva@example.com",
 			birthdate: "1990-12-17",
 			phone: "(11) 98765-4321",
-			cpfOrCnpj: "123.456.789-01",
 			created_at: "2025-04-15T10:00:00Z",
 			access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
 		},

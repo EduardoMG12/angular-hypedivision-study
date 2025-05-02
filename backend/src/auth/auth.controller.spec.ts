@@ -38,7 +38,6 @@ const makeMockUser = (
 	fullName = "Mock User",
 	password = "hashed_password",
 	phone = "11999999999",
-	cpfOrCnpj = "12345678901",
 	birthdate = new Date(),
 	createdAt = new Date(),
 	updatedAt = new Date(),
@@ -52,7 +51,6 @@ const makeMockUser = (
 		fullName,
 		password,
 		phone,
-		cpfOrCnpj,
 		birthdate,
 		createdAt,
 		updatedAt,
@@ -130,7 +128,6 @@ describe("AuthController", () => {
 				password: "password123",
 				fullName: "Test User",
 				phone: "11999999999",
-				cpfOrCnpj: "12345678901",
 				birthdate: new Date("1990-01-01"),
 				accept_terms: true,
 			};
@@ -140,7 +137,6 @@ describe("AuthController", () => {
 				fullName: registerDto.fullName,
 				access_token: "fake-jwt",
 				phone: registerDto.phone,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
 				birthdate: registerDto.birthdate,
 				created_at: new Date(),
 			} as SafeUserWithJwt;
@@ -168,7 +164,6 @@ describe("AuthController", () => {
 				password: "password123",
 				fullName: "Test User",
 				phone: "11999999999",
-				cpfOrCnpj: "12345678901",
 				birthdate: new Date("1990-01-01"),
 				accept_terms: true,
 			};

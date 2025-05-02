@@ -41,8 +41,8 @@ describe("UserService", () => {
 
 			const result = await service.createUser(registerDto);
 
-			expect(usersRepository.create).toHaveBeenCalled();
-			expect(usersRepository.save).toHaveBeenCalled();
+			expect(usersRepository.create).toHaveBeenCalledTimes(1);
+			expect(usersRepository.save).toHaveBeenCalledTimes(1);
 			expect(result).toEqual(fakeUser);
 		});
 
@@ -142,15 +142,15 @@ describe("UserService", () => {
 			phoneNumberSpy.mockRestore();
 		});
 
-		it("should complete successfully if no user is found with the same email, cpfOrCnpj, or phone", async () => {
+		it("should complete successfully if no user is found with the same email or phone", async () => {
 			const { registerDto } = makeUser();
+
 			const validateData: ValidateUniquenessDto = {
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
 				phone: registerDto.phone,
 			};
+
 			usersRepository.findOne
-				.mockResolvedValueOnce(null)
 				.mockResolvedValueOnce(null)
 				.mockResolvedValueOnce(null);
 
@@ -158,19 +158,16 @@ describe("UserService", () => {
 				service.validateUserUniqueness(validateData),
 			).resolves.toBeUndefined();
 
-			expect(usersRepository.findOne).toHaveBeenCalledTimes(3);
+			expect(usersRepository.findOne).toHaveBeenCalledTimes(2);
+
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
 				where: { email: validateData.email },
 			});
+
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: validateData.cpfOrCnpj },
+				where: { phone: SanitizerUtils.phoneNumber(validateData.phone) },
 			});
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { phone: validateData.phone },
-			});
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
-				validateData.cpfOrCnpj,
-			);
+
 			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
 				validateData.phone,
 			);
@@ -178,14 +175,14 @@ describe("UserService", () => {
 
 		it("should throw BadRequestException if a user is found with the same email", async () => {
 			const { registerDto, fakeUser } = makeUser();
+
 			const validateData: ValidateUniquenessDto = {
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
 				phone: registerDto.phone,
 			};
+
 			usersRepository.findOne
 				.mockResolvedValueOnce(fakeUser)
-				.mockResolvedValueOnce(null)
 				.mockResolvedValueOnce(null);
 
 			await expect(
@@ -197,54 +194,27 @@ describe("UserService", () => {
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
 				where: { email: validateData.email },
 			});
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
-				validateData.cpfOrCnpj,
-			);
+
 			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
 				validateData.phone,
 			);
-		});
 
-		it("should throw BadRequestException if a user is found with the same cpfOrCnpj", async () => {
-			const { registerDto, fakeUser } = makeUser();
-			const validateData: ValidateUniquenessDto = {
-				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
-				phone: registerDto.phone,
-			};
-			usersRepository.findOne
-				.mockResolvedValueOnce(null)
-				.mockResolvedValueOnce(fakeUser)
-				.mockResolvedValueOnce(null);
-
-			await expect(
-				service.validateUserUniqueness(validateData),
-			).rejects.toThrow(
-				new BadRequestException(
-					errorMessages.CPF_OR_CNPJ_ALREADY_EXISTS["pt-BR"],
-				),
-			);
+			expect(usersRepository.findOne).toHaveBeenCalledTimes(2);
 
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: validateData.cpfOrCnpj },
+				where: { phone: SanitizerUtils.phoneNumber(validateData.phone) },
 			});
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
-				validateData.cpfOrCnpj,
-			);
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
-				validateData.phone,
-			);
 		});
 
 		it("should throw BadRequestException if a user is found with the same phone", async () => {
 			const { registerDto, fakeUser } = makeUser();
+
 			const validateData: ValidateUniquenessDto = {
 				email: registerDto.email,
-				cpfOrCnpj: registerDto.cpfOrCnpj,
 				phone: registerDto.phone,
 			};
+
 			usersRepository.findOne
-				.mockResolvedValueOnce(null)
 				.mockResolvedValueOnce(null)
 				.mockResolvedValueOnce(fakeUser);
 
@@ -257,14 +227,18 @@ describe("UserService", () => {
 			);
 
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { phone: validateData.phone },
+				where: { email: validateData.email },
 			});
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
-				validateData.cpfOrCnpj,
-			);
+
+			expect(usersRepository.findOne).toHaveBeenCalledWith({
+				where: { phone: SanitizerUtils.phoneNumber(validateData.phone) },
+			});
+
 			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(
 				validateData.phone,
 			);
+
+			expect(usersRepository.findOne).toHaveBeenCalledTimes(2);
 		});
 	});
 
@@ -284,7 +258,8 @@ describe("UserService", () => {
 		it("should find a user by phone successfully", async () => {
 			const { fakeUser } = makeUser();
 			const inputPhone = "(99) 99999-9999";
-			const sanitizedPhone = "99999999999";
+
+			const sanitizedPhone = inputPhone.replace(/[\D]/g, "");
 			usersRepository.findOne.mockResolvedValue(fakeUser);
 
 			const result = await service.findByPhone(inputPhone);
@@ -298,7 +273,7 @@ describe("UserService", () => {
 
 		it("should throw NotFoundException if user is not found and throwNotFound is true", async () => {
 			const inputPhone = "(00) 00000-0000";
-			const sanitizedPhone = "00000000000";
+			const sanitizedPhone = inputPhone.replace(/[\D]/g, "");
 			usersRepository.findOne.mockResolvedValue(null);
 
 			await expect(service.findByPhone(inputPhone, true)).rejects.toThrow(
@@ -313,7 +288,7 @@ describe("UserService", () => {
 
 		it("should throw NotFoundException if user is not found and throwNotFound is not declared", async () => {
 			const inputPhone = "(00) 00000-0000";
-			const sanitizedPhone = "00000000000";
+			const sanitizedPhone = inputPhone.replace(/[\D]/g, "");
 			usersRepository.findOne.mockResolvedValue(null);
 
 			await expect(service.findByPhone(inputPhone)).rejects.toThrow(
@@ -328,7 +303,7 @@ describe("UserService", () => {
 
 		it("should return null if user is not found and throwNotFound is false", async () => {
 			const inputPhone = "(00) 00000-0000";
-			const sanitizedPhone = "00000000000";
+			const sanitizedPhone = inputPhone.replace(/[\D]/g, "");
 			usersRepository.findOne.mockResolvedValue(null);
 
 			const result = await service.findByPhone(inputPhone, false);
@@ -336,81 +311,6 @@ describe("UserService", () => {
 			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(inputPhone);
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
 				where: { phone: sanitizedPhone },
-			});
-			expect(result).toBeNull();
-		});
-	});
-
-	describe("findByCpfOrCnpj", () => {
-		let phoneNumberSpy: jest.SpyInstance;
-
-		beforeEach(() => {
-			phoneNumberSpy = jest
-				.spyOn(SanitizerUtils, "phoneNumber")
-				.mockImplementation((input: string) => input.replace(/[\D]/g, ""));
-		});
-
-		afterEach(() => {
-			phoneNumberSpy.mockRestore();
-		});
-
-		it("should find a user by cpfOrCnpj successfully", async () => {
-			const { fakeUser } = makeUser();
-			const inputCpfOrCnpj = "123.456.789-00";
-			const sanitizedCpfOrCnpj = "12345678900";
-			usersRepository.findOne.mockResolvedValue(fakeUser);
-
-			const result = await service.findByCpfOrCnpj(inputCpfOrCnpj);
-
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(inputCpfOrCnpj);
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: sanitizedCpfOrCnpj },
-			});
-			expect(result).toEqual(fakeUser);
-		});
-
-		it("should throw NotFoundException if user is not found and throwNotFound is true", async () => {
-			const inputCpfOrCnpj = "000.000.000-00";
-			const sanitizedCpfOrCnpj = "00000000000";
-			usersRepository.findOne.mockResolvedValue(null);
-
-			await expect(
-				service.findByCpfOrCnpj(inputCpfOrCnpj, true),
-			).rejects.toThrow(
-				new NotFoundException(errorMessages.USER_NOT_FOUND["pt-BR"]),
-			);
-
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(inputCpfOrCnpj);
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: sanitizedCpfOrCnpj },
-			});
-		});
-
-		it("should throw NotFoundException if user is not found and throwNotFound is not declared", async () => {
-			const inputCpfOrCnpj = "000.000.000-00";
-			const sanitizedCpfOrCnpj = "00000000000";
-			usersRepository.findOne.mockResolvedValue(null);
-
-			await expect(service.findByCpfOrCnpj(inputCpfOrCnpj)).rejects.toThrow(
-				new NotFoundException(errorMessages.USER_NOT_FOUND["pt-BR"]),
-			);
-
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(inputCpfOrCnpj);
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: sanitizedCpfOrCnpj },
-			});
-		});
-
-		it("should return null if user is not found and throwNotFound is false", async () => {
-			const inputCpfOrCnpj = "000.000.000-00";
-			const sanitizedCpfOrCnpj = "00000000000";
-			usersRepository.findOne.mockResolvedValue(null);
-
-			const result = await service.findByCpfOrCnpj(inputCpfOrCnpj, false);
-
-			expect(SanitizerUtils.phoneNumber).toHaveBeenCalledWith(inputCpfOrCnpj);
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { cpfOrCnpj: sanitizedCpfOrCnpj },
 			});
 			expect(result).toBeNull();
 		});
