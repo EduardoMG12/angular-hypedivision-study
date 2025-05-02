@@ -4,13 +4,14 @@ import { Repository } from "typeorm";
 import { Package } from "../entities/package.entity";
 import { User } from "../entities/user.entity";
 
-import {
-	NotFoundException,
-	UnauthorizedException,
-	BadRequestException,
-} from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
 import { PackageService } from "./package.service";
-// Importe DTOs ou interfaces para entrada/saída se existirem.
+import { UsersService } from "src/users/users.service";
+
+import { CreatePackageDto } from "./dto/create.dto";
+import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
+import { UpdatePackageDto } from "./dto/update.dto";
+import { PackageStatus } from "./common/enums/packageStatus.enum";
 
 const makeMockUser = (id = "user-owner-id"): User => ({
 	id,
@@ -18,8 +19,7 @@ const makeMockUser = (id = "user-owner-id"): User => ({
 	fullName: "Package Owner",
 	password: "hashed_password",
 	phone: "11999999999",
-	cpfOrCnpj: "12345678901",
-	birthdate: new Date(),
+	birthdate: new Date("1990-01-01"),
 	created_at: new Date(),
 	updated_at: new Date(),
 	deleted_at: null,
@@ -28,770 +28,511 @@ const makeMockUser = (id = "user-owner-id"): User => ({
 const makeMockPackage = (
 	id = "package-id",
 	ownerId = "user-owner-id",
-	status = "active",
+
+	status = PackageStatus.Active,
+	title = "Test Package",
+	description = "This is a test package description.",
+	createdAt = new Date(),
+	updatedAt = new Date(),
 ): Package => ({
 	id,
-	title: "Test Package",
-	description: "This is a test package description.",
-	owner: makeMockUser(ownerId), // Relacionamento ManyToOne com User
+	title,
+	description,
+	owner: makeMockUser(ownerId),
 	status,
-	createdAt: new Date(),
-	updatedAt: new Date(),
+	createdAt,
+	updatedAt,
 });
 
-interface CreatePackageDto {
-	title: string;
-	description?: string;
-	ownerId: string;
-}
-
-interface EditPackageDto {
-	title?: string;
-	description?: string;
-	status?: string;
-}
-
 describe("PackageService", () => {
-	// Declaração das variáveis para o serviço e o repositório mockado
-	let service: PackageService; // Usaremos 'any' por enquanto, já que o serviço ainda não existe
+	let service: PackageService;
 	let packagesRepository: jest.Mocked<Repository<Package>>;
-	let usersRepository: jest.Mocked<Repository<User>>; // Mockar UsersService seria outra opção, mas podemos simular a carga do owner pelo Repository
+	let usersService: jest.Mocked<UsersService>;
 
-	// Configuração que roda antes de cada teste
 	beforeEach(async () => {
-		// Cria o módulo de teste do NestJS
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				// O serviço a ser testado (ainda não existe, será 'any')
-				// Em TDD, você criaria a classe PackageService aqui
-				{
-					provide: PackageService, // Nome provisório até criar a classe
-					useValue: {
-						// Mockamos os métodos que queremos testar
-						createPackage: jest.fn(),
-						findPackageById: jest.fn(),
-						findAllPackagesByUserId: jest.fn(),
-						deletePackage: jest.fn(),
-						editPackage: jest.fn(),
-						desactivePackage: jest.fn(),
-						workingPackage: jest.fn(),
-						donePackage: jest.fn(),
-						// Métodos de status específicos (opcional, dependendo da sua implementação final)
-						updatePackageStatus: jest.fn(),
-					},
-				},
-				// Mock do Repository<Package>
+				PackageService,
+
 				{
 					provide: getRepositoryToken(Package),
 					useValue: {
-						create: jest.fn(), // Método do Repository para criar instância local
-						save: jest.fn(), // Método do Repository para salvar no DB
-						findOne: jest.fn(), // Método do Repository para buscar 1
-						find: jest.fn(), // Método do Repository para buscar N
-						delete: jest.fn(), // Método do Repository para deletar
-						update: jest.fn(), // Método do Repository para atualizar parcialmente
+						create: jest.fn(),
+						save: jest.fn(),
+						findOne: jest.fn(),
+						find: jest.fn(),
+						delete: jest.fn(),
 					},
 				},
-				// Mock do Repository<User> (se necessário para buscar o owner)
+
 				{
-					provide: getRepositoryToken(User),
+					provide: UsersService,
 					useValue: {
-						findOne: jest.fn(), // Para buscar o owner
+						findById: jest.fn(),
 					},
 				},
 			],
 		}).compile();
 
-		// Obtém as instâncias mockadas
 		service = module.get<PackageService>(PackageService);
-		packagesRepository = module.get(getRepositoryToken(Package)); // Obtém o mock do Repository<Package>
-		usersRepository = module.get(getRepositoryToken(User)); // Obtém o mock do Repository<User>
+		packagesRepository = module.get(getRepositoryToken(Package));
+		usersService = module.get(UsersService);
 	});
 
-	// Verifica se o serviço foi definido (teste inicial básico)
 	it("should be defined", () => {
 		expect(service).toBeDefined();
+		expect(packagesRepository).toBeDefined();
+		expect(usersService).toBeDefined();
 	});
 
-	// --- Testes para createPackage ---
-	describe("createPackage", () => {
-		// Cenário de sucesso: criar um pacote
+	describe("create", () => {
 		it("should create a package successfully", async () => {
-			// 1. Arrange (Preparação)
+			const userId = "user-owner-id";
 			const createDto: CreatePackageDto = {
 				title: "New Package Title",
 				description: "Details about the new package.",
-				ownerId: "user-owner-id",
 			};
-			const owner = makeMockUser(createDto.ownerId); // O owner que seria encontrado
+			const owner = makeMockUser(userId);
 			const expectedPackage = makeMockPackage(
 				"new-package-id",
-				createDto.ownerId,
-				"active",
-			); // O pacote esperado a ser retornado
+				userId,
+				PackageStatus.Active,
+				createDto.title,
+				createDto.description,
+			);
 
-			// Configura os mocks:
-			// usersRepository.findOne deve encontrar o owner
-			usersRepository.findOne.mockResolvedValue(owner);
-			// packagesRepository.create deve retornar uma instância Package baseada no DTO e owner
-			// Em uma implementação real, você passaria { ...dto, owner } para create
+			usersService.findById.mockResolvedValue(owner);
 			packagesRepository.create.mockReturnValue({
 				...createDto,
-				owner, // O objeto owner é adicionado aqui
-				id: "temp-id", // ID temporário antes de salvar
-				status: "active", // Status padrão
+				owner,
+				status: PackageStatus.Active,
 				createdAt: new Date(),
-				updatedAt: new Date(),
-			} as Package); // Afirma o tipo
-			// packagesRepository.save deve retornar o pacote salvo (com ID final)
+			} as Package);
 			packagesRepository.save.mockResolvedValue(expectedPackage);
 
-			// 2. Act (Ação)
-			// Chama o método createPackage do serviço
-			// Em TDD, você implementaria este método DEPOIS de escrever este teste
-			const result = await service.create(createDto);
+			const result = await service.create(userId, createDto);
 
-			// 3. Assert (Verificações)
-			// Verifica se o owner foi buscado
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { id: createDto.ownerId },
-			});
-			// Verifica se packagesRepository.create foi chamado com os dados corretos (incluindo o owner)
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packagesRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description,
-				owner, // Espera que o objeto owner seja passado
+				owner,
+				status: PackageStatus.Active,
+				createdAt: expect.any(Date),
 			});
-			// Verifica se packagesRepository.save foi chamado com a instância criada
-			// O argumento para save é o resultado de packagesRepository.create
-			expect(packagesRepository.save).toHaveBeenCalled(); // Poderia verificar com o objeto exato retornado por create
-			// Verifica se o resultado retornado pelo serviço é o pacote esperado
+
+			expect(packagesRepository.save).toHaveBeenCalledWith(
+				packagesRepository.create.mock.results[0].value,
+			);
 			expect(result).toEqual(expectedPackage);
 		});
 
-		// Cenário de erro: owner não encontrado
-		it("should throw NotFoundException if owner is not found", async () => {
-			// 1. Arrange (Preparação)
+		it("should throw NotFoundException if owner is not found by UsersService", async () => {
+			const userId = "nonexistent-user-id";
 			const createDto: CreatePackageDto = {
 				title: "New Package Title",
 				description: "Details about the new package.",
-				ownerId: "nonexistent-user-id",
 			};
 
-			// Configura o mock: usersRepository.findOne retorna null
-			usersRepository.findOne.mockResolvedValue(null);
+			usersService.findById.mockRejectedValue(
+				new NotFoundException("User not found"),
+			);
 
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			// Espera que o método createPackage lance NotFoundException
-			await expect(service.create(createDto)).rejects.toThrow(
+			await expect(service.create(userId, createDto)).rejects.toThrow(
 				NotFoundException,
 			);
 
-			// Verifica se o owner foi buscado
-			expect(usersRepository.findOne).toHaveBeenCalledWith({
-				where: { id: createDto.ownerId },
-			});
-			// Verifica que packagesRepository.create e save NÃO foram chamados
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packagesRepository.create).not.toHaveBeenCalled();
 			expect(packagesRepository.save).not.toHaveBeenCalled();
 		});
-
-		// Cenário de erro: DTO de entrada inválido (geralmente tratado por ValidationPipe, mas bom ter teste no service se houver validação interna)
-		// Exemplo: título vazio (assumindo que o serviço valida isso se não houver pipe)
-		// it('should throw BadRequestException if input is invalid', async () => { ... });
 	});
 
-	// --- Testes para findPackageById ---
-	describe("findPackageById", () => {
-		// Cenário de sucesso: pacote encontrado pelo ID
-		it("should find a package by id", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const expectedPackage = makeMockPackage(packageId); // O pacote esperado a ser encontrado
-
-			// Configura o mock: packagesRepository.findOne retorna o pacote
-			packagesRepository.findOne.mockResolvedValue(expectedPackage);
-
-			// 2. Act (Ação)
-			const result = await service.findPackageById(packageId);
-
-			// 3. Assert (Verificações)
-			// Verifica se packagesRepository.findOne foi chamado com o ID correto
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId },
-			});
-			// Verifica se o resultado retornado é o pacote esperado
-			expect(result).toEqual(expectedPackage);
-		});
-
-		// Cenário de sucesso com ownerId: encontrar um pacote POR ID E OWNER
-		it("should find a package by id and owner id", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const expectedPackage = makeMockPackage(packageId, ownerId); // O pacote esperado a ser encontrado
-
-			// Configura o mock: packagesRepository.findOne retorna o pacote
-			// O mock deve ser configurado para esperar a query COM o ownerId no 'where'
-			packagesRepository.findOne.mockResolvedValue(expectedPackage);
-
-			// 2. Act (Ação)
-			// O método do service precisará receber o ownerId também
-			const result = await service.findPackageById(packageId, ownerId);
-
-			// 3. Assert (Verificações)
-			// Verifica se packagesRepository.findOne foi chamado com o ID E o ownerId
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			}); // Assumindo que TypeORM permite filtrar pelo ID do relacionamento assim
-			// Verifica se o resultado retornado é o pacote esperado
-			expect(result).toEqual(expectedPackage);
-		});
-
-		// Cenário de erro: pacote não encontrado
-		it("should throw NotFoundException if package is not found", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "nonexistent-package-id";
-
-			// Configura o mock: packagesRepository.findOne retorna null
-			packagesRepository.findOne.mockResolvedValue(null);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			// Espera que o método lance NotFoundException
-			await expect(service.findPackageById(packageId)).rejects.toThrow(
-				NotFoundException,
-			);
-
-			// Verifica se packagesRepository.findOne foi chamado
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId },
-			});
-		});
-
-		// Cenário de erro com ownerId: pacote encontrado, mas não pertence ao owner
-		it("should throw UnauthorizedException if package is found but belongs to a different owner", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id"; // O ID do owner na chamada
-			const packageFound = makeMockPackage(packageId, "different-owner-id"); // Pacote encontrado com owner DIFERENTE
-
-			// Configura o mock: packagesRepository.findOne retorna o pacote (sem filtrar pelo owner no mock)
-			// Na implementação do serviço, você buscaria o pacote e DEPOIS checaria o owner
-			// Para o teste, mockamos o findOne retornando um pacote com owner diferente e esperamos a exceção
-			packagesRepository.findOne.mockResolvedValue(packageFound);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			// Espera que o método lance UnauthorizedException
-			// O método do service precisará receber o ownerId para a verificação
-			await expect(service.findPackageById(packageId, ownerId)).rejects.toThrow(
-				UnauthorizedException,
-			);
-
-			// Verifica se packagesRepository.findOne foi chamado (provavelmente sem o filtro de owner para este cenário de teste)
-			// expect(packagesRepository.findOne).toHaveBeenCalledWith({ where: { id: packageId } }); // Depende de como você implementará a busca no service
-			expect(packagesRepository.findOne).toHaveBeenCalled(); // Verificação mais genérica
-		});
-	});
-
-	// --- Testes para findAllPackagesByUserId ---
-	describe("findAllPackagesByUserId", () => {
-		// Cenário de sucesso: encontrar pacotes de um usuário
+	describe("findAll", () => {
 		it("should find all packages for a user", async () => {
-			// 1. Arrange (Preparação)
-			const ownerId = "user-owner-id";
+			const userId = "user-owner-id";
 			const userPackages = [
-				makeMockPackage("pkg1", ownerId),
-				makeMockPackage("pkg2", ownerId),
-			]; // Array de pacotes esperados
+				makeMockPackage("pkg1", userId),
+				makeMockPackage("pkg2", userId),
+			];
 
-			// Configura o mock: packagesRepository.find retorna o array de pacotes
-			// O mock deve esperar a query filtrando pelo ownerId
 			packagesRepository.find.mockResolvedValue(userPackages);
 
-			// 2. Act (Ação)
-			// O método do service receberá o userId
-			const result = await service.findAllPackagesByUserId(ownerId);
+			const result = await service.findAll(userId);
 
-			// 3. Assert (Verificações)
-			// Verifica se packagesRepository.find foi chamado com o filtro de ownerId
 			expect(packagesRepository.find).toHaveBeenCalledWith({
-				where: { owner: { id: ownerId } },
+				where: { owner: { id: userId } },
 			});
-			// Verifica se o resultado é o array de pacotes
 			expect(result).toEqual(userPackages);
 		});
 
-		// Cenário de sucesso: usuário sem pacotes
 		it("should return an empty array if the user has no packages", async () => {
-			// 1. Arrange (Preparação)
-			const ownerId = "user-without-packages-id";
-			const userPackages: Package[] = []; // Array vazio esperado
+			const userId = "user-without-packages-id";
+			const userPackages: Package[] = [];
 
-			// Configura o mock: packagesRepository.find retorna array vazio
 			packagesRepository.find.mockResolvedValue(userPackages);
 
-			// 2. Act (Ação)
-			const result = await service.findAllPackagesByUserId(ownerId);
+			const result = await service.findAll(userId);
 
-			// 3. Assert (Verificações)
 			expect(packagesRepository.find).toHaveBeenCalledWith({
-				where: { owner: { id: ownerId } },
+				where: { owner: { id: userId } },
 			});
 			expect(result).toEqual(userPackages);
 			expect(result).toHaveLength(0);
 		});
-
-		// Cenário de erro: ownerId inválido ou usuário não existe (pode ser verificado no service ou assumir que o controller/guard já validou)
-		// Se o service validar, adicionaria teste aqui:
-		// it('should throw NotFoundException if user does not exist', async () => { ... });
 	});
 
-	// --- Testes para deletePackage ---
-	describe("deletePackage", () => {
-		// Cenário de sucesso: deletar um pacote
-		it("should delete a package successfully", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-to-delete-id";
-			const ownerId = "user-owner-id";
-			const packageToDelete = makeMockPackage(packageId, ownerId); // O pacote a ser encontrado e deletado
+	describe("findById", () => {
+		it("should find a package by id for the given user", async () => {
+			const userId = "user-owner-id";
+			const packageId = "package-id";
+			const owner = makeMockUser(userId);
+			const expectedPackage = makeMockPackage(packageId, userId);
 
-			// Configura os mocks:
-			// findOne encontra o pacote pelo ID e owner (para verificar propriedade antes de deletar)
-			packagesRepository.findOne.mockResolvedValue(packageToDelete);
-			// delete mockado para resolver, geralmente retorna um objeto com affected/raw
-			// Mockamos um retorno simples para indicar sucesso
-			packagesRepository.delete.mockResolvedValue({ affected: 1, raw: {} }); // Simula deleção de 1 registro
+			usersService.findById.mockResolvedValue(owner);
+			packagesRepository.findOne.mockResolvedValue(expectedPackage);
 
-			// 2. Act (Ação)
-			// O método do service receberá o ID do pacote E o ID do owner para verificação
-			await service.deletePackage(packageId, ownerId);
+			const result = await service.findById(userId, packageId);
 
-			// 3. Assert (Verificações)
-			// Verifica se findOne foi chamado com o ID do pacote E o ID do owner
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
+				where: { owner: { id: userId }, id: packageId },
 			});
-			// Verifica se delete foi chamado com o ID do pacote
-			expect(packagesRepository.delete).toHaveBeenCalledWith(packageId);
+			expect(result).toEqual(expectedPackage);
 		});
 
-		// Cenário de erro: pacote não encontrado para deletar
-		it("should throw NotFoundException if package to delete is not found", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "nonexistent-package-id";
-			const ownerId = "user-owner-id";
+		it("should throw NotFoundException if owner user is not found when finding package by id", async () => {
+			const userId = "nonexistent-user-id";
+			const packageId = "package-id";
 
-			// Configura o mock: findOne retorna null
-			packagesRepository.findOne.mockResolvedValue(null);
+			usersService.findById.mockRejectedValue(
+				new NotFoundException("User not found"),
+			);
+			expect(packagesRepository.findOne).not.toHaveBeenCalled();
 
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(service.deletePackage(packageId, ownerId)).rejects.toThrow(
+			await expect(service.findById(userId, packageId)).rejects.toThrow(
 				NotFoundException,
 			);
 
-			// Verifica se findOne foi chamado
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			// Verifica que delete NÃO foi chamado
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(packagesRepository.findOne).not.toHaveBeenCalled();
 		});
 
-		// Cenário de erro: pacote encontrado, mas não pertence ao owner que tenta deletar
-		it("should throw UnauthorizedException if package to delete belongs to a different owner", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id"; // O ID do owner na chamada
-			const packageFound = makeMockPackage(packageId, "different-owner-id"); // Pacote encontrado com owner DIFERENTE
+		it("should throw NotFoundException if package is not found for the given user id", async () => {
+			const userId = "user-owner-id";
+			const packageId = "nonexistent-package-id-for-this-user";
+			const owner = makeMockUser(userId);
 
-			// Configura o mock: findOne retorna o pacote (sem filtrar pelo owner no mock findOne)
-			// Na implementação, você buscaria e DEPOIS checaria o owner
-			packagesRepository.findOne.mockResolvedValue(packageFound);
+			usersService.findById.mockResolvedValue(owner);
+			packagesRepository.findOne.mockResolvedValue(null);
 
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(service.deletePackage(packageId, ownerId)).rejects.toThrow(
-				UnauthorizedException,
+			await expect(service.findById(userId, packageId)).rejects.toThrow(
+				NotFoundException,
 			);
 
-			// Verifica se findOne foi chamado
-			// expect(packagesRepository.findOne).toHaveBeenCalledWith({ where: { id: packageId } }); // Depende da implementação
-			expect(packagesRepository.findOne).toHaveBeenCalled(); // Verificação mais genérica
-
-			// Verifica que delete NÃO foi chamado
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(packagesRepository.findOne).toHaveBeenCalledWith({
+				where: { owner: { id: userId }, id: packageId },
+			});
 		});
 	});
 
-	// --- Testes para editPackage ---
-	describe("editPackage", () => {
-		// Cenário de sucesso: editar um pacote
-		it("should edit a package successfully", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-to-edit-id";
-			const ownerId = "user-owner-id";
-			const editDto: EditPackageDto = {
+	describe("changeStatus", () => {
+		let serviceFindByIdSpy: jest.SpyInstance;
+
+		beforeEach(() => {
+			serviceFindByIdSpy = jest.spyOn(service, "findById");
+		});
+
+		afterEach(() => {
+			serviceFindByIdSpy.mockRestore();
+		});
+
+		it("should change package status successfully", async () => {
+			const userId = "user-owner-id";
+			const changeStatusDto: ChangePackageStatusDto = {
+				id: "package-id",
+				status: "WORKING",
+			};
+			const owner = makeMockUser(userId);
+			const existingPackage = makeMockPackage(
+				changeStatusDto.id,
+				userId,
+				PackageStatus.Active,
+			);
+			const expectedPackage = {
+				...existingPackage,
+				status: changeStatusDto.status,
+				updatedAt: expect.any(Date),
+			};
+
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockResolvedValue(existingPackage);
+			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+
+			const result = await service.changeStatus(userId, changeStatusDto);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(
+				userId,
+				changeStatusDto.id,
+			);
+
+			expect(packagesRepository.save).toHaveBeenCalledWith({
+				...existingPackage,
+				status: changeStatusDto.status,
+			});
+			expect(result).toEqual(expectedPackage);
+		});
+
+		it("should throw NotFoundException if owner user is not found when changing package status", async () => {
+			const userId = "nonexistent-user-id";
+			const changeStatusDto: ChangePackageStatusDto = {
+				id: "package-id",
+				status: "DONE",
+			};
+
+			usersService.findById.mockRejectedValue(
+				new NotFoundException("User not found"),
+			);
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
+			expect(packagesRepository.save).not.toHaveBeenCalled();
+
+			await expect(
+				service.changeStatus(userId, changeStatusDto),
+			).rejects.toThrow(NotFoundException);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
+			expect(packagesRepository.save).not.toHaveBeenCalled();
+		});
+
+		it("should throw NotFoundException if package is not found for the user when changing status", async () => {
+			const userId = "user-owner-id";
+			const changeStatusDto: ChangePackageStatusDto = {
+				id: "nonexistent-id",
+				status: "DONE",
+			};
+			const owner = makeMockUser(userId);
+
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockRejectedValue(
+				new NotFoundException("Package not found"),
+			);
+			expect(packagesRepository.save).not.toHaveBeenCalled();
+
+			await expect(
+				service.changeStatus(userId, changeStatusDto),
+			).rejects.toThrow(NotFoundException);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(
+				userId,
+				changeStatusDto.id,
+			);
+			expect(packagesRepository.save).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("update", () => {
+		let serviceFindByIdSpy: jest.SpyInstance;
+
+		beforeEach(() => {
+			serviceFindByIdSpy = jest.spyOn(service, "findById");
+		});
+
+		afterEach(() => {
+			serviceFindByIdSpy.mockRestore();
+		});
+
+		it("should update a package successfully", async () => {
+			const userId = "user-owner-id";
+			const updateDto: UpdatePackageDto = {
+				id: "package-to-update-id",
 				title: "Updated Title",
 				description: "Updated description.",
+				status: PackageStatus.Concluded,
 			};
-			const existingPackage = makeMockPackage(packageId, ownerId, "active"); // Pacote existente
-			const updatedPackage = {
-				// O pacote esperado após a atualização
-				...existingPackage,
-				...editDto,
-				updatedAt: new Date(), // Simula a data de atualização mudando
-			};
-
-			// Configura os mocks:
-			// findOne encontra o pacote pelo ID e owner
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-			// save mockado para retornar o pacote atualizado
-			packagesRepository.save.mockResolvedValue(updatedPackage as Package); // Afirma o tipo
-
-			// 2. Act (Ação)
-			// O método do service receberá o ID do pacote, o ownerId e o DTO de edição
-			const result = await service.editPackage(packageId, ownerId, editDto);
-
-			// 3. Assert (Verificações)
-			// Verifica se findOne foi chamado
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			// Verifica se save foi chamado com o pacote EXISTENTE, mas com as propriedades ATUALIZADAS
-			// A implementação no service deve buscar o pacote, aplicar as mudanças do DTO, e depois salvar.
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage, // O objeto original
-				...editDto, // Propriedades do DTO aplicadas
-			});
-			// Verifica se o resultado retornado é o pacote atualizado
-			expect(result).toEqual(updatedPackage);
-		});
-
-		// Cenário de sucesso: editar apenas alguns campos
-		it("should edit only specified fields", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-to-edit-id";
-			const ownerId = "user-owner-id";
-			const editDto: EditPackageDto = {
-				title: "Only Title Changed", // Apenas o título muda
-			};
-			const existingPackage = makeMockPackage(packageId, ownerId, "active");
-			const updatedPackage = {
-				...existingPackage,
-				title: editDto.title, // Apenas o título atualizado
-				updatedAt: new Date(),
-			};
-
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-			packagesRepository.save.mockResolvedValue(updatedPackage as Package);
-
-			const result = await service.editPackage(packageId, ownerId, editDto);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
-				...editDto, // Aplicar apenas o DTO parcial
-			});
-			expect(result).toEqual(updatedPackage);
-		});
-
-		// Cenário de erro: pacote não encontrado para editar
-		it("should throw NotFoundException if package to edit is not found", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "nonexistent-package-id";
-			const ownerId = "user-owner-id";
-			const editDto: EditPackageDto = { title: "Update" };
-
-			packagesRepository.findOne.mockResolvedValue(null);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(
-				service.editPackage(packageId, ownerId, editDto),
-			).rejects.toThrow(NotFoundException);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			// Verifica que save NÃO foi chamado
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-		});
-
-		// Cenário de erro: pacote encontrado, mas não pertence ao owner que tenta editar
-		it("should throw UnauthorizedException if package to edit belongs to a different owner", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id"; // O ID do owner na chamada
-			const editDto: EditPackageDto = { title: "Update" };
-			const packageFound = makeMockPackage(packageId, "different-owner-id"); // Pacote encontrado com owner DIFERENTE
-
-			packagesRepository.findOne.mockResolvedValue(packageFound);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(
-				service.editPackage(packageId, ownerId, editDto),
-			).rejects.toThrow(UnauthorizedException);
-
-			// expect(packagesRepository.findOne).toHaveBeenCalledWith({ where: { id: packageId } }); // Depende da implementação
-			expect(packagesRepository.findOne).toHaveBeenCalled(); // Verificação mais genérica
-
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-		});
-
-		// Cenário de erro: tentar mudar status para um valor inválido (se o edit permitir status change)
-		// it('should throw BadRequestException if status update is invalid', async () => { ... });
-	});
-
-	// --- Testes para métodos de status (desactive, working, done) ---
-	// Podemos criar um método genérico updatePackageStatus que é chamado pelos métodos específicos,
-	// ou testar cada método de status individualmente. Vamos testar individualmente para clareza.
-
-	describe("desactivePackage", () => {
-		// Cenário de sucesso: desativar um pacote ativo
-		it('should change package status to "desactive"', async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const existingPackage = makeMockPackage(packageId, ownerId, "active"); // Começa ativo
+			const owner = makeMockUser(userId);
+			const existingPackage = makeMockPackage(
+				updateDto.id,
+				userId,
+				PackageStatus.Active,
+				"Old Title",
+				"Old Description",
+			);
 			const expectedPackage = {
 				...existingPackage,
-				status: "desactive", // Status esperado
-				updatedAt: new Date(), // Simula data de atualização
+				...updateDto,
+				updatedAt: expect.any(Date),
 			};
 
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockResolvedValue(existingPackage);
+
 			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
 
-			// 2. Act (Ação)
-			const result = await service.desactivePackage(packageId, ownerId);
+			const result = await service.update(userId, updateDto);
 
-			// 3. Assert (Verificações)
-			// Verifica se buscou o pacote pelo ID e owner
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			// Verifica se save foi chamado com o pacote e o status atualizado
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
 			expect(packagesRepository.save).toHaveBeenCalledWith({
 				...existingPackage,
-				status: "desactive",
-			});
-			// Verifica o retorno
-			expect(result).toEqual(expectedPackage);
-		});
-
-		// Cenário de erro: pacote não encontrado
-		it("should throw NotFoundException if package is not found for deactivation", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "nonexistent-id";
-			const ownerId = "user-owner-id";
-
-			packagesRepository.findOne.mockResolvedValue(null);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(
-				service.desactivePackage(packageId, ownerId),
-			).rejects.toThrow(NotFoundException);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-		});
-
-		// Cenário de erro: não pertence ao owner
-		it("should throw UnauthorizedException if package belongs to a different owner for deactivation", async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const packageFound = makeMockPackage(packageId, "different-owner-id");
-
-			packagesRepository.findOne.mockResolvedValue(packageFound);
-
-			// 2. Act (Ação) & 3. Assert (Verificações)
-			await expect(
-				service.desactivePackage(packageId, ownerId),
-			).rejects.toThrow(UnauthorizedException);
-
-			expect(packagesRepository.findOne).toHaveBeenCalled(); // Verifica a busca
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-		});
-
-		// Cenário de lógica: tentar desativar um pacote que JÁ está desativado
-		it('should not change status if package is already "desactive"', async () => {
-			// 1. Arrange (Preparação)
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const existingPackage = makeMockPackage(packageId, ownerId, "desactive"); // Já desativado
-
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-			// Não mockamos save, pois esperamos que não seja chamado
-
-			// 2. Act (Ação)
-			const result = await service.desactivePackage(packageId, ownerId);
-
-			// 3. Assert (Verificações)
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			// Verifica que save NÃO foi chamado
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-			// Verifica que o método retornou o pacote existente sem modificação
-			expect(result).toEqual(existingPackage);
-		});
-
-		// Testar transições inválidas de outros status (working, done) para desactive, se a lógica do service proibir
-		// it('should throw BadRequestException if status transition from "working" to "desactive" is not allowed', async () => { ... });
-	});
-
-	// --- Testes para workingPackage (similar a desactivePackage, mas com status "working") ---
-	describe("workingPackage", () => {
-		// Cenário de sucesso: mudar status para "working"
-		it('should change package status to "working"', async () => {
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			// Pode começar de 'active' ou outro status permitido
-			const existingPackage = makeMockPackage(packageId, ownerId, "active");
-			const expectedPackage = {
-				...existingPackage,
-				status: "working",
-				updatedAt: new Date(),
-			};
-
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
-
-			const result = await service.workingPackage(packageId, ownerId);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
-				status: "working",
+				title: updateDto.title,
+				description: updateDto.description,
+				status: updateDto.status,
+				updatedAt: expect.any(Date),
 			});
 			expect(result).toEqual(expectedPackage);
 		});
 
-		// Cenários de erro: pacote não encontrado, owner incorreto (similares aos de desactivePackage)
-		it('should throw NotFoundException if package is not found for setting status to "working"', async () => {
-			const packageId = "nonexistent-id";
-			const ownerId = "user-owner-id";
-			packagesRepository.findOne.mockResolvedValue(null);
-			await expect(service.workingPackage(packageId, ownerId)).rejects.toThrow(
+		it("should update only specified fields", async () => {
+			const userId = "user-owner-id";
+			const updateDto: UpdatePackageDto = {
+				id: "package-to-update-id",
+				title: "Only Title Changed",
+			};
+			const owner = makeMockUser(userId);
+			const existingPackage = makeMockPackage(
+				updateDto.id,
+				userId,
+				PackageStatus.Active,
+				"Old Title",
+				"Old Description",
+			);
+			const expectedPackage = {
+				...existingPackage,
+				title: updateDto.title,
+				updatedAt: expect.any(Date),
+			};
+
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockResolvedValue(existingPackage);
+			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+
+			const result = await service.update(userId, updateDto);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
+			expect(packagesRepository.save).toHaveBeenCalledWith({
+				...existingPackage,
+				title: updateDto.title,
+
+				updatedAt: expect.any(Date),
+			});
+			expect(result).toEqual(expectedPackage);
+		});
+
+		it("should throw NotFoundException if owner user is not found when updating package", async () => {
+			const userId = "nonexistent-user-id";
+			const updateDto: UpdatePackageDto = { id: "package-id", title: "Update" };
+
+			usersService.findById.mockRejectedValue(
+				new NotFoundException("User not found"),
+			);
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
+			expect(packagesRepository.save).not.toHaveBeenCalled();
+
+			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				NotFoundException,
 			);
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
 			expect(packagesRepository.save).not.toHaveBeenCalled();
 		});
 
-		it('should throw UnauthorizedException if package belongs to a different owner for setting status to "working"', async () => {
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const packageFound = makeMockPackage(packageId, "different-owner-id");
-			packagesRepository.findOne.mockResolvedValue(packageFound);
-			await expect(service.workingPackage(packageId, ownerId)).rejects.toThrow(
-				UnauthorizedException,
-			);
-			expect(packagesRepository.findOne).toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-		});
-
-		// Cenário de lógica: tentar mudar para "working" se JÁ está "working"
-		it('should not change status if package is already "working"', async () => {
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const existingPackage = makeMockPackage(packageId, ownerId, "working"); // Já working
-
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-
-			const result = await service.workingPackage(packageId, ownerId);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-			expect(result).toEqual(existingPackage);
-		});
-
-		// Testar transições inválidas (ex: de 'done' para 'working', se não for permitido)
-		// it('should throw BadRequestException if status transition from "done" to "working" is not allowed', async () => { ... });
-	});
-
-	// --- Testes para donePackage (similar a desactivePackage, mas com status "done") ---
-	describe("donePackage", () => {
-		// Cenário de sucesso: mudar status para "done"
-		it('should change package status to "done"', async () => {
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			// Pode começar de 'active' ou 'working'
-			const existingPackage = makeMockPackage(packageId, ownerId, "working");
-			const expectedPackage = {
-				...existingPackage,
-				status: "done",
-				updatedAt: new Date(),
+		it("should throw NotFoundException if package is not found for the user when updating", async () => {
+			const userId = "user-owner-id";
+			const updateDto: UpdatePackageDto = {
+				id: "nonexistent-id",
+				title: "Update",
 			};
+			const owner = makeMockUser(userId);
 
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
-			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockRejectedValue(
+				new NotFoundException("Package not found"),
+			);
+			expect(packagesRepository.save).not.toHaveBeenCalled();
 
-			const result = await service.donePackage(packageId, ownerId);
-
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
-				status: "done",
-			});
-			expect(result).toEqual(expectedPackage);
-		});
-
-		// Cenários de erro: pacote não encontrado, owner incorreto (similares aos de desactivePackage)
-		it('should throw NotFoundException if package is not found for setting status to "done"', async () => {
-			const packageId = "nonexistent-id";
-			const ownerId = "user-owner-id";
-			packagesRepository.findOne.mockResolvedValue(null);
-			await expect(service.donePackage(packageId, ownerId)).rejects.toThrow(
+			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				NotFoundException,
 			);
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
 			expect(packagesRepository.save).not.toHaveBeenCalled();
 		});
+	});
 
-		it('should throw UnauthorizedException if package belongs to a different owner for setting status to "done"', async () => {
+	describe("delete", () => {
+		let serviceFindByIdSpy: jest.SpyInstance;
+
+		beforeEach(() => {
+			serviceFindByIdSpy = jest.spyOn(service, "findById");
+		});
+
+		afterEach(() => {
+			serviceFindByIdSpy.mockRestore();
+		});
+
+		it("should delete a package successfully", async () => {
+			const userId = "user-owner-id";
+			const packageId = "package-to-delete-id";
+			const owner = makeMockUser(userId);
+			const packageToDelete = makeMockPackage(packageId, userId);
+
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockResolvedValue(packageToDelete);
+			packagesRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
+
+			const result = await service.delete(userId, packageId);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, packageId);
+			expect(packagesRepository.delete).toHaveBeenCalledWith(packageId);
+
+			expect(result).toEqual(packageToDelete);
+		});
+
+		it("should throw NotFoundException if owner user is not found when deleting package", async () => {
+			const userId = "nonexistent-user-id";
 			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const packageFound = makeMockPackage(packageId, "different-owner-id");
-			packagesRepository.findOne.mockResolvedValue(packageFound);
-			await expect(service.donePackage(packageId, ownerId)).rejects.toThrow(
-				UnauthorizedException,
+
+			usersService.findById.mockRejectedValue(
+				new NotFoundException("User not found"),
 			);
-			expect(packagesRepository.findOne).toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
+			expect(packagesRepository.delete).not.toHaveBeenCalled();
+
+			await expect(service.delete(userId, packageId)).rejects.toThrow(
+				NotFoundException,
+			);
+
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
+			expect(packagesRepository.delete).not.toHaveBeenCalled();
 		});
 
-		// Cenário de lógica: tentar mudar para "done" se JÁ está "done"
-		it('should not change status if package is already "done"', async () => {
-			const packageId = "package-id";
-			const ownerId = "user-owner-id";
-			const existingPackage = makeMockPackage(packageId, ownerId, "done"); // Já done
+		it("should throw NotFoundException if package is not found for the user when deleting", async () => {
+			const userId = "user-owner-id";
+			const packageId = "nonexistent-id";
+			const owner = makeMockUser(userId);
 
-			packagesRepository.findOne.mockResolvedValue(existingPackage);
+			usersService.findById.mockResolvedValue(owner);
+			serviceFindByIdSpy.mockRejectedValue(
+				new NotFoundException("Package not found"),
+			);
+			expect(packagesRepository.delete).not.toHaveBeenCalled();
 
-			const result = await service.donePackage(packageId, ownerId);
+			await expect(service.delete(userId, packageId)).rejects.toThrow(
+				NotFoundException,
+			);
 
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { id: packageId, owner: { id: ownerId } },
-			});
-			expect(packagesRepository.save).not.toHaveBeenCalled();
-			expect(result).toEqual(existingPackage);
+			expect(usersService.findById).toHaveBeenCalledWith(userId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, packageId);
+			expect(packagesRepository.delete).not.toHaveBeenCalled();
 		});
-
-		// Testar transições inválidas (ex: de 'desactive' para 'done', se não for permitido)
-		// it('should throw BadRequestException if status transition from "desactive" to "done" is not allowed', async () => { ... });
 	});
 });

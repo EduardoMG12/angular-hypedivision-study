@@ -1,6 +1,7 @@
-import { IsOptional, IsUUID, MaxLength } from "class-validator";
+import { IsEnum, IsOptional, IsUUID, MaxLength } from "class-validator";
 
 import { Expose } from "class-transformer";
+import { PackageStatus } from "../common/enums/packageStatus.enum";
 
 export class UpdatePackageDto {
 	@Expose()
@@ -17,7 +18,10 @@ export class UpdatePackageDto {
 	@Expose()
 	description?: string;
 
-	@IsOptional()
+	@IsEnum(PackageStatus, {
+		message:
+			"Status deve ser um valor válido: active, paused, concluded, working",
+	})
 	@Expose()
-	status?: string;
+	status?: PackageStatus;
 }

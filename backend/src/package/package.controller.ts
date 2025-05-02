@@ -1,7 +1,6 @@
 import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
 import { GetUserId } from "./../common/decorators/getUserId.decorator";
 import { Body, Controller, Delete, Get, Post, Put } from "@nestjs/common";
-// import { IPackageController } from "./interfaces/IPackageController.interface";
 import { CreatePackageDto } from "./dto/create.dto";
 import { PackageDto } from "./dto/package.dto";
 import { PackageService } from "./package.service";

@@ -1,5 +1,10 @@
 import { UsersService } from "src/users/users.service";
-import { Body, Injectable, NotFoundException } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Injectable,
+	NotFoundException,
+} from "@nestjs/common";
 import { CreatePackageDto } from "./dto/create.dto";
 import { PackageDto } from "./dto/package.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -8,6 +13,7 @@ import { Repository } from "typeorm";
 import { GetUserId } from "src/common/decorators/getUserId.decorator";
 import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
 import { UpdatePackageDto } from "./dto/update.dto";
+import { PackageStatus } from "./common/enums/packageStatus.enum";
 
 @Injectable()
 export class PackageService {
@@ -27,7 +33,7 @@ export class PackageService {
 			title: packageData.title,
 			description: packageData.description || "",
 			owner: user,
-			status: "ACTIVE",
+			status: PackageStatus.Active,
 			createdAt: new Date(),
 		});
 
@@ -60,7 +66,28 @@ export class PackageService {
 
 		const packageEntity = await this.findById(userId, changeStatusDto.id);
 
-		packageEntity.status = changeStatusDto.status; // i will implemented this types .e. ACTIVE, INACTIVE, ARCHIVED, COMPLETED, PAUSED
+		const currentStatus = packageEntity.status;
+		const targetStatus = changeStatusDto.status;
+
+		if (
+			currentStatus === PackageStatus.Concluded &&
+			targetStatus !== PackageStatus.Concluded
+		) {
+			throw new BadRequestException("Cannot change status from concluded");
+		}
+
+		if (
+			targetStatus === PackageStatus.Working &&
+			![PackageStatus.Active, PackageStatus.Paused].includes(
+				currentStatus as PackageStatus,
+			)
+		) {
+			throw new BadRequestException(
+				"Can only set status to working from active or paused",
+			);
+		}
+
+		packageEntity.status = targetStatus as PackageStatus;
 
 		return (await this.packageRepository.save(packageEntity)) as PackageDto;
 	}
@@ -83,9 +110,9 @@ export class PackageService {
 	}
 
 	async delete(userId: string, id: string): Promise<PackageDto> {
-		const user = this.usersService.findById(userId);
+		const user = await this.usersService.findById(userId);
 
-		const packageEntity = this.findById(userId, id);
+		const packageEntity = await this.findById(userId, id);
 
 		await this.packageRepository.delete(id);
 

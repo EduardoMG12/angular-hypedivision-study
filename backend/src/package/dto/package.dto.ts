@@ -1,6 +1,7 @@
 import { Expose } from "class-transformer";
-import { IsString, IsUUID, MaxLength } from "class-validator";
+import { IsEnum, IsString, IsUUID, MaxLength } from "class-validator";
 import { User } from "src/entities/user.entity";
+import { PackageStatus } from "../common/enums/packageStatus.enum";
 
 export class PackageDto {
 	@Expose()
@@ -17,10 +18,12 @@ export class PackageDto {
 	@MaxLength(1000)
 	description?: string;
 
+	@IsEnum(PackageStatus, {
+		message:
+			"Status deve ser um valor válido: active, paused, concluded, working",
+	})
 	@Expose()
-	@IsString()
-	@MaxLength(20)
-	status: string;
+	status?: PackageStatus;
 
 	@Expose()
 	owner: User;
