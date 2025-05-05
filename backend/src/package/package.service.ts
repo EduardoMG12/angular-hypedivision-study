@@ -14,6 +14,7 @@ import { GetUserId } from "src/common/decorators/getUserId.decorator";
 import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
 import { UpdatePackageDto } from "./dto/update.dto";
 import { PackageStatus } from "./common/enums/packageStatus.enum";
+import { PackageWithFlashcardsDto } from "./dto/packageWithFlashcards";
 
 @Injectable()
 export class PackageService {
@@ -58,6 +59,31 @@ export class PackageService {
 		return packageEntity as PackageDto;
 	}
 
+	async findByIdWithFlashcards(
+		userId: string,
+		id: string,
+	): Promise<PackageWithFlashcardsDto> {
+		const user = await this.usersService.findById(userId);
+
+		const packageEntity = await this.packageRepository.findOne({
+			where: { owner: { id: userId }, id },
+			relations: ["flashcards", "owner"],
+		});
+
+		if (!packageEntity) {
+			throw new NotFoundException("Package not found");
+		}
+
+		return packageEntity as PackageWithFlashcardsDto;
+	}
+
+	// async findByIdWithFlashcardsAndCards(
+	// 	userId: string,
+	// 	id: string,
+	// ): Promise<PackageWithFlashcardsDto> {
+
+	// }
+
 	async changeStatus(
 		userId: string,
 		changeStatusDto: ChangePackageStatusDto,
@@ -69,22 +95,8 @@ export class PackageService {
 		const currentStatus = packageEntity.status;
 		const targetStatus = changeStatusDto.status;
 
-		if (
-			currentStatus === PackageStatus.Concluded &&
-			targetStatus !== PackageStatus.Concluded
-		) {
-			throw new BadRequestException("Cannot change status from concluded");
-		}
-
-		if (
-			targetStatus === PackageStatus.Working &&
-			![PackageStatus.Active, PackageStatus.Paused].includes(
-				currentStatus as PackageStatus,
-			)
-		) {
-			throw new BadRequestException(
-				"Can only set status to working from active or paused",
-			);
+		if (currentStatus === targetStatus) {
+			throw new BadRequestException("Cannot change status for egual status");
 		}
 
 		packageEntity.status = targetStatus as PackageStatus;

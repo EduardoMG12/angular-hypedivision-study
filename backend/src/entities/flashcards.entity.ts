@@ -5,10 +5,12 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	OneToMany,
 } from "typeorm";
 import { User } from "./user.entity";
 import { Package } from "./package.entity";
-import { PackageStatus } from "./common/enums/packageStatus.enum";
+import { Cards } from "./cards.entity";
+import { FlashcardStatus } from "./common/enums/flashcardStatus.enum";
 
 @Entity("flashcards")
 export class Flashcard {
@@ -25,10 +27,17 @@ export class Flashcard {
 	owner: User;
 
 	@ManyToOne(() => Package, { nullable: true })
-	package: Package;
+	package: Package | null;
 
-	@Column({ type: "varchar", length: 20, default: PackageStatus.Active })
-	status: PackageStatus;
+	@OneToMany(
+		() => Cards,
+		(card) => card.flashcard,
+		{ nullable: true },
+	)
+	cards: Cards[];
+
+	@Column({ type: "varchar", length: 20, default: FlashcardStatus.Active })
+	status: FlashcardStatus;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

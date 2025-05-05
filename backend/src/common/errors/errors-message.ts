@@ -1,6 +1,10 @@
 import { ErrorCode } from "./error-codes.enum";
 
 export const errorMessages = {
+	[ErrorCode.FLASHCARD_NOT_FOUND]: {
+		"pt-BR": "O flashcard nao existe.",
+		"en-US": "The flashcard not foun.",
+	},
 	[ErrorCode.INVALID_CREDENTIALS]: {
 		"pt-BR": "Credenciais inválidas. Por favor, verifique seu e-mail e senha.",
 		"en-US": "Invalid credentials. Please check your email and password.",

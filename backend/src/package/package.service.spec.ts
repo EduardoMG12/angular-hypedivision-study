@@ -42,6 +42,7 @@ const makeMockPackage = (
 	status,
 	createdAt,
 	updatedAt,
+	flashcards: [],
 });
 
 describe("PackageService", () => {

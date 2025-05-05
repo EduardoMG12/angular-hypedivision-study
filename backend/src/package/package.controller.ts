@@ -23,6 +23,7 @@ import {
 	ApiParam,
 	ApiExtraModels,
 } from "@nestjs/swagger";
+import { PackageWithFlashcardsDto } from "./dto/packageWithFlashcards";
 
 @ApiTags("Package")
 @ApiBearerAuth()
@@ -106,10 +107,44 @@ export class PackageController {
 	async findById(
 		@GetUserId() userId: string,
 		@Body() packageData: { id: string },
-	): Promise<PackageDto> {
+	): Promise<PackageWithFlashcardsDto> {
 		return toPlainToInstance(
-			PackageDto,
+			PackageWithFlashcardsDto,
 			await this.packageService.findById(userId, packageData.id),
+		);
+	}
+
+	@Post("findByIdWithFlashcards")
+	@ApiOperation({
+		summary: "Find a specific Package by ID for the authenticated user",
+		description:
+			"Returns a specific Package belonging to the authenticated user, given its ID.",
+	})
+	@ApiBody({
+		type: Object,
+		description: "ID of the Package to find",
+		examples: {
+			"application/json": {
+				value: { id: "a1b2c3d4-e5f6-7890-1234-56789abcdef0" },
+				summary: "Example body for finding by ID",
+			},
+		},
+	})
+	@ApiResponse({
+		status: 200,
+		description: "Package found successfully",
+		type: PackageDto,
+	})
+	@ApiResponse({ status: 400, description: "Bad Request" })
+	@ApiResponse({ status: 401, description: "Unauthorized" })
+	@ApiResponse({ status: 404, description: "Package not found for this user" })
+	async findByIdWithFlashcards(
+		@GetUserId() userId: string,
+		@Body() packageData: { id: string },
+	): Promise<PackageWithFlashcardsDto> {
+		return toPlainToInstance(
+			PackageWithFlashcardsDto,
+			await this.packageService.findByIdWithFlashcards(userId, packageData.id),
 		);
 	}
 
