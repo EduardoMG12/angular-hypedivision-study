@@ -7,6 +7,15 @@ import { UsersService } from "../../users/users.service";
 import { Injectable } from "@nestjs/common";
 import { SanitizerUtils } from "../utils/sanitize";
 
+/**
+ * Custom validator to check if a value is a valid CPF or CNPJ.
+ * It uses the Brazilian CPF and CNPJ validation rules.
+ * The validation is asynchronous and uses the UsersService to check if the CPF or CNPJ already exists in the database.
+
+ * @example
+ * @IsCpfOrCnpj() cpfOrCnpj: string;
+*/
+
 @ValidatorConstraint({ name: "isCpfOrCnpj", async: true })
 @Injectable()
 export class IsCpfOrCnpjConstraint implements ValidatorConstraintInterface {

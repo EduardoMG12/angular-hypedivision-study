@@ -12,6 +12,18 @@ export namespace FormatterUtils {
 		return "CPF ou CNPJ inválido";
 	}
 
+	/**
+	 * Formats a given phone number string into a standardized format.
+	 *
+	 * The function removes all non-digit characters from the input and validates
+	 * the length of the cleaned phone number. It supports formatting for both
+	 * 8-digit and 9-digit phone numbers, including an area code.
+	 *
+	 * @param phoneNumber - The phone number string to be formatted.
+	 * @returns A formatted phone number string in the format `(XX)XXXX-XXXX` or
+	 * `(XX)XXXXX-XXXX`, where `XX` is the area code. If the input is invalid,
+	 * returns "Número de telefone inválido".
+	 */
 	export function phoneNumber(phoneNumber: string): string {
 		const cleanedPhoneNumber = phoneNumber.replace(/\D/g, "");
 
