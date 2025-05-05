@@ -22,10 +22,10 @@ export class Cards {
 	type: CardType;
 
 	@Column({ type: "text", nullable: false })
-	question: string; // frontend?
+	frontend: string;
 
 	@Column({ type: "text", nullable: false })
-	answer: string; // backend? // missing make pnpm migration:generate migration:run
+	backend: string;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

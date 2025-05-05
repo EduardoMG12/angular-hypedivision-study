@@ -8,6 +8,7 @@ import { AuthModule } from "./auth/auth.module";
 import { AdminModule } from "./admin/admin.module";
 import { PackageModule } from "./package/package.module";
 import { FlashcardModule } from "./flashcard/flashcard.module";
+import { CardModule } from './card/card.module';
 
 @Module({
 	imports: [
@@ -33,6 +34,7 @@ import { FlashcardModule } from "./flashcard/flashcard.module";
 		TermsOfUseModule,
 		PackageModule,
 		FlashcardModule,
+		CardModule,
 	],
 	controllers: [],
 	providers: [AppService],

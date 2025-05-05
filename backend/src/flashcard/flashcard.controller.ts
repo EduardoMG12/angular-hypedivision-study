@@ -17,6 +17,7 @@ import {
 	ApiResponse,
 	ApiBearerAuth,
 } from "@nestjs/swagger";
+import { FlashcardWithCardsDto } from "./dto/flashcardWithCards.dto";
 
 @ApiTags("Flashcard")
 @ApiBearerAuth()
@@ -116,6 +117,17 @@ export class FlashcardController {
 		return toPlainToInstance(
 			FlashcardDto,
 			await this.flashcardService.findById(userId, packageData.id),
+		);
+	}
+
+	@Post("findByIdWithCards")
+	async findByIdWithCards(
+		@GetUserId() userId: string,
+		@Body() packageData: { id: string },
+	): Promise<FlashcardWithCardsDto> {
+		return toPlainToInstance(
+			FlashcardWithCardsDto,
+			await this.flashcardService.findByIdWithCards(userId, packageData.id),
 		);
 	}
 

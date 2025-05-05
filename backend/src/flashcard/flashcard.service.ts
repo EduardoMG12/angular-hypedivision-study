@@ -15,6 +15,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { errorMessages } from "src/common/errors/errors-message";
 import { ChangeFlashcardStatusDto } from "./dto/changeStatus.dto";
 import { UpdateFlashcardDto } from "./dto/update.dto";
+import { FlashcardWithCardsDto } from "./dto/flashcardWithCards.dto";
 
 @Injectable()
 export class FlashcardService {
@@ -69,6 +70,7 @@ export class FlashcardService {
 
 		const flashcard = await this.flashcardRepository.findOne({
 			where: { id: flashcardId, owner: { id: userId } },
+			// relations: ["cards", "owner"],
 		});
 
 		if (!flashcard) {
@@ -76,6 +78,27 @@ export class FlashcardService {
 		}
 
 		return flashcard;
+	}
+
+	async findByIdWithCards(
+		userId: string,
+		flashcardId: string,
+	): Promise<FlashcardWithCardsDto> {
+		const user = await this.usersService.findById(userId);
+
+		const flashcard = await this.flashcardRepository.findOne({
+			where: { id: flashcardId, owner: { id: userId } },
+			relations: ["cards"],
+		});
+
+		if (!flashcard) {
+			throw new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]);
+		}
+
+		return {
+			...flashcard,
+			flashcards: flashcard.cards || [],
+		} as FlashcardWithCardsDto;
 	}
 
 	async changeStatus(

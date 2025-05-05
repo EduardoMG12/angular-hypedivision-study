@@ -32,7 +32,7 @@ export class Flashcard {
 	@OneToMany(
 		() => Cards,
 		(card) => card.flashcard,
-		{ nullable: true },
+		{ cascade: true, nullable: true },
 	)
 	cards: Cards[];
 
