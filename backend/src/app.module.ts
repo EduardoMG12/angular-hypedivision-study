@@ -8,11 +8,20 @@ import { AuthModule } from "./auth/auth.module";
 import { AdminModule } from "./admin/admin.module";
 import { PackageModule } from "./package/package.module";
 import { FlashcardModule } from "./flashcard/flashcard.module";
-import { CardModule } from './card/card.module';
+import { CardModule } from "./card/card.module";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
+		ConfigModule.forRoot({ isGlobal: true }),
+		JwtModule.registerAsync({
+			useFactory: (configService: ConfigService) => ({
+				secret: configService.get<string>("JWT_SECRET"),
+				signOptions: { expiresIn: "1h" },
+			}),
+			inject: [ConfigService],
+		}),
 		TypeOrmModule.forRootAsync({
 			imports: [ConfigModule],
 			useFactory: (configService: ConfigService) => ({

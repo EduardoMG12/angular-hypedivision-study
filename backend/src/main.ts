@@ -7,6 +7,7 @@ import { runSeed } from "../seed";
 import { UsersService } from "./users/users.service";
 import { BcryptAdapter } from "./common/adapter/bcrypt.adapter";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -26,7 +27,10 @@ async function bootstrap() {
 	await runSeed(usersService, bcryptAdapter, configService);
 
 	const reflector = app.get(Reflector);
-	app.useGlobalGuards(new JwtAuthGuard(reflector));
+	const jwtService = app.get(JwtService);
+	app.useGlobalGuards(
+		new JwtAuthGuard(reflector, jwtService, usersService, configService),
+	);
 
 	await app.listen(process.env.PORT ?? 3000);
 }

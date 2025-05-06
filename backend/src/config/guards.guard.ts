@@ -1,23 +1,33 @@
 import {
-	CanActivate,
-	ExecutionContext,
 	Injectable,
 	UnauthorizedException,
+	ExecutionContext,
+	CanActivate,
 } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { Reflector } from "@nestjs/core";
-import { IS_PUBLIC_KEY } from "src/common/decorators/public.decorator";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { UsersService } from "../users/users.service";
+import { IS_PUBLIC_KEY } from "../common/decorators/public.decorator";
+import { errorMessages } from "../common/errors/errors-message";
 
-interface JwtPayload {
-	id: string;
-	email: string;
-}
-
+/**
+ * JwtAuthGuard protects API routes by validating JWT tokens.
+ * Routes marked with @Public() bypass authentication.
+ * For protected routes, the guard verifies the token and checks if the user exists in the database.
+ * The authenticated user's ID and email are attached to the request for use with @GetUserId().
+ *
+ * @ApiBearerAuth Indicates that protected routes require a Bearer token in the Authorization header.
+ * @ApiUnauthorizedResponse Describes the response for invalid or missing tokens.
+ */
 @Injectable()
-export class JwtAuthGuard extends AuthGuard("jwt") implements CanActivate {
-	constructor(private reflector: Reflector) {
-		super();
-	}
+export class JwtAuthGuard implements CanActivate {
+	constructor(
+		private readonly reflector: Reflector,
+		private readonly jwtService: JwtService,
+		private readonly usersService: UsersService,
+		private readonly configService: ConfigService,
+	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const isPublic = this.reflector.get<boolean>(
@@ -28,18 +38,30 @@ export class JwtAuthGuard extends AuthGuard("jwt") implements CanActivate {
 			return true;
 		}
 
-		const canActivate = await super.canActivate(context);
-		if (!canActivate) {
-			throw new UnauthorizedException("Invalid or missing token");
-		}
-
 		const request = context.switchToHttp().getRequest();
-		const user = request.user as JwtPayload;
+		const authHeader = request.headers.authorization;
 
-		if (!user) {
-			throw new UnauthorizedException("User not found in request");
+		if (!authHeader || !authHeader.startsWith("Bearer ")) {
+			throw new UnauthorizedException("Missing or invalid token");
 		}
 
-		return true;
+		const token = authHeader.split(" ")[1];
+
+		try {
+			const payload = await this.jwtService.verifyAsync(token, {
+				secret: this.configService.get<string>("JWT_SECRET"),
+			});
+
+			const user = await this.usersService.findById(payload.id);
+			if (!user) {
+				throw new UnauthorizedException(errorMessages.USER_NOT_FOUND["pt-BR"]);
+			}
+
+			request.user = { id: payload.id, email: payload.email };
+
+			return true;
+		} catch (error) {
+			throw new UnauthorizedException("Invalid or expired token");
+		}
 	}
 }
