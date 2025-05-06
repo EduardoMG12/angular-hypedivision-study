@@ -5,6 +5,10 @@ export const errorMessages = {
 		"pt-BR": "O flashcard nao existe.",
 		"en-US": "The flashcard not foun.",
 	},
+	[ErrorCode.INVALID_INPUT]: {
+		"pt-BR": "A entrada de dados é invalida.",
+		"en-US": "The input of data is not valid.",
+	},
 	[ErrorCode.INVALID_CREDENTIALS]: {
 		"pt-BR": "Credenciais inválidas. Por favor, verifique seu e-mail e senha.",
 		"en-US": "Invalid credentials. Please check your email and password.",

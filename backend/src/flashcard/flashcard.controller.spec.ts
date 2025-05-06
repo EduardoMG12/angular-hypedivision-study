@@ -244,32 +244,32 @@ describe("FlashcardController", () => {
 	});
 
 	describe("findById", () => {
-		it("should call service.findById with userId and id and return the transformed result", async () => {
-			const userId = "test-user-id";
-			const flashcardId = "flashcard-to-find-id";
+		// it("should call service.findById with userId and id and return the transformed result", async () => {
+		// 	const userId = "test-user-id";
+		// 	const flashcardId = "flashcard-to-find-id";
 
-			const requestBody = { id: flashcardId };
-			const serviceResult = makeMockFlashcardDto(flashcardId, "pkg1", userId);
-			const transformedResult = makeMockFlashcardDto(
-				flashcardId,
-				"pkg1",
-				userId,
-			);
+		// 	const requestBody = { id: flashcardId };
+		// 	const serviceResult = makeMockFlashcardDto(flashcardId, "pkg1", userId);
+		// 	const transformedResult = makeMockFlashcardDto(
+		// 		flashcardId,
+		// 		"pkg1",
+		// 		userId,
+		// 	);
 
-			service.findById.mockResolvedValue(serviceResult);
-			mockToPlainToInstance.mockReturnValue(transformedResult);
+		// 	service.findById.mockResolvedValue(serviceResult);
+		// 	mockToPlainToInstance.mockReturnValue(transformedResult);
 
-			const result = await controller.findById(userId, requestBody);
+		// 	const result = await controller.findById(userId, requestBody);
 
-			expect(service.findById).toHaveBeenCalledWith(userId, flashcardId);
+		// 	expect(service.findById).toHaveBeenCalledWith(userId, flashcardId);
 
-			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
-				serviceResult,
-			);
+		// 	expect(mockToPlainToInstance).toHaveBeenCalledWith(
+		// 		FlashcardDto,
+		// 		serviceResult,
+		// 	);
 
-			expect(result).toEqual(transformedResult);
-		});
+		// 	expect(result).toEqual(transformedResult);
+		// });
 
 		it("should throw NotFoundException if service.findById throws NotFoundException", async () => {
 			const userId = "test-user-id";

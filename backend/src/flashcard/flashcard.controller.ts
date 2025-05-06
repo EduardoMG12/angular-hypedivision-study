@@ -1,4 +1,4 @@
-import { Body, Delete, Get, Post, Put } from "@nestjs/common";
+import { Body, Delete, Get, Param, Patch, Post, Put } from "@nestjs/common";
 import { Controller } from "@nestjs/common";
 import { GetUserId } from "src/common/decorators/getUserId.decorator";
 import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
@@ -16,8 +16,11 @@ import {
 	ApiBody,
 	ApiResponse,
 	ApiBearerAuth,
+	ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { FlashcardWithCardsDto } from "./dto/flashcardWithCards.dto";
+import { UpdateFlashcardReferencePackageDto } from "./dto/updateFlashcardReferencePackage.dto";
+import { FlashcardWithPackageDto } from "./dto/flashcardWithPackage.dto";
 
 @ApiTags("Flashcard")
 @ApiBearerAuth()
@@ -131,7 +134,7 @@ export class FlashcardController {
 		);
 	}
 
-	@Post("changeStatus")
+	@Patch("changeStatus")
 	@ApiOperation({
 		summary: "Change the status of a Flashcard",
 		description:
@@ -197,6 +200,38 @@ export class FlashcardController {
 		return toPlainToInstance(
 			FlashcardDto,
 			await this.flashcardService.update(userId, packageData),
+		);
+	}
+
+	@ApiBearerAuth()
+	@ApiOperation({
+		summary: "Assign or remove a package for a flashcard",
+		description:
+			"Assigns a flashcard to a new package or removes it from its current package by setting packageId to null.",
+	})
+	@ApiResponse({
+		status: 200,
+		description: "Flashcard package updated successfully",
+		type: FlashcardDto,
+	})
+	@ApiUnauthorizedResponse({
+		description: "Unauthorized: Missing, invalid, or expired token",
+	})
+	@ApiResponse({
+		status: 400,
+		description: "Invalid flashcard ID or package already assigned",
+	})
+	@Patch("/updateRefencePackage")
+	async assignPackage(
+		@GetUserId() userId: string,
+		@Body() updatePackageDto: UpdateFlashcardReferencePackageDto,
+	): Promise<FlashcardWithPackageDto> {
+		return toPlainToInstance(
+			FlashcardWithPackageDto,
+			await this.flashcardService.updateReferencePackage(
+				userId,
+				updatePackageDto,
+			),
 		);
 	}
 

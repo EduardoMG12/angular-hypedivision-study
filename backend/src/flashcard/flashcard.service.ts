@@ -16,6 +16,9 @@ import { errorMessages } from "src/common/errors/errors-message";
 import { ChangeFlashcardStatusDto } from "./dto/changeStatus.dto";
 import { UpdateFlashcardDto } from "./dto/update.dto";
 import { FlashcardWithCardsDto } from "./dto/flashcardWithCards.dto";
+import { UpdateFlashcardReferencePackageDto } from "./dto/updateFlashcardReferencePackage.dto";
+import { Package } from "src/entities/package.entity";
+import { FlashcardWithPackageDto } from "./dto/flashcardWithPackage.dto";
 
 @Injectable()
 export class FlashcardService {
@@ -65,7 +68,7 @@ export class FlashcardService {
 		return flashcard;
 	}
 
-	async findById(userId: string, flashcardId: string): Promise<FlashcardDto> {
+	async findById(userId: string, flashcardId: string): Promise<Flashcard> {
 		const user = await this.usersService.findById(userId);
 
 		const flashcard = await this.flashcardRepository.findOne({
@@ -139,6 +142,31 @@ export class FlashcardService {
 		flashcardEntity.updatedAt = new Date();
 
 		return await this.flashcardRepository.save(flashcardEntity);
+	}
+
+	async updateReferencePackage(
+		userId: string,
+		updateReferenceData: UpdateFlashcardReferencePackageDto,
+	): Promise<FlashcardWithPackageDto> {
+		const flashcard = await this.findById(
+			userId,
+			updateReferenceData.flashcardId,
+		);
+
+		if (!updateReferenceData.packageId) {
+			flashcard.package = null;
+			return await this.flashcardRepository.save(flashcard);
+		}
+
+		const packageEntity = (await this.packageService.findById(
+			userId,
+			updateReferenceData.packageId,
+		)) as Package;
+		if (packageEntity.id === flashcard.package?.id) {
+			throw new BadRequestException("this package is egual the old package");
+		}
+		flashcard.package = packageEntity;
+		return await this.flashcardRepository.save(flashcard);
 	}
 
 	async delete(userId: string, id: string): Promise<FlashcardDto> {

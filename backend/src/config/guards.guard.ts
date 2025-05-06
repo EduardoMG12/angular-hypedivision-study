@@ -10,17 +10,14 @@ import { ConfigService } from "@nestjs/config";
 import { UsersService } from "../users/users.service";
 import { IS_PUBLIC_KEY } from "../common/decorators/public.decorator";
 import { errorMessages } from "../common/errors/errors-message";
+import { ApiBearerAuth, ApiUnauthorizedResponse } from "@nestjs/swagger";
 
-/**
- * JwtAuthGuard protects API routes by validating JWT tokens.
- * Routes marked with @Public() bypass authentication.
- * For protected routes, the guard verifies the token and checks if the user exists in the database.
- * The authenticated user's ID and email are attached to the request for use with @GetUserId().
- *
- * @ApiBearerAuth Indicates that protected routes require a Bearer token in the Authorization header.
- * @ApiUnauthorizedResponse Describes the response for invalid or missing tokens.
- */
 @Injectable()
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+	description:
+		"Unauthorized: Missing, invalid, or expired token, or user not found.",
+})
 export class JwtAuthGuard implements CanActivate {
 	constructor(
 		private readonly reflector: Reflector,

@@ -1,5 +1,6 @@
 import { FlashcardService } from "./../flashcard/flashcard.service";
 import {
+	BadRequestException,
 	ForbiddenException,
 	Injectable,
 	NotFoundException,
@@ -15,6 +16,8 @@ import { Flashcard } from "src/entities/flashcards.entity";
 import { CreateMultipleCardsDto } from "./dto/createMultipleCards.dto";
 import { CreateCardDto } from "./dto/create.dto";
 import { UpdateCardDto } from "./dto/update.dto";
+import { ChangeCardTypeDto } from "./dto/changeType.dto";
+import { FindCardDto } from "./dto/find.dto";
 
 @Injectable()
 export class CardService {
@@ -75,10 +78,8 @@ export class CardService {
 
 	// async findAll(userId: string, ) don't need cause exist on flashcards.findByIdWithCards
 
-	async findById(userId: string, cardId: string): Promise<CardDto> {
-		await this.usersService.findById(userId);
-
-		const card = await this.verifyCardOwnership(userId, cardId);
+	async findById(userId: string, cardId: FindCardDto): Promise<CardDto> {
+		const card = await this.verifyCardOwnership(userId, cardId.id);
 		return card;
 	}
 
@@ -106,21 +107,20 @@ export class CardService {
 
 	async changeType(
 		userId: string,
-		cardId: string,
-		newType: CardType,
+		cardDto: ChangeCardTypeDto,
 	): Promise<CardDto> {
-		const card = await this.verifyCardOwnership(userId, cardId);
+		const card = await this.verifyCardOwnership(userId, cardDto.cardId);
 
-		card.type = newType;
+		if (card.type === cardDto.newType) {
+			throw new BadRequestException("Cannot change type for egual type");
+		}
+
+		card.type = cardDto.newType;
 		return await this.cardRepository.save(card);
 	}
 
-	async update(
-		userId: string,
-		cardId: string,
-		updateData: UpdateCardDto,
-	): Promise<CardDto> {
-		const card = await this.verifyCardOwnership(userId, cardId);
+	async update(userId: string, updateData: UpdateCardDto): Promise<CardDto> {
+		const card = await this.verifyCardOwnership(userId, updateData.cardId);
 
 		this.cardRepository.merge(card, updateData);
 		return await this.cardRepository.save(card);

@@ -107,9 +107,9 @@ export class PackageController {
 	async findById(
 		@GetUserId() userId: string,
 		@Body() packageData: { id: string },
-	): Promise<PackageWithFlashcardsDto> {
+	): Promise<PackageDto> {
 		return toPlainToInstance(
-			PackageWithFlashcardsDto,
+			PackageDto,
 			await this.packageService.findById(userId, packageData.id),
 		);
 	}
