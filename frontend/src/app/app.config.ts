@@ -1,21 +1,28 @@
 // biome-ignore lint/style/useImportType: <explanation>
-import { ApplicationConfig, provideZoneChangeDetection } from "@angular/core";
-import { provideRouter } from "@angular/router";
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
-import { routes } from "./app.routes";
+import { routes } from './app.routes';
 import {
 	provideClientHydration,
 	withEventReplay,
-} from "@angular/platform-browser";
-import { provideCharts, withDefaultRegisterables } from "ng2-charts";
+} from '@angular/platform-browser';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { AuthService } from './services/auth.service';
+import { AuthGuard } from './guards/auth.guard';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
-    provideCharts(withDefaultRegisterables()),
+		provideCharts(withDefaultRegisterables()),
 		provideZoneChangeDetection({ eventCoalescing: true }),
 		provideRouter(routes),
 		provideClientHydration(withEventReplay()),
-    provideAnimations()
+		provideAnimations(),
+		provideRouter(routes),
+		AuthService,
+		AuthGuard,
+		provideHttpClient(withFetch())
 	],
 };

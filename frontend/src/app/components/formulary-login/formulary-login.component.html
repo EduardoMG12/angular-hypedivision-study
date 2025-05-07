@@ -11,6 +11,7 @@
     class="w-full"
   />
   <app-checkbox label="Lembrar de mim" [(value)]="checkbox" />
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
   <button
     type="submit"
     class="w-full h-10 flex justify-center items-center bg-portage rounded-lg cursor-pointer gap-4"
