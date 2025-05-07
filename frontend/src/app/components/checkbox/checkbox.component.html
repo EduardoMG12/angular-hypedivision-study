@@ -5,6 +5,7 @@
     id="remember"
     class="hidden peer"
     [ngModel]="value"
+    (ngModelChange)="onValueChange()"
   />
   <span
     class="w-5 h-5 border-2 border-portage rounded-full peer-checked:bg-portage transition-colors duration-200"

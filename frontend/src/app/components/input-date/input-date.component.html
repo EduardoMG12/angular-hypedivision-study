@@ -1,0 +1,11 @@
+<div class="w-full flex flex-col justify-center items-start gap-3">
+  <p class="text-alabaster font-normal text-sm">{{ label }}</p>
+  <input
+    type="text"
+    [placeholder]="placeholder || 'DD/MM/AAAA'"
+    class="bg-wood-smoke w-full h-10 border-charade border rounded-lg text-santas-gray pl-3"
+    [ngModel]="formattedValue"
+    (ngModelChange)="onInputChange($event)"
+    (keypress)="onKeyPress($event)"
+  />
+</div>

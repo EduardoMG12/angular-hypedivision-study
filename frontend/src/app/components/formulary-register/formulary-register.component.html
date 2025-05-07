@@ -2,13 +2,19 @@
   (ngSubmit)="onSubmit()"
   class="w-[28rem] flex flex-col justify-center items-start gap-5"
 >
-  <app-input label="Email" type="email" [(value)]="email" class="w-full" />
   <app-input
     label="Nome completo"
     type="text"
     [(value)]="fullName"
     class="w-full"
   />
+  <app-input-date
+    label="Data de nascimento"
+    [(value)]="birthdate"
+    class="w-full"
+  />
+  <app-input-phone label="Telefone" [(value)]="phone" class="w-full" />
+  <app-input label="Email" type="email" [(value)]="email" class="w-full" />
   <app-input-password
     label="Senha"
     [(value)]="password"
@@ -22,15 +28,19 @@
     class="w-full"
   />
   <app-checkbox
-    label="Eu concordo com os "
+    label="Eu concordo com os&nbsp;"
     urlLabel="termos e condições"
-    url="/slaa"
+    url="/terms"
+    [(value)]="accept_terms"
   />
+
+  <div *ngIf="errorMessage" class="text-red-500 mb-4">{{ errorMessage }}</div>
+
   <button
     type="submit"
     class="w-full h-10 flex justify-center items-center bg-portage rounded-lg cursor-pointer gap-4"
   >
     <img src="/user.svg" alt="" />
-    <p class="text-small text-[#FFFFFF]">Entrar</p>
+    <p class="text-small text-[#FFFFFF]">Registrar</p>
   </button>
 </form>
