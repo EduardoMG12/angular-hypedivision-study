@@ -68,11 +68,8 @@ export class DeckService {
 	}
 
 	async findById(userId: string, deckId: string): Promise<Deck> {
-		const user = await this.usersService.findById(userId);
-
 		const deck = await this.deckRepository.findOne({
 			where: { id: deckId, owner: { id: userId } },
-			// relations: ["cards", "owner"],
 		});
 
 		if (!deck) {
@@ -86,8 +83,6 @@ export class DeckService {
 		userId: string,
 		deckId: string,
 	): Promise<DeckWithCardsDto> {
-		const user = await this.usersService.findById(userId);
-
 		const deck = await this.deckRepository.findOne({
 			where: { id: deckId, owner: { id: userId } },
 			relations: ["cards"],
@@ -128,8 +123,6 @@ export class DeckService {
 	}
 
 	async update(userId: string, deckData: UpdateDeckDto): Promise<DeckDto> {
-		const user = await this.usersService.findById(userId);
-
 		const deckEntity = await this.findById(userId, deckData.id);
 
 		deckEntity.title = deckData.title || deckEntity.title;
@@ -164,8 +157,6 @@ export class DeckService {
 	}
 
 	async delete(userId: string, id: string): Promise<DeckDto> {
-		const user = await this.usersService.findById(userId);
-
 		const deckEntity = await this.findById(userId, id);
 
 		await this.deckRepository.delete(id);

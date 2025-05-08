@@ -13,17 +13,11 @@ export class AdminService {
 	constructor(
 		@InjectRepository(User)
 		private usersRepository: Repository<User>,
-		private usersService: UsersService,
 		private readonly bcryptAdapter: BcryptAdapter,
 		private readonly termsOfUseService: TermsOfUseService,
 	) {}
 
-	async createTermsOfUse(
-		dto: CreateTermsOfUseDto,
-		userId: string,
-	): Promise<TermsOfUse> {
-		await this.usersService.findById(userId);
-
+	async createTermsOfUse(dto: CreateTermsOfUseDto): Promise<TermsOfUse> {
 		return this.termsOfUseService.create(dto);
 	}
 

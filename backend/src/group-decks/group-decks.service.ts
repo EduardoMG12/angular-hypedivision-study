@@ -45,8 +45,6 @@ export class GroupDecksService {
 	}
 
 	async findById(userId: string, id: string): Promise<GroupDecksDto> {
-		const user = await this.usersService.findById(userId);
-
 		const groupDecksEntity = await this.groupDecksRepository.findOne({
 			where: { owner: { id: userId }, id },
 		});
@@ -62,8 +60,6 @@ export class GroupDecksService {
 		userId: string,
 		id: string,
 	): Promise<GroupDecksWithDecksDto> {
-		const user = await this.usersService.findById(userId);
-
 		const groupDecksEntity = await this.groupDecksRepository.findOne({
 			where: { owner: { id: userId }, id },
 			relations: ["decks", "owner"],
@@ -87,8 +83,6 @@ export class GroupDecksService {
 		userId: string,
 		changeStatusDto: ChangeGroupDecksStatusDto,
 	): Promise<GroupDecksDto> {
-		const user = await this.usersService.findById(userId);
-
 		const groupDecksEntity = await this.findById(userId, changeStatusDto.id);
 
 		const currentStatus = groupDecksEntity.status;
@@ -109,8 +103,6 @@ export class GroupDecksService {
 		userId: string,
 		GroupDecksData: UpdateGroupDecksDto,
 	): Promise<GroupDecksDto> {
-		const user = await this.usersService.findById(userId);
-
 		const groupDecksEntity = await this.findById(userId, GroupDecksData.id);
 
 		groupDecksEntity.title = GroupDecksData.title || groupDecksEntity.title;
@@ -123,8 +115,6 @@ export class GroupDecksService {
 	}
 
 	async delete(userId: string, id: string): Promise<GroupDecksDto> {
-		const user = await this.usersService.findById(userId);
-
 		const groupDecksEntity = await this.findById(userId, id);
 
 		await this.groupDecksRepository.delete(id);

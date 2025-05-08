@@ -112,11 +112,10 @@ export class AdminController {
 	})
 	async createTermsOfUse(
 		@Body() dto: CreateTermsOfUseDto,
-		@GetUserId() userId: string,
 	): Promise<TermsOfUse> {
 		return toPlainToInstance(
 			TermsOfUse,
-			await this.adminService.createTermsOfUse(dto, userId),
+			await this.adminService.createTermsOfUse(dto),
 		);
 	}
 

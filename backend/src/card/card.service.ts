@@ -29,10 +29,9 @@ export class CardService {
 	) {}
 
 	async create(userId: string, cardData: CreateCardDto) {
-		await this.usersService.findById(userId);
 		const deck = await this.deckService.findById(userId, cardData.deckId);
 
-		const card = await this.cardRepository.create({
+		const card = this.cardRepository.create({
 			frontend: cardData.frontend,
 			backend: cardData.backend,
 			deck: deck,
@@ -51,7 +50,6 @@ export class CardService {
 			return [];
 		}
 
-		await this.usersService.findById(userId);
 		const deck = await this.deckService.findById(userId, cardsDataArray.deckId);
 
 		const cardsToCreate: DeepPartial<CardDto>[] = cardsDataArray.cards.map(
@@ -81,7 +79,6 @@ export class CardService {
 		userId: string,
 		cardId: string,
 	): Promise<Cards> {
-		await this.usersService.findById(userId);
 		const card = await this.cardRepository.findOne({
 			where: { id: cardId },
 			relations: ["deck", "deck.owner"],
@@ -121,8 +118,6 @@ export class CardService {
 	}
 
 	async delete(userId: string, cardId: string): Promise<CardDto> {
-		await this.usersService.findById(userId);
-
 		const cardToDelete = await this.verifyCardOwnership(userId, cardId);
 		await this.cardRepository.delete(cardId);
 
