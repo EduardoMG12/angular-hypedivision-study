@@ -3,11 +3,11 @@ import { DeckService } from "./deck.service";
 import { DeckController } from "./deck.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UsersModule } from "src/users/users.module";
-import { PackageModule } from "src/package/package.module";
+import { GroupDecksModule } from "src/group-decks/group-decks.module";
 import { Deck } from "src/entities/decks.entity";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Deck]), UsersModule, PackageModule],
+	imports: [TypeOrmModule.forFeature([Deck]), UsersModule, GroupDecksModule],
 	providers: [DeckService],
 	controllers: [DeckController],
 	exports: [DeckService],

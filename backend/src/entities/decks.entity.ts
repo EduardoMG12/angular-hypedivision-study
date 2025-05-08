@@ -8,7 +8,7 @@ import {
 	OneToMany,
 } from "typeorm";
 import { User } from "./user.entity";
-import { Package } from "./package.entity";
+import { GroupDecks } from "./group_decks.entity";
 import { Cards } from "./cards.entity";
 import { DeckStatus } from "./common/enums/deckStatus.enum";
 
@@ -26,8 +26,8 @@ export class Deck {
 	@ManyToOne(() => User, { nullable: false })
 	owner: User;
 
-	@ManyToOne(() => Package, { nullable: true })
-	package: Package | null;
+	@ManyToOne(() => GroupDecks, { nullable: true })
+	group_decks: GroupDecks | null;
 
 	@OneToMany(
 		() => Cards,

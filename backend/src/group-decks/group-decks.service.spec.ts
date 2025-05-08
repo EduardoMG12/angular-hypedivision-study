@@ -1,22 +1,22 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Package } from "../entities/package.entity";
+import { GroupDecks } from "../entities/group_decks.entity";
 import { User } from "../entities/user.entity";
 
 import { NotFoundException } from "@nestjs/common";
-import { PackageService } from "./package.service";
+import { GroupDecksService } from "./group-decks.service";
 import { UsersService } from "src/users/users.service";
 
-import { CreatePackageDto } from "./dto/create.dto";
-import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
-import { UpdatePackageDto } from "./dto/update.dto";
-import { PackageStatus } from "./common/enums/packageStatus.enum";
+import { CreateGroupDecksDto } from "./dto/create.dto";
+import { ChangeGroupDecksStatusDto } from "./dto/change-status.dto";
+import { UpdateGroupDecksDto } from "./dto/update.dto";
+import { GroupDecksStatus } from "./common/enums/group-decksStatus.enum";
 
 const makeMockUser = (id = "user-owner-id"): User => ({
 	id,
 	email: "owner@example.com",
-	fullName: "Package Owner",
+	fullName: "GroupDeck Owner",
 	password: "hashed_password",
 	phone: "11999999999",
 	birthdate: new Date("1990-01-01"),
@@ -25,16 +25,16 @@ const makeMockUser = (id = "user-owner-id"): User => ({
 	deleted_at: null,
 });
 
-const makeMockPackage = (
-	id = "package-id",
+const makeMockGroupDeck = (
+	id = "groupDeck-id",
 	ownerId = "user-owner-id",
 
-	status = PackageStatus.Active,
-	title = "Test Package",
-	description = "This is a test package description.",
+	status = GroupDecksStatus.Active,
+	title = "Test GroupDeck",
+	description = "This is a test groupDeck description.",
 	createdAt = new Date(),
 	updatedAt = new Date(),
-): Package => ({
+): GroupDecks => ({
 	id,
 	title,
 	description,
@@ -45,18 +45,18 @@ const makeMockPackage = (
 	decks: [],
 });
 
-describe("PackageService", () => {
-	let service: PackageService;
-	let packagesRepository: jest.Mocked<Repository<Package>>;
+describe("GroupDeckService", () => {
+	let service: GroupDecksService;
+	let groupDecksRepository: jest.Mocked<Repository<GroupDecks>>;
 	let usersService: jest.Mocked<UsersService>;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				PackageService,
+				GroupDecksService,
 
 				{
-					provide: getRepositoryToken(Package),
+					provide: getRepositoryToken(GroupDecks),
 					useValue: {
 						create: jest.fn(),
 						save: jest.fn(),
@@ -75,64 +75,64 @@ describe("PackageService", () => {
 			],
 		}).compile();
 
-		service = module.get<PackageService>(PackageService);
-		packagesRepository = module.get(getRepositoryToken(Package));
+		service = module.get<GroupDecksService>(GroupDecksService);
+		groupDecksRepository = module.get(getRepositoryToken(GroupDecks));
 		usersService = module.get(UsersService);
 	});
 
 	it("should be defined", () => {
 		expect(service).toBeDefined();
-		expect(packagesRepository).toBeDefined();
+		expect(groupDecksRepository).toBeDefined();
 		expect(usersService).toBeDefined();
 	});
 
 	describe("create", () => {
-		it("should create a package successfully", async () => {
+		it("should create a groupDeck successfully", async () => {
 			const userId = "user-owner-id";
-			const createDto: CreatePackageDto = {
-				title: "New Package Title",
-				description: "Details about the new package.",
+			const createDto: CreateGroupDecksDto = {
+				title: "New GroupDeck Title",
+				description: "Details about the new groupDeck.",
 			};
 			const owner = makeMockUser(userId);
-			const expectedPackage = makeMockPackage(
-				"new-package-id",
+			const expectedGroupDeck = makeMockGroupDeck(
+				"new-groupDeck-id",
 				userId,
-				PackageStatus.Active,
+				GroupDecksStatus.Active,
 				createDto.title,
 				createDto.description,
 			);
 
 			usersService.findById.mockResolvedValue(owner);
-			packagesRepository.create.mockReturnValue({
+			groupDecksRepository.create.mockReturnValue({
 				...createDto,
 				owner,
-				status: PackageStatus.Active,
+				status: GroupDecksStatus.Active,
 				createdAt: new Date(),
-			} as Package);
-			packagesRepository.save.mockResolvedValue(expectedPackage);
+			} as GroupDecks);
+			groupDecksRepository.save.mockResolvedValue(expectedGroupDeck);
 
 			const result = await service.create(userId, createDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packagesRepository.create).toHaveBeenCalledWith({
+			expect(groupDecksRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description,
 				owner,
-				status: PackageStatus.Active,
+				status: GroupDecksStatus.Active,
 				createdAt: expect.any(Date),
 			});
 
-			expect(packagesRepository.save).toHaveBeenCalledWith(
-				packagesRepository.create.mock.results[0].value,
+			expect(groupDecksRepository.save).toHaveBeenCalledWith(
+				groupDecksRepository.create.mock.results[0].value,
 			);
-			expect(result).toEqual(expectedPackage);
+			expect(result).toEqual(expectedGroupDeck);
 		});
 
 		it("should throw NotFoundException if owner is not found by UsersService", async () => {
 			const userId = "nonexistent-user-id";
-			const createDto: CreatePackageDto = {
-				title: "New Package Title",
-				description: "Details about the new package.",
+			const createDto: CreateGroupDecksDto = {
+				title: "New GroupDeck Title",
+				description: "Details about the new groupDeck.",
 			};
 
 			usersService.findById.mockRejectedValue(
@@ -144,96 +144,96 @@ describe("PackageService", () => {
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packagesRepository.create).not.toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.create).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("findAll", () => {
-		it("should find all packages for a user", async () => {
+		it("should find all groupDecks for a user", async () => {
 			const userId = "user-owner-id";
-			const userPackages = [
-				makeMockPackage("pkg1", userId),
-				makeMockPackage("pkg2", userId),
+			const userGroupDecks = [
+				makeMockGroupDeck("pkg1", userId),
+				makeMockGroupDeck("pkg2", userId),
 			];
 
-			packagesRepository.find.mockResolvedValue(userPackages);
+			groupDecksRepository.find.mockResolvedValue(userGroupDecks);
 
 			const result = await service.findAll(userId);
 
-			expect(packagesRepository.find).toHaveBeenCalledWith({
+			expect(groupDecksRepository.find).toHaveBeenCalledWith({
 				where: { owner: { id: userId } },
 			});
-			expect(result).toEqual(userPackages);
+			expect(result).toEqual(userGroupDecks);
 		});
 
-		it("should return an empty array if the user has no packages", async () => {
-			const userId = "user-without-packages-id";
-			const userPackages: Package[] = [];
+		it("should return an empty array if the user has no groupDecks", async () => {
+			const userId = "user-without-groupDecks-id";
+			const userGroupDecks: GroupDecks[] = [];
 
-			packagesRepository.find.mockResolvedValue(userPackages);
+			groupDecksRepository.find.mockResolvedValue(userGroupDecks);
 
 			const result = await service.findAll(userId);
 
-			expect(packagesRepository.find).toHaveBeenCalledWith({
+			expect(groupDecksRepository.find).toHaveBeenCalledWith({
 				where: { owner: { id: userId } },
 			});
-			expect(result).toEqual(userPackages);
+			expect(result).toEqual(userGroupDecks);
 			expect(result).toHaveLength(0);
 		});
 	});
 
 	describe("findById", () => {
-		it("should find a package by id for the given user", async () => {
+		it("should find a groupDeck by id for the given user", async () => {
 			const userId = "user-owner-id";
-			const packageId = "package-id";
+			const groupDeckId = "groupDeck-id";
 			const owner = makeMockUser(userId);
-			const expectedPackage = makeMockPackage(packageId, userId);
+			const expectedGroupDeck = makeMockGroupDeck(groupDeckId, userId);
 
 			usersService.findById.mockResolvedValue(owner);
-			packagesRepository.findOne.mockResolvedValue(expectedPackage);
+			groupDecksRepository.findOne.mockResolvedValue(expectedGroupDeck);
 
-			const result = await service.findById(userId, packageId);
+			const result = await service.findById(userId, groupDeckId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { owner: { id: userId }, id: packageId },
+			expect(groupDecksRepository.findOne).toHaveBeenCalledWith({
+				where: { owner: { id: userId }, id: groupDeckId },
 			});
-			expect(result).toEqual(expectedPackage);
+			expect(result).toEqual(expectedGroupDeck);
 		});
 
-		it("should throw NotFoundException if owner user is not found when finding package by id", async () => {
+		it("should throw NotFoundException if owner user is not found when finding groupDeck by id", async () => {
 			const userId = "nonexistent-user-id";
-			const packageId = "package-id";
+			const groupDeckId = "groupDeck-id";
 
 			usersService.findById.mockRejectedValue(
 				new NotFoundException("User not found"),
 			);
-			expect(packagesRepository.findOne).not.toHaveBeenCalled();
+			expect(groupDecksRepository.findOne).not.toHaveBeenCalled();
 
-			await expect(service.findById(userId, packageId)).rejects.toThrow(
+			await expect(service.findById(userId, groupDeckId)).rejects.toThrow(
 				NotFoundException,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packagesRepository.findOne).not.toHaveBeenCalled();
+			expect(groupDecksRepository.findOne).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if package is not found for the given user id", async () => {
+		it("should throw NotFoundException if groupDeck is not found for the given user id", async () => {
 			const userId = "user-owner-id";
-			const packageId = "nonexistent-package-id-for-this-user";
+			const groupDeckId = "nonexistent-groupDeck-id-for-this-user";
 			const owner = makeMockUser(userId);
 
 			usersService.findById.mockResolvedValue(owner);
-			packagesRepository.findOne.mockResolvedValue(null);
+			groupDecksRepository.findOne.mockResolvedValue(null);
 
-			await expect(service.findById(userId, packageId)).rejects.toThrow(
+			await expect(service.findById(userId, groupDeckId)).rejects.toThrow(
 				NotFoundException,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packagesRepository.findOne).toHaveBeenCalledWith({
-				where: { owner: { id: userId }, id: packageId },
+			expect(groupDecksRepository.findOne).toHaveBeenCalledWith({
+				where: { owner: { id: userId }, id: groupDeckId },
 			});
 		});
 	});
@@ -249,27 +249,29 @@ describe("PackageService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should change package status successfully", async () => {
+		it("should change groupDeck status successfully", async () => {
 			const userId = "user-owner-id";
-			const changeStatusDto: ChangePackageStatusDto = {
-				id: "package-id",
-				status: PackageStatus.Concluded,
+			const changeStatusDto: ChangeGroupDecksStatusDto = {
+				id: "groupDeck-id",
+				status: GroupDecksStatus.Concluded,
 			};
 			const owner = makeMockUser(userId);
-			const existingPackage = makeMockPackage(
+			const existingGroupDeck = makeMockGroupDeck(
 				changeStatusDto.id,
 				userId,
-				PackageStatus.Active,
+				GroupDecksStatus.Active,
 			);
-			const expectedPackage = {
-				...existingPackage,
+			const expectedGroupDeck = {
+				...existingGroupDeck,
 				status: changeStatusDto.status,
 				updatedAt: expect.any(Date),
 			};
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(existingPackage);
-			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+			serviceFindByIdSpy.mockResolvedValue(existingGroupDeck);
+			groupDecksRepository.save.mockResolvedValue(
+				expectedGroupDeck as GroupDecks,
+			);
 
 			const result = await service.changeStatus(userId, changeStatusDto);
 
@@ -279,25 +281,25 @@ describe("PackageService", () => {
 				changeStatusDto.id,
 			);
 
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
+			expect(groupDecksRepository.save).toHaveBeenCalledWith({
+				...existingGroupDeck,
 				status: changeStatusDto.status,
 			});
-			expect(result).toEqual(expectedPackage);
+			expect(result).toEqual(expectedGroupDeck);
 		});
 
-		it("should throw NotFoundException if owner user is not found when changing package status", async () => {
+		it("should throw NotFoundException if owner user is not found when changing groupDeck status", async () => {
 			const userId = "nonexistent-user-id";
-			const changeStatusDto: ChangePackageStatusDto = {
-				id: "package-id",
-				status: PackageStatus.Concluded,
+			const changeStatusDto: ChangeGroupDecksStatusDto = {
+				id: "groupDeck-id",
+				status: GroupDecksStatus.Concluded,
 			};
 
 			usersService.findById.mockRejectedValue(
 				new NotFoundException("User not found"),
 			);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 
 			await expect(
 				service.changeStatus(userId, changeStatusDto),
@@ -305,22 +307,22 @@ describe("PackageService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if package is not found for the user when changing status", async () => {
+		it("should throw NotFoundException if groupDeck is not found for the user when changing status", async () => {
 			const userId = "user-owner-id";
-			const changeStatusDto: ChangePackageStatusDto = {
+			const changeStatusDto: ChangeGroupDecksStatusDto = {
 				id: "nonexistent-id",
-				status: PackageStatus.Concluded,
+				status: GroupDecksStatus.Concluded,
 			};
 			const owner = makeMockUser(userId);
 
 			usersService.findById.mockResolvedValue(owner);
 			serviceFindByIdSpy.mockRejectedValue(
-				new NotFoundException("Package not found"),
+				new NotFoundException("GroupDeck not found"),
 			);
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 
 			await expect(
 				service.changeStatus(userId, changeStatusDto),
@@ -331,7 +333,7 @@ describe("PackageService", () => {
 				userId,
 				changeStatusDto.id,
 			);
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
@@ -346,93 +348,100 @@ describe("PackageService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should update a package successfully", async () => {
+		it("should update a groupDeck successfully", async () => {
 			const userId = "user-owner-id";
-			const updateDto: UpdatePackageDto = {
-				id: "package-to-update-id",
+			const updateDto: UpdateGroupDecksDto = {
+				id: "groupDeck-to-update-id",
 				title: "Updated Title",
 				description: "Updated description.",
-				status: PackageStatus.Concluded,
+				status: GroupDecksStatus.Concluded,
 			};
 			const owner = makeMockUser(userId);
-			const existingPackage = makeMockPackage(
+			const existingGroupDeck = makeMockGroupDeck(
 				updateDto.id,
 				userId,
-				PackageStatus.Active,
+				GroupDecksStatus.Active,
 				"Old Title",
 				"Old Description",
 			);
-			const expectedPackage = {
-				...existingPackage,
+			const expectedGroupDeck = {
+				...existingGroupDeck,
 				...updateDto,
 				updatedAt: expect.any(Date),
 			};
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(existingPackage);
+			serviceFindByIdSpy.mockResolvedValue(existingGroupDeck);
 
-			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+			groupDecksRepository.save.mockResolvedValue(
+				expectedGroupDeck as GroupDecks,
+			);
 
 			const result = await service.update(userId, updateDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
+			expect(groupDecksRepository.save).toHaveBeenCalledWith({
+				...existingGroupDeck,
 				title: updateDto.title,
 				description: updateDto.description,
 				status: updateDto.status,
 				updatedAt: expect.any(Date),
 			});
-			expect(result).toEqual(expectedPackage);
+			expect(result).toEqual(expectedGroupDeck);
 		});
 
 		it("should update only specified fields", async () => {
 			const userId = "user-owner-id";
-			const updateDto: UpdatePackageDto = {
-				id: "package-to-update-id",
+			const updateDto: UpdateGroupDecksDto = {
+				id: "groupDeck-to-update-id",
 				title: "Only Title Changed",
 			};
 			const owner = makeMockUser(userId);
-			const existingPackage = makeMockPackage(
+			const existingGroupDeck = makeMockGroupDeck(
 				updateDto.id,
 				userId,
-				PackageStatus.Active,
+				GroupDecksStatus.Active,
 				"Old Title",
 				"Old Description",
 			);
-			const expectedPackage = {
-				...existingPackage,
+			const expectedGroupDeck = {
+				...existingGroupDeck,
 				title: updateDto.title,
 				updatedAt: expect.any(Date),
 			};
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(existingPackage);
-			packagesRepository.save.mockResolvedValue(expectedPackage as Package);
+			serviceFindByIdSpy.mockResolvedValue(existingGroupDeck);
+			groupDecksRepository.save.mockResolvedValue(
+				expectedGroupDeck as GroupDecks,
+			);
 
 			const result = await service.update(userId, updateDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
-			expect(packagesRepository.save).toHaveBeenCalledWith({
-				...existingPackage,
+			expect(groupDecksRepository.save).toHaveBeenCalledWith({
+				...existingGroupDeck,
 				title: updateDto.title,
 
 				updatedAt: expect.any(Date),
 			});
-			expect(result).toEqual(expectedPackage);
+			expect(result).toEqual(expectedGroupDeck);
 		});
 
-		it("should throw NotFoundException if owner user is not found when updating package", async () => {
+		it("should throw NotFoundException if owner user is not found when updating groupDeck", async () => {
 			const userId = "nonexistent-user-id";
-			const updateDto: UpdatePackageDto = { id: "package-id", title: "Update" };
+			const updateDto: UpdateGroupDecksDto = {
+				id: "groupDeck-id",
+				title: "Update",
+			};
 
 			usersService.findById.mockRejectedValue(
 				new NotFoundException("User not found"),
 			);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 
 			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				NotFoundException,
@@ -440,12 +449,12 @@ describe("PackageService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if package is not found for the user when updating", async () => {
+		it("should throw NotFoundException if groupDeck is not found for the user when updating", async () => {
 			const userId = "user-owner-id";
-			const updateDto: UpdatePackageDto = {
+			const updateDto: UpdateGroupDecksDto = {
 				id: "nonexistent-id",
 				title: "Update",
 			};
@@ -453,9 +462,9 @@ describe("PackageService", () => {
 
 			usersService.findById.mockResolvedValue(owner);
 			serviceFindByIdSpy.mockRejectedValue(
-				new NotFoundException("Package not found"),
+				new NotFoundException("GroupDeck not found"),
 			);
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 
 			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				NotFoundException,
@@ -463,7 +472,7 @@ describe("PackageService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
-			expect(packagesRepository.save).not.toHaveBeenCalled();
+			expect(groupDecksRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
@@ -478,62 +487,62 @@ describe("PackageService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should delete a package successfully", async () => {
+		it("should delete a groupDeck successfully", async () => {
 			const userId = "user-owner-id";
-			const packageId = "package-to-delete-id";
+			const groupDeckId = "groupDeck-to-delete-id";
 			const owner = makeMockUser(userId);
-			const packageToDelete = makeMockPackage(packageId, userId);
+			const groupDeckToDelete = makeMockGroupDeck(groupDeckId, userId);
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(packageToDelete);
-			packagesRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
+			serviceFindByIdSpy.mockResolvedValue(groupDeckToDelete);
+			groupDecksRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
 
-			const result = await service.delete(userId, packageId);
+			const result = await service.delete(userId, groupDeckId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, packageId);
-			expect(packagesRepository.delete).toHaveBeenCalledWith(packageId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, groupDeckId);
+			expect(groupDecksRepository.delete).toHaveBeenCalledWith(groupDeckId);
 
-			expect(result).toEqual(packageToDelete);
+			expect(result).toEqual(groupDeckToDelete);
 		});
 
-		it("should throw NotFoundException if owner user is not found when deleting package", async () => {
+		it("should throw NotFoundException if owner user is not found when deleting groupDeck", async () => {
 			const userId = "nonexistent-user-id";
-			const packageId = "package-id";
+			const groupDeckId = "groupDeck-id";
 
 			usersService.findById.mockRejectedValue(
 				new NotFoundException("User not found"),
 			);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(groupDecksRepository.delete).not.toHaveBeenCalled();
 
-			await expect(service.delete(userId, packageId)).rejects.toThrow(
+			await expect(service.delete(userId, groupDeckId)).rejects.toThrow(
 				NotFoundException,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(groupDecksRepository.delete).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if package is not found for the user when deleting", async () => {
+		it("should throw NotFoundException if groupDeck is not found for the user when deleting", async () => {
 			const userId = "user-owner-id";
-			const packageId = "nonexistent-id";
+			const groupDeckId = "nonexistent-id";
 			const owner = makeMockUser(userId);
 
 			usersService.findById.mockResolvedValue(owner);
 			serviceFindByIdSpy.mockRejectedValue(
-				new NotFoundException("Package not found"),
+				new NotFoundException("GroupDeck not found"),
 			);
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(groupDecksRepository.delete).not.toHaveBeenCalled();
 
-			await expect(service.delete(userId, packageId)).rejects.toThrow(
+			await expect(service.delete(userId, groupDeckId)).rejects.toThrow(
 				NotFoundException,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, packageId);
-			expect(packagesRepository.delete).not.toHaveBeenCalled();
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, groupDeckId);
+			expect(groupDecksRepository.delete).not.toHaveBeenCalled();
 		});
 	});
 });

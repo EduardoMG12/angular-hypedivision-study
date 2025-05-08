@@ -7,11 +7,11 @@ import {
 	IsUUID,
 	MaxLength,
 } from "class-validator";
-import { PackageStatus } from "../common/enums/packageStatus.enum";
+import { GroupDecksStatus } from "../common/enums/group-decksStatus.enum";
 
-export class ChangePackageStatusDto {
+export class ChangeGroupDecksStatusDto {
 	@ApiProperty({
-		description: "ID of Package can be changed",
+		description: "ID of GroupDecks can be changed",
 		example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
 		format: "uuid",
 	})
@@ -21,17 +21,17 @@ export class ChangePackageStatusDto {
 	id: string;
 
 	@ApiProperty({
-		description: "New status of Package",
-		enum: PackageStatus,
-		example: PackageStatus.Active,
+		description: "New status of GroupDecks",
+		enum: GroupDecksStatus,
+		example: GroupDecksStatus.Active,
 		maxLength: 20,
 	})
 	@Expose()
 	@IsString()
 	@IsNotEmpty()
-	@IsEnum(PackageStatus, {
+	@IsEnum(GroupDecksStatus, {
 		message: "Status can be valide value: active, paused, concluded, working",
 	})
 	@MaxLength(20)
-	status: PackageStatus;
+	status: GroupDecksStatus;
 }

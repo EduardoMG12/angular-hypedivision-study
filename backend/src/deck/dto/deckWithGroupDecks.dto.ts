@@ -3,13 +3,13 @@ import { Expose, Type } from "class-transformer";
 import { DeckDto } from "./deck.dto";
 import { ApiProperty } from "@nestjs/swagger";
 import { CardType } from "src/card/common/enum/cardType.enum";
-import { PackageDto } from "src/package/dto/package.dto";
-import { Package } from "src/entities/package.entity";
+import { GroupDecksDto } from "src/group-decks/dto/group-decks.dto";
+import { GroupDecks } from "src/entities/group_decks.entity";
 
-export class DeckWithPackageDto extends DeckDto {
+export class DeckWithGroupDecksDto extends DeckDto {
 	@ApiProperty({
-		description: "The Package when assign Decks",
-		type: [PackageDto],
+		description: "The GroupDecks when assign Decks",
+		type: [GroupDecksDto],
 		example: [
 			{
 				frontend: "how can i say ... in english?",
@@ -21,6 +21,6 @@ export class DeckWithPackageDto extends DeckDto {
 		],
 	})
 	@Expose()
-	@Type(() => PackageDto)
-	declare package: Package | null;
+	@Type(() => GroupDecksDto)
+	declare group_decks: GroupDecks | null;
 }

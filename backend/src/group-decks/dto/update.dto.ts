@@ -8,11 +8,11 @@ import {
 	IsString,
 	IsEnum,
 } from "class-validator";
-import { PackageStatus } from "../common/enums/packageStatus.enum";
+import { GroupDecksStatus } from "../common/enums/group-decksStatus.enum";
 
-export class UpdatePackageDto {
+export class UpdateGroupDecksDto {
 	@ApiProperty({
-		description: "Unic ID of Package to find what Package be updated",
+		description: "Unic ID of GroupDecks to find what GroupDecks be updated",
 		example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
 		format: "uuid",
 	})
@@ -22,7 +22,7 @@ export class UpdatePackageDto {
 	id: string;
 
 	@ApiProperty({
-		description: "New title of package (optional)",
+		description: "New title of group-decks (optional)",
 		example: "Update title",
 		maxLength: 100,
 		required: false,
@@ -34,7 +34,7 @@ export class UpdatePackageDto {
 	title?: string;
 
 	@ApiProperty({
-		description: "New description of package do Pacote (optional)",
+		description: "New description of group-decks do Pacote (optional)",
 		example: "Descrição revisada.",
 		maxLength: 1000,
 		required: false,
@@ -47,16 +47,16 @@ export class UpdatePackageDto {
 	description?: string;
 
 	@ApiProperty({
-		description: "New status of Package (optional)",
-		enum: PackageStatus,
-		example: PackageStatus.Paused,
+		description: "New status of GroupDecks (optional)",
+		enum: GroupDecksStatus,
+		example: GroupDecksStatus.Paused,
 		maxLength: 20,
 		required: false,
 	})
 	@IsOptional()
-	@IsEnum(PackageStatus, {
+	@IsEnum(GroupDecksStatus, {
 		message: "Status must be valid value: active, paused, concluded, working",
 	})
 	@Expose()
-	status?: PackageStatus;
+	status?: GroupDecksStatus;
 }

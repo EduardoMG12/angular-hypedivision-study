@@ -8,11 +8,11 @@ import {
 	OneToMany,
 } from "typeorm";
 import { User } from "./user.entity";
-import { PackageStatus } from "./common/enums/packageStatus.enum";
+import { GroupDecksStatus } from "./common/enums/groupDecksStatus.enum";
 import { Deck } from "./decks.entity";
 
-@Entity("packages")
-export class Package {
+@Entity("group_decks")
+export class GroupDecks {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
@@ -25,12 +25,12 @@ export class Package {
 	@ManyToOne(() => User, { nullable: false })
 	owner: User;
 
-	@Column({ type: "varchar", length: 20, default: PackageStatus.Active })
-	status: PackageStatus;
+	@Column({ type: "varchar", length: 20, default: GroupDecksStatus.Active })
+	status: GroupDecksStatus;
 
 	@OneToMany(
 		() => Deck,
-		(deck) => deck.package,
+		(deck) => deck.group_decks,
 		{ cascade: true },
 	)
 	decks: Deck[];

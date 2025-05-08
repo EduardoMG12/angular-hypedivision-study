@@ -6,7 +6,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AuthModule } from "./auth/auth.module";
 import { AdminModule } from "./admin/admin.module";
-import { PackageModule } from "./package/package.module";
+import { GroupDecksModule } from "./group-decks/group-decks.module";
 import { DeckModule } from "./deck/deck.module";
 import { CardModule } from "./card/card.module";
 import { JwtModule } from "@nestjs/jwt";
@@ -41,7 +41,7 @@ import { JwtModule } from "@nestjs/jwt";
 		AuthModule,
 		AdminModule,
 		TermsOfUseModule,
-		PackageModule,
+		GroupDecksModule,
 		DeckModule,
 		CardModule,
 	],

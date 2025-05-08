@@ -1,16 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import {
-	IsNotEmpty,
-	IsOptional,
-	IsString,
-	IsUUID,
-	MaxLength,
-} from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 
-export class CreatePackageDto {
+export class CreateGroupDecksDto {
 	@ApiProperty({
-		description: "Package title (required)",
+		description: "Group Decks title (required)",
 		example: "My new deck for revision",
 		maxLength: 100,
 		required: true,
@@ -22,8 +16,7 @@ export class CreatePackageDto {
 	title: string;
 
 	@ApiProperty({
-		// Adicionar ApiProperty
-		description: "Package description is optional",
+		description: "Group Decks description is optional",
 		example: "Deck to revise NestJS concepts",
 		maxLength: 1000,
 		required: false,

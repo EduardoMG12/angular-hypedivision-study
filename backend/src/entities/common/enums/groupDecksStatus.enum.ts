@@ -1,4 +1,4 @@
-export enum PackageStatus {
+export enum GroupDecksStatus {
 	Active = "active",
 	Paused = "paused",
 	Concluded = "concluded",

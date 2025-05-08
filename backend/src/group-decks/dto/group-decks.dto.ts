@@ -7,12 +7,12 @@ import {
 	MaxLength,
 } from "class-validator";
 import { User } from "src/entities/user.entity";
-import { PackageStatus } from "../common/enums/packageStatus.enum";
+import { GroupDecksStatus } from "../common/enums/group-decksStatus.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
-export class PackageDto {
+export class GroupDecksDto {
 	@ApiProperty({
-		description: "unic ID of Package",
+		description: "unic ID of GroupDecks",
 		example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
 		format: "uuid",
 	})
@@ -21,7 +21,7 @@ export class PackageDto {
 	id: string;
 
 	@ApiProperty({
-		description: "Package title",
+		description: "GroupDecks title",
 		example: "My new revision deck",
 		maxLength: 100,
 	})
@@ -31,7 +31,7 @@ export class PackageDto {
 	title: string;
 
 	@ApiProperty({
-		description: "Package description",
+		description: "GroupDecks description",
 		example: "Deck to revise NestJS concepts",
 		maxLength: 1000,
 		nullable: true,
@@ -43,26 +43,26 @@ export class PackageDto {
 	description?: string;
 
 	@ApiProperty({
-		description: "Package Status",
-		enum: PackageStatus,
-		example: PackageStatus.Active,
+		description: "GroupDecks Status",
+		enum: GroupDecksStatus,
+		example: GroupDecksStatus.Active,
 		maxLength: 20,
 	})
-	@IsEnum(PackageStatus, {
+	@IsEnum(GroupDecksStatus, {
 		message: "Status can be valid value: active, paused, concluded, working",
 	})
 	@Expose()
-	status?: PackageStatus;
+	status?: GroupDecksStatus;
 
 	@ApiProperty({
-		description: "Owner user of package",
+		description: "Owner user of group of decks",
 		type: User,
 	})
 	@Expose()
 	owner: User;
 
 	@ApiProperty({
-		description: "Package creating date",
+		description: "GroupDecks creating date",
 		example: "2023-10-27T10:00:00Z",
 		format: "date-time",
 	})
@@ -70,7 +70,7 @@ export class PackageDto {
 	createdAt: Date;
 
 	@ApiProperty({
-		description: "The Date of last package update",
+		description: "The Date of last group of decks update",
 		example: "2023-10-27T10:30:00Z",
 		format: "date-time",
 		nullable: true,

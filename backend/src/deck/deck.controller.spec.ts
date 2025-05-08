@@ -19,12 +19,12 @@ jest.mock("./../common/utils/toPlainToInstance", () => ({
 }));
 
 import { toPlainToInstance } from "../common/utils/toPlainToInstance";
-import { Package } from "src/entities/package.entity";
+import { GroupDecks } from "src/entities/group_decks.entity";
 
 const makeMockCreateDeckDto = (pkgId?: string): CreateDeckDto => ({
 	title: "Test Deck Title",
 	description: "Test Description",
-	package: pkgId,
+	group_decks: pkgId,
 	owner: { id: "test-owner-id", name: "Test User" } as any,
 	createdAt: new Date(),
 	updatedAt: new Date(),
@@ -39,7 +39,7 @@ const makeMockDeckDto = (
 	title: "Test Deck Title",
 	description: "Test Description",
 
-	package: pkgId ? ({ id: pkgId } as Package) : null,
+	group_decks: pkgId ? ({ id: pkgId } as GroupDecks) : null,
 	owner: { id: userId } as any,
 	status: "active" as any,
 	createdAt: new Date(),
@@ -107,15 +107,15 @@ describe("DeckController", () => {
 	describe("create", () => {
 		it("should call service.create with userId and DTO and return the transformed result", async () => {
 			const userId = "test-user-id";
-			const createDto = makeMockCreateDeckDto("package-123");
+			const createDto = makeMockCreateDeckDto("group-decks-123");
 			const serviceResult = makeMockDeckDto(
 				"new-deck-id",
-				createDto.package,
+				createDto.group_decks,
 				userId,
 			);
 			const transformedResult = makeMockDeckDto(
 				"new-deck-id",
-				createDto.package,
+				createDto.group_decks,
 				userId,
 			);
 
@@ -137,9 +137,9 @@ describe("DeckController", () => {
 
 		it("should throw the exception thrown by service.create", async () => {
 			const userId = "test-user-id";
-			const createDto = makeMockCreateDeckDto("package-123");
+			const createDto = makeMockCreateDeckDto("group-decks-123");
 			const serviceError = new BadRequestException(
-				"Invalid deck data or package ID",
+				"Invalid deck data or group-decks ID",
 			);
 
 			service.create.mockRejectedValue(serviceError);
@@ -153,7 +153,7 @@ describe("DeckController", () => {
 			expect(mockToPlainToInstance).not.toHaveBeenCalled();
 		});
 
-		it("should handle creation without a package ID", async () => {
+		it("should handle creation without a group-decks ID", async () => {
 			const userId = "test-user-id";
 			const createDto = makeMockCreateDeckDto(undefined);
 			const serviceResult = makeMockDeckDto("new-deck-id", undefined, userId);

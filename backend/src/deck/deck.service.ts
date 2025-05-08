@@ -9,17 +9,18 @@ import { UsersService } from "src/users/users.service";
 import { Repository } from "typeorm";
 import { DeckDto } from "./dto/deck.dto";
 import { DeckStatus } from "./common/enums/deckStatus.enum";
-import { PackageService } from "src/package/package.service";
-import { PackageDto } from "src/package/dto/package.dto";
+
+import { GroupDecksDto } from "src/group-decks/dto/group-decks.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { errorMessages } from "src/common/errors/errors-message";
 import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
 import { UpdateDeckDto } from "./dto/update.dto";
 import { DeckWithCardsDto } from "./dto/deckWithCards.dto";
-import { UpdateDeckReferencePackageDto } from "./dto/updateDeckReferencePackage.dto";
-import { Package } from "src/entities/package.entity";
-import { DeckWithPackageDto } from "./dto/deckWithPackage.dto";
+import { UpdateDeckReferenceGroupDecksDto } from "./dto/updateDeckReferenceGroupDecks.dto";
+import { GroupDecks } from "src/entities/group_decks.entity";
+import { DeckWithGroupDecksDto } from "./dto/deckWithGroupDecks.dto";
 import { Deck } from "src/entities/decks.entity";
+import { GroupDecksService } from "src/group-decks/group-decks.service";
 
 @Injectable()
 export class DeckService {
@@ -27,24 +28,24 @@ export class DeckService {
 		@InjectRepository(Deck)
 		private deckRepository: Repository<Deck>,
 		private readonly usersService: UsersService,
-		private readonly packageService: PackageService,
+		private readonly groupDecksService: GroupDecksService,
 	) {}
 
 	async create(userId: string, deckData: CreateDeckDto): Promise<DeckDto> {
 		const owner = await this.usersService.findById(userId);
 
-		let packageEntity: PackageDto | null = null;
-		if (deckData.package) {
-			packageEntity = await this.packageService.findById(
+		let groupDecksEntity: GroupDecksDto | null = null;
+		if (deckData.group_decks) {
+			groupDecksEntity = await this.groupDecksService.findById(
 				userId,
-				deckData.package,
+				deckData.group_decks,
 			);
 		}
 
 		const deckEntity = this.deckRepository.create({
 			title: deckData.title,
 			description: deckData.description || "",
-			package: packageEntity,
+			group_decks: groupDecksEntity,
 			owner,
 			status: DeckStatus.Active,
 			createdAt: new Date(),
@@ -138,25 +139,27 @@ export class DeckService {
 		return await this.deckRepository.save(deckEntity);
 	}
 
-	async updateReferencePackage(
+	async updateReferenceGroupDecks(
 		userId: string,
-		updateReferenceData: UpdateDeckReferencePackageDto,
-	): Promise<DeckWithPackageDto> {
+		updateReferenceData: UpdateDeckReferenceGroupDecksDto,
+	): Promise<DeckWithGroupDecksDto> {
 		const deck = await this.findById(userId, updateReferenceData.deckId);
 
-		if (!updateReferenceData.packageId) {
-			deck.package = null;
+		if (!updateReferenceData.groupDecksId) {
+			deck.group_decks = null;
 			return await this.deckRepository.save(deck);
 		}
 
-		const packageEntity = (await this.packageService.findById(
+		const groupDecksEntity = (await this.groupDecksService.findById(
 			userId,
-			updateReferenceData.packageId,
-		)) as Package;
-		if (packageEntity.id === deck.package?.id) {
-			throw new BadRequestException("this package is egual the old package");
+			updateReferenceData.groupDecksId,
+		)) as GroupDecks;
+		if (groupDecksEntity.id === deck.group_decks?.id) {
+			throw new BadRequestException(
+				"this groupDecks is egual the old groupDecks",
+			);
 		}
-		deck.package = packageEntity;
+		deck.group_decks = groupDecksEntity;
 		return await this.deckRepository.save(deck);
 	}
 

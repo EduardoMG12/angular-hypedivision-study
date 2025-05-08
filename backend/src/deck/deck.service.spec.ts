@@ -3,25 +3,26 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { DeckService } from "./deck.service";
 import { UsersService } from "src/users/users.service";
-import { PackageService } from "src/package/package.service";
+import { GroupDecksService } from "src/group-decks/group-decks.service";
+
 import { Deck } from "src/entities/decks.entity";
 import { User } from "src/entities/user.entity";
-import { Package } from "src/entities/package.entity";
+import { GroupDecks } from "src/entities/group_decks.entity";
 import { CreateDeckDto } from "./dto/create.dto";
 
 import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
 import { UpdateDeckDto } from "./dto/update.dto";
 import { DeckStatus } from "./common/enums/deckStatus.enum";
-import { PackageDto } from "src/package/dto/package.dto";
+import { GroupDecksDto } from "src/group-decks/dto/group-decks.dto";
 
 import { BadRequestException, NotFoundException } from "@nestjs/common";
-import { PackageStatus } from "src/package/common/enums/packageStatus.enum";
+import { GroupDecksStatus } from "src/group-decks/common/enums/group-decksStatus.enum";
 import { errorMessages } from "src/common/errors/errors-message";
 
 const makeMockUser = (id = "user-owner-id"): User => ({
 	id,
 	email: "owner@example.com",
-	fullName: "Package Owner",
+	fullName: "GroupDecks Owner",
 	password: "hashed_password",
 	birthdate: new Date("1990-01-01"),
 	phone: "123-456-7890",
@@ -31,15 +32,15 @@ const makeMockUser = (id = "user-owner-id"): User => ({
 	deleted_at: null,
 });
 
-const makeMockPackage = (
-	id = "package-id",
+const makeMockGroupDecks = (
+	id = "group-decks-id",
 	ownerId = "user-owner-id",
-	status: PackageStatus = PackageStatus.Active,
-	title = "Test Package",
-	description = "This is a test package description.",
+	status: GroupDecksStatus = GroupDecksStatus.Active,
+	title = "Test GroupDecks",
+	description = "This is a test group-decks description.",
 	createdAt = new Date(),
 	updatedAt = new Date(),
-): Package => ({
+): GroupDecks => ({
 	id,
 	title,
 	description,
@@ -53,7 +54,7 @@ const makeMockPackage = (
 const makeMockDeck = (
 	id = "deck-id",
 	ownerId = "user-owner-id",
-	packageId?: string,
+	groupDecksId?: string,
 	status: DeckStatus = DeckStatus.Active,
 	title = "Deck Title",
 	description = "Deck Description",
@@ -66,7 +67,7 @@ const makeMockDeck = (
 
 	owner: makeMockUser(ownerId),
 
-	package: packageId ? makeMockPackage(packageId, ownerId) : null,
+	group_decks: groupDecksId ? makeMockGroupDecks(groupDecksId, ownerId) : null,
 	status,
 	createdAt,
 	updatedAt,
@@ -76,7 +77,7 @@ const makeMockDeck = (
 const makeMockCreateDeckDto = (pkgId?: string): CreateDeckDto => ({
 	title: "Test Deck Title",
 	description: "Test Description",
-	package: pkgId,
+	group_decks: pkgId,
 	owner: makeMockUser("mock-owner-id"),
 	createdAt: new Date(),
 	updatedAt: new Date(),
@@ -105,7 +106,7 @@ describe("DeckService", () => {
 
 	let usersService: jest.Mocked<UsersService>;
 
-	let packageService: jest.Mocked<PackageService>;
+	let groupDecksService: jest.Mocked<GroupDecksService>;
 
 	let serviceFindByIdSpy: jest.SpyInstance;
 
@@ -130,7 +131,7 @@ describe("DeckService", () => {
 					},
 				},
 				{
-					provide: PackageService,
+					provide: GroupDecksService,
 					useValue: {
 						findById: jest.fn(),
 					},
@@ -141,7 +142,7 @@ describe("DeckService", () => {
 		service = module.get<DeckService>(DeckService);
 		deckRepository = module.get(getRepositoryToken(Deck));
 		usersService = module.get(UsersService);
-		packageService = module.get(PackageService);
+		groupDecksService = module.get(GroupDecksService);
 
 		serviceFindByIdSpy = jest.spyOn(service, "findById");
 
@@ -152,17 +153,17 @@ describe("DeckService", () => {
 		expect(service).toBeDefined();
 		expect(deckRepository).toBeDefined();
 		expect(usersService).toBeDefined();
-		expect(packageService).toBeDefined();
+		expect(groupDecksService).toBeDefined();
 		expect(serviceFindByIdSpy).toBeDefined();
 	});
 
 	describe("create", () => {
-		it("should create a deck with an associated package successfully", async () => {
+		it("should create a deck with an associated groupDecks successfully", async () => {
 			const userId = "user-owner-id";
-			const packageId = "existing-package-id";
-			const createDto = makeMockCreateDeckDto(packageId);
+			const groupDecksId = "existing-group-decks-id";
+			const createDto = makeMockCreateDeckDto(groupDecksId);
 			const owner = makeMockUser(userId);
-			const packageEntity = makeMockPackage(packageId, userId);
+			const groupDecksEntity = makeMockGroupDecks(groupDecksId, userId);
 
 			const createdDeck = makeMockDeck(
 				"new-deck-id-temp",
@@ -174,7 +175,7 @@ describe("DeckService", () => {
 			);
 
 			createdDeck.owner = owner;
-			createdDeck.package = packageEntity;
+			createdDeck.group_decks = groupDecksEntity;
 			createdDeck.status = DeckStatus.Active;
 			createdDeck.createdAt = expect.any(Date) as Date;
 
@@ -182,18 +183,23 @@ describe("DeckService", () => {
 
 			usersService.findById.mockResolvedValue(owner);
 
-			packageService.findById.mockResolvedValue(packageEntity as PackageDto);
+			groupDecksService.findById.mockResolvedValue(
+				groupDecksEntity as GroupDecksDto,
+			);
 			deckRepository.create.mockReturnValue(createdDeck);
 			deckRepository.save.mockResolvedValue(savedDeck);
 
 			const result = await service.create(userId, createDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packageService.findById).toHaveBeenCalledWith(userId, packageId);
+			expect(groupDecksService.findById).toHaveBeenCalledWith(
+				userId,
+				groupDecksId,
+			);
 			expect(deckRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description || "",
-				package: packageEntity,
+				group_decks: groupDecksEntity,
 				owner: owner,
 				status: DeckStatus.Active,
 				createdAt: expect.any(Date),
@@ -203,7 +209,7 @@ describe("DeckService", () => {
 			expect(result).toEqual(savedDeck);
 		});
 
-		it("should create a deck without an associated package successfully", async () => {
+		it("should create a deck without an associated groupDecks successfully", async () => {
 			const userId = "user-owner-id";
 			const createDto = makeMockCreateDeckDto(undefined);
 			const owner = makeMockUser(userId);
@@ -217,25 +223,25 @@ describe("DeckService", () => {
 				createDto.description,
 			);
 			createdDeck.owner = owner;
-			createdDeck.package = null;
+			createdDeck.group_decks = null;
 			createdDeck.status = DeckStatus.Active;
 			createdDeck.createdAt = expect.any(Date) as Date;
 
 			const savedDeck = { ...createdDeck, id: "saved-deck-id" };
 
 			usersService.findById.mockResolvedValue(owner);
-			expect(packageService.findById).not.toHaveBeenCalled();
+			expect(groupDecksService.findById).not.toHaveBeenCalled();
 			deckRepository.create.mockReturnValue(createdDeck);
 			deckRepository.save.mockResolvedValue(savedDeck);
 
 			const result = await service.create(userId, createDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packageService.findById).not.toHaveBeenCalled();
+			expect(groupDecksService.findById).not.toHaveBeenCalled();
 			expect(deckRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description || "",
-				package: null,
+				group_decks: null,
 				owner: owner,
 				status: DeckStatus.Active,
 				createdAt: expect.any(Date),
@@ -246,7 +252,7 @@ describe("DeckService", () => {
 
 		it("should throw NotFoundException if owner is not found", async () => {
 			const userId = "nonexistent-user-id";
-			const createDto = makeMockCreateDeckDto("package-123");
+			const createDto = makeMockCreateDeckDto("groupDecks-123");
 			const serviceError = new NotFoundException("User not found");
 
 			usersService.findById.mockRejectedValue(serviceError);
@@ -256,30 +262,33 @@ describe("DeckService", () => {
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packageService.findById).not.toHaveBeenCalled();
+			expect(groupDecksService.findById).not.toHaveBeenCalled();
 			expect(deckRepository.create).not.toHaveBeenCalled();
 			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if package is not found for the user", async () => {
+		it("should throw NotFoundException if groupDecks is not found for the user", async () => {
 			const userId = "user-owner-id";
-			const packageId = "nonexistent-package-id";
-			const createDto = makeMockCreateDeckDto(packageId);
+			const groupDecksId = "nonexistent-group-decks-id";
+			const createDto = makeMockCreateDeckDto(groupDecksId);
 			const owner = makeMockUser(userId);
 
 			const serviceError = new NotFoundException(
-				"Package not found for this user",
+				"GroupDecks not found for this user",
 			);
 
 			usersService.findById.mockResolvedValue(owner);
-			packageService.findById.mockRejectedValue(serviceError);
+			groupDecksService.findById.mockRejectedValue(serviceError);
 
 			await expect(service.create(userId, createDto)).rejects.toThrow(
 				serviceError,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(packageService.findById).toHaveBeenCalledWith(userId, packageId);
+			expect(groupDecksService.findById).toHaveBeenCalledWith(
+				userId,
+				groupDecksId,
+			);
 			expect(deckRepository.create).not.toHaveBeenCalled();
 			expect(deckRepository.save).not.toHaveBeenCalled();
 		});

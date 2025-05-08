@@ -20,7 +20,7 @@ export class CreateDeckDto {
 	@Expose()
 	@IsOptional()
 	@IsUUID()
-	package?: string;
+	group_decks?: string;
 
 	@Expose()
 	@CreateDateColumn({ name: "created_at" })

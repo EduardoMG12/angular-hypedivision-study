@@ -1,6 +1,6 @@
 import { Expose } from "class-transformer";
 import { IsEnum, IsString, IsUUID, MaxLength } from "class-validator";
-import { Package } from "src/entities/package.entity";
+import { GroupDecks } from "src/entities/group_decks.entity";
 import { User } from "src/entities/user.entity";
 import { DeckStatus } from "../common/enums/deckStatus.enum";
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
@@ -23,7 +23,7 @@ export class DeckDto {
 	owner: User;
 
 	@Expose()
-	package: Package | null;
+	group_decks: GroupDecks | null;
 
 	@Expose()
 	@IsEnum(DeckStatus, {

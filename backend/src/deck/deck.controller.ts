@@ -19,8 +19,8 @@ import {
 	ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { DeckWithCardsDto } from "./dto/deckWithCards.dto";
-import { UpdateDeckReferencePackageDto } from "./dto/updateDeckReferencePackage.dto";
-import { DeckWithPackageDto } from "./dto/deckWithPackage.dto";
+import { UpdateDeckReferenceGroupDecksDto } from "./dto/updateDeckReferenceGroupDecks.dto";
+import { DeckWithGroupDecksDto } from "./dto/deckWithGroupDecks.dto";
 
 @ApiTags("Deck")
 @ApiBearerAuth()
@@ -32,7 +32,7 @@ export class DeckController {
 	@ApiOperation({
 		summary: "Create a new Deck",
 		description:
-			"Creates a new Deck associated with the authenticated user and optionally links it to a Package.",
+			"Creates a new Deck associated with the authenticated user and optionally links it to a GroupDecks.",
 	})
 
 	@ApiBody({
@@ -52,7 +52,7 @@ export class DeckController {
 	@ApiResponse({ status: 401, description: "Unauthorized" })
 	@ApiResponse({
 		status: 404,
-		description: "User or associated Package not found",
+		description: "User or associated GroupDecks not found",
 	})
 	async create(
 		@GetUserId() userId: string,
@@ -112,22 +112,22 @@ export class DeckController {
 	})
 	async findById(
 		@GetUserId() userId: string,
-		@Body() packageData: { id: string },
+		@Body() groupDecksData: { id: string },
 	): Promise<DeckDto> {
 		return toPlainToInstance(
 			DeckDto,
-			await this.deckService.findById(userId, packageData.id),
+			await this.deckService.findById(userId, groupDecksData.id),
 		);
 	}
 
 	@Post("findByIdWithCards")
 	async findByIdWithCards(
 		@GetUserId() userId: string,
-		@Body() packageData: { id: string },
+		@Body() groupDecksData: { id: string },
 	): Promise<DeckWithCardsDto> {
 		return toPlainToInstance(
 			DeckWithCardsDto,
-			await this.deckService.findByIdWithCards(userId, packageData.id),
+			await this.deckService.findByIdWithCards(userId, groupDecksData.id),
 		);
 	}
 
@@ -192,23 +192,23 @@ export class DeckController {
 	})
 	async update(
 		@GetUserId() userId: string,
-		@Body() packageData: UpdateDeckDto,
+		@Body() groupDecksData: UpdateDeckDto,
 	): Promise<DeckDto> {
 		return toPlainToInstance(
 			DeckDto,
-			await this.deckService.update(userId, packageData),
+			await this.deckService.update(userId, groupDecksData),
 		);
 	}
 
 	@ApiBearerAuth()
 	@ApiOperation({
-		summary: "Assign or remove a package for a deck",
+		summary: "Assign or remove a groupDecks for a deck",
 		description:
-			"Assigns a deck to a new package or removes it from its current package by setting packageId to null.",
+			"Assigns a deck to a new groupDecks or removes it from its current groupDecks by setting groupDecksId to null.",
 	})
 	@ApiResponse({
 		status: 200,
-		description: "Deck package updated successfully",
+		description: "Deck groupDecks updated successfully",
 		type: DeckDto,
 	})
 	@ApiUnauthorizedResponse({
@@ -216,16 +216,19 @@ export class DeckController {
 	})
 	@ApiResponse({
 		status: 400,
-		description: "Invalid deck ID or package already assigned",
+		description: "Invalid deck ID or groupDecks already assigned",
 	})
-	@Patch("/updateRefencePackage")
-	async assignPackage(
+	@Patch("/updateRefenceGroupDecks")
+	async assignGroupDecks(
 		@GetUserId() userId: string,
-		@Body() updatePackageDto: UpdateDeckReferencePackageDto,
-	): Promise<DeckWithPackageDto> {
+		@Body() updateGroupDecksDto: UpdateDeckReferenceGroupDecksDto,
+	): Promise<DeckWithGroupDecksDto> {
 		return toPlainToInstance(
-			DeckWithPackageDto,
-			await this.deckService.updateReferencePackage(userId, updatePackageDto),
+			DeckWithGroupDecksDto,
+			await this.deckService.updateReferenceGroupDecks(
+				userId,
+				updateGroupDecksDto,
+			),
 		);
 	}
 
