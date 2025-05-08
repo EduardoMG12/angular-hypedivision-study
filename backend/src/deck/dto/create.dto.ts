@@ -1,12 +1,10 @@
 import { Expose } from "class-transformer";
-import { IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
-import { Package } from "src/entities/package.entity";
+import { IsOptional, IsString, IsUUID } from "class-validator";
 import { User } from "src/entities/user.entity";
 
-import { FlashcardStatus } from "../common/enums/flashcardStatus.enum";
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
-export class CreateFlashcardDto {
+export class CreateDeckDto {
 	@Expose()
 	@IsString()
 	title: string;

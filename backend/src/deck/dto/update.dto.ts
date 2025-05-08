@@ -1,13 +1,7 @@
 import { Expose } from "class-transformer";
-import {
-	IsEnum,
-	IsOptional,
-	IsString,
-	IsUUID,
-	MaxLength,
-} from "class-validator";
+import { IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
-export class UpdateFlashcardDto {
+export class UpdateDeckDto {
 	@Expose()
 	@IsUUID()
 	id: string;

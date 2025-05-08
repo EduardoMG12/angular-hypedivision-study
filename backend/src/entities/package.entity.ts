@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./user.entity";
 import { PackageStatus } from "./common/enums/packageStatus.enum";
-import { Flashcard } from "./flashcards.entity";
+import { Deck } from "./decks.entity";
 
 @Entity("packages")
 export class Package {
@@ -29,11 +29,11 @@ export class Package {
 	status: PackageStatus;
 
 	@OneToMany(
-		() => Flashcard,
-		(flashcard) => flashcard.package,
+		() => Deck,
+		(deck) => deck.package,
 		{ cascade: true },
 	)
-	flashcards: Flashcard[];
+	decks: Deck[];
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

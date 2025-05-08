@@ -1,16 +1,16 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { FlashcardController } from "./flashcard.controller";
-import { FlashcardService } from "./flashcard.service";
-import { CreateFlashcardDto } from "./dto/create.dto";
-import { FlashcardDto } from "./dto/flashcard.dto";
-import { ChangeFlashcardStatusDto } from "./dto/changeStatus.dto";
-import { UpdateFlashcardDto } from "./dto/update.dto";
+import { DeckController } from "./deck.controller";
+import { DeckService } from "./deck.service";
+import { CreateDeckDto } from "./dto/create.dto";
+import { DeckDto } from "./dto/deck.dto";
+import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
+import { UpdateDeckDto } from "./dto/update.dto";
 import {
 	NotFoundException,
 	BadRequestException,
 	UnauthorizedException,
 } from "@nestjs/common";
-import { FlashcardStatus } from "./common/enums/flashcardStatus.enum";
+import { DeckStatus } from "./common/enums/deckStatus.enum";
 
 let mockToPlainToInstance: jest.Mock;
 
@@ -18,11 +18,11 @@ jest.mock("./../common/utils/toPlainToInstance", () => ({
 	toPlainToInstance: jest.fn(),
 }));
 
-import { toPlainToInstance } from "./../common/utils/toPlainToInstance";
+import { toPlainToInstance } from "../common/utils/toPlainToInstance";
 import { Package } from "src/entities/package.entity";
 
-const makeMockCreateFlashcardDto = (pkgId?: string): CreateFlashcardDto => ({
-	title: "Test Flashcard Title",
+const makeMockCreateDeckDto = (pkgId?: string): CreateDeckDto => ({
+	title: "Test Deck Title",
 	description: "Test Description",
 	package: pkgId,
 	owner: { id: "test-owner-id", name: "Test User" } as any,
@@ -30,13 +30,13 @@ const makeMockCreateFlashcardDto = (pkgId?: string): CreateFlashcardDto => ({
 	updatedAt: new Date(),
 });
 
-const makeMockFlashcardDto = (
-	id = "flashcard-id",
+const makeMockDeckDto = (
+	id = "deck-id",
 	pkgId?: string,
 	userId = "user-id",
-): FlashcardDto => ({
+): DeckDto => ({
 	id,
-	title: "Test Flashcard Title",
+	title: "Test Deck Title",
 	description: "Test Description",
 
 	package: pkgId ? ({ id: pkgId } as Package) : null,
@@ -46,33 +46,33 @@ const makeMockFlashcardDto = (
 	updatedAt: new Date(),
 });
 
-const makeMockChangeFlashcardStatusDto = (
-	id = "flashcard-id",
+const makeMockChangeDeckStatusDto = (
+	id = "deck-id",
 	status = "paused",
-): ChangeFlashcardStatusDto => ({
+): ChangeDeckStatusDto => ({
 	id,
-	status: status as FlashcardStatus,
+	status: status as DeckStatus,
 });
 
-const makeMockUpdateFlashcardDto = (
-	id = "flashcard-id",
-	updateData: Partial<UpdateFlashcardDto> = {},
-): UpdateFlashcardDto => ({
+const makeMockUpdateDeckDto = (
+	id = "deck-id",
+	updateData: Partial<UpdateDeckDto> = {},
+): UpdateDeckDto => ({
 	id,
 	...updateData,
 });
 
-describe("FlashcardController", () => {
-	let controller: FlashcardController;
+describe("DeckController", () => {
+	let controller: DeckController;
 
-	let service: jest.Mocked<FlashcardService>;
+	let service: jest.Mocked<DeckService>;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
-			controllers: [FlashcardController],
+			controllers: [DeckController],
 			providers: [
 				{
-					provide: FlashcardService,
+					provide: DeckService,
 					useValue: {
 						create: jest.fn(),
 						findAll: jest.fn(),
@@ -85,8 +85,8 @@ describe("FlashcardController", () => {
 			],
 		}).compile();
 
-		controller = module.get<FlashcardController>(FlashcardController);
-		service = module.get(FlashcardService) as jest.Mocked<FlashcardService>;
+		controller = module.get<DeckController>(DeckController);
+		service = module.get(DeckService) as jest.Mocked<DeckService>;
 
 		mockToPlainToInstance =
 			require("./../common/utils/toPlainToInstance").toPlainToInstance;
@@ -107,14 +107,14 @@ describe("FlashcardController", () => {
 	describe("create", () => {
 		it("should call service.create with userId and DTO and return the transformed result", async () => {
 			const userId = "test-user-id";
-			const createDto = makeMockCreateFlashcardDto("package-123");
-			const serviceResult = makeMockFlashcardDto(
-				"new-flashcard-id",
+			const createDto = makeMockCreateDeckDto("package-123");
+			const serviceResult = makeMockDeckDto(
+				"new-deck-id",
 				createDto.package,
 				userId,
 			);
-			const transformedResult = makeMockFlashcardDto(
-				"new-flashcard-id",
+			const transformedResult = makeMockDeckDto(
+				"new-deck-id",
 				createDto.package,
 				userId,
 			);
@@ -128,7 +128,7 @@ describe("FlashcardController", () => {
 			expect(service.create).toHaveBeenCalledWith(userId, createDto);
 
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 
@@ -137,9 +137,9 @@ describe("FlashcardController", () => {
 
 		it("should throw the exception thrown by service.create", async () => {
 			const userId = "test-user-id";
-			const createDto = makeMockCreateFlashcardDto("package-123");
+			const createDto = makeMockCreateDeckDto("package-123");
 			const serviceError = new BadRequestException(
-				"Invalid flashcard data or package ID",
+				"Invalid deck data or package ID",
 			);
 
 			service.create.mockRejectedValue(serviceError);
@@ -155,14 +155,10 @@ describe("FlashcardController", () => {
 
 		it("should handle creation without a package ID", async () => {
 			const userId = "test-user-id";
-			const createDto = makeMockCreateFlashcardDto(undefined);
-			const serviceResult = makeMockFlashcardDto(
-				"new-flashcard-id",
-				undefined,
-				userId,
-			);
-			const transformedResult = makeMockFlashcardDto(
-				"new-flashcard-id",
+			const createDto = makeMockCreateDeckDto(undefined);
+			const serviceResult = makeMockDeckDto("new-deck-id", undefined, userId);
+			const transformedResult = makeMockDeckDto(
+				"new-deck-id",
 				undefined,
 				userId,
 			);
@@ -174,7 +170,7 @@ describe("FlashcardController", () => {
 
 			expect(service.create).toHaveBeenCalledWith(userId, createDto);
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 			expect(result).toEqual(transformedResult);
@@ -186,13 +182,13 @@ describe("FlashcardController", () => {
 			const userId = "test-user-id";
 
 			const serviceResult = [
-				makeMockFlashcardDto("id1", "pkg1", userId),
-				makeMockFlashcardDto("id2", "pkg1", userId),
+				makeMockDeckDto("id1", "pkg1", userId),
+				makeMockDeckDto("id2", "pkg1", userId),
 			];
 
 			const transformedResult = [
-				makeMockFlashcardDto("id1", "pkg1", userId),
-				makeMockFlashcardDto("id2", "pkg1", userId),
+				makeMockDeckDto("id1", "pkg1", userId),
+				makeMockDeckDto("id2", "pkg1", userId),
 			];
 
 			service.findAll.mockResolvedValue(serviceResult);
@@ -204,7 +200,7 @@ describe("FlashcardController", () => {
 			expect(service.findAll).toHaveBeenCalledWith(userId);
 
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 
@@ -213,8 +209,8 @@ describe("FlashcardController", () => {
 
 		it("should return an empty array if service.findAll returns an empty array", async () => {
 			const userId = "test-user-id";
-			const serviceResult: FlashcardDto[] = [];
-			const transformedResult: FlashcardDto[] = [];
+			const serviceResult: DeckDto[] = [];
+			const transformedResult: DeckDto[] = [];
 
 			service.findAll.mockResolvedValue(serviceResult);
 			mockToPlainToInstance.mockReturnValue(transformedResult);
@@ -223,7 +219,7 @@ describe("FlashcardController", () => {
 
 			expect(service.findAll).toHaveBeenCalledWith(userId);
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 			expect(result).toEqual(transformedResult);
@@ -246,12 +242,12 @@ describe("FlashcardController", () => {
 	describe("findById", () => {
 		// it("should call service.findById with userId and id and return the transformed result", async () => {
 		// 	const userId = "test-user-id";
-		// 	const flashcardId = "flashcard-to-find-id";
+		// 	const deckId = "deck-to-find-id";
 
-		// 	const requestBody = { id: flashcardId };
-		// 	const serviceResult = makeMockFlashcardDto(flashcardId, "pkg1", userId);
-		// 	const transformedResult = makeMockFlashcardDto(
-		// 		flashcardId,
+		// 	const requestBody = { id: deckId };
+		// 	const serviceResult = makeMockDeckDto(deckId, "pkg1", userId);
+		// 	const transformedResult = makeMockDeckDto(
+		// 		deckId,
 		// 		"pkg1",
 		// 		userId,
 		// 	);
@@ -261,10 +257,10 @@ describe("FlashcardController", () => {
 
 		// 	const result = await controller.findById(userId, requestBody);
 
-		// 	expect(service.findById).toHaveBeenCalledWith(userId, flashcardId);
+		// 	expect(service.findById).toHaveBeenCalledWith(userId, deckId);
 
 		// 	expect(mockToPlainToInstance).toHaveBeenCalledWith(
-		// 		FlashcardDto,
+		// 		DeckDto,
 		// 		serviceResult,
 		// 	);
 
@@ -273,10 +269,10 @@ describe("FlashcardController", () => {
 
 		it("should throw NotFoundException if service.findById throws NotFoundException", async () => {
 			const userId = "test-user-id";
-			const flashcardId = "nonexistent-id";
-			const requestBody = { id: flashcardId };
+			const deckId = "nonexistent-id";
+			const requestBody = { id: deckId };
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			service.findById.mockRejectedValue(serviceError);
@@ -285,14 +281,14 @@ describe("FlashcardController", () => {
 				serviceError,
 			);
 
-			expect(service.findById).toHaveBeenCalledWith(userId, flashcardId);
+			expect(service.findById).toHaveBeenCalledWith(userId, deckId);
 			expect(mockToPlainToInstance).not.toHaveBeenCalled();
 		});
 
 		it("should throw other exceptions thrown by service.findById", async () => {
 			const userId = "test-user-id";
-			const flashcardId = "some-id";
-			const requestBody = { id: flashcardId };
+			const deckId = "some-id";
+			const requestBody = { id: deckId };
 			const serviceError = new BadRequestException("Invalid ID format");
 
 			service.findById.mockRejectedValue(serviceError);
@@ -301,7 +297,7 @@ describe("FlashcardController", () => {
 				serviceError,
 			);
 
-			expect(service.findById).toHaveBeenCalledWith(userId, flashcardId);
+			expect(service.findById).toHaveBeenCalledWith(userId, deckId);
 			expect(mockToPlainToInstance).not.toHaveBeenCalled();
 		});
 	});
@@ -309,16 +305,12 @@ describe("FlashcardController", () => {
 	describe("changeStatus", () => {
 		it("should call service.changeStatus with userId and DTO and return the transformed result", async () => {
 			const userId = "test-user-id";
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
-				"flashcard-id-to-change",
+			const changeStatusDto = makeMockChangeDeckStatusDto(
+				"deck-id-to-change",
 				"concluded",
 			);
-			const serviceResult = makeMockFlashcardDto(
-				changeStatusDto.id,
-				"pkg1",
-				userId,
-			);
-			const transformedResult = makeMockFlashcardDto(
+			const serviceResult = makeMockDeckDto(changeStatusDto.id, "pkg1", userId);
+			const transformedResult = makeMockDeckDto(
 				changeStatusDto.id,
 				"pkg1",
 				userId,
@@ -337,7 +329,7 @@ describe("FlashcardController", () => {
 			);
 
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 
@@ -346,8 +338,8 @@ describe("FlashcardController", () => {
 
 		it("should throw exceptions thrown by service.changeStatus", async () => {
 			const userId = "test-user-id";
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
-				"flashcard-id-to-change",
+			const changeStatusDto = makeMockChangeDeckStatusDto(
+				"deck-id-to-change",
 				"invalid-status",
 			);
 			const serviceError = new BadRequestException("Invalid status transition");
@@ -367,12 +359,12 @@ describe("FlashcardController", () => {
 
 		it("should throw NotFoundException if service.changeStatus throws NotFoundException", async () => {
 			const userId = "test-user-id";
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
+			const changeStatusDto = makeMockChangeDeckStatusDto(
 				"nonexistent-id",
 				"paused",
 			);
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			service.changeStatus.mockRejectedValue(serviceError);
@@ -392,22 +384,18 @@ describe("FlashcardController", () => {
 	describe("update", () => {
 		it("should call service.update with userId and DTO and return the transformed result", async () => {
 			const userId = "test-user-id";
-			const updateDto = makeMockUpdateFlashcardDto("flashcard-id-to-update", {
+			const updateDto = makeMockUpdateDeckDto("deck-id-to-update", {
 				title: "New Title",
 				description: "New Desc",
 			});
 
-			const serviceResult = makeMockFlashcardDto(updateDto.id, "pkg1", userId);
+			const serviceResult = makeMockDeckDto(updateDto.id, "pkg1", userId);
 
 			serviceResult.title = updateDto.title ?? serviceResult.title;
 			serviceResult.description =
 				updateDto.description ?? serviceResult.description;
 
-			const transformedResult = makeMockFlashcardDto(
-				updateDto.id,
-				"pkg1",
-				userId,
-			);
+			const transformedResult = makeMockDeckDto(updateDto.id, "pkg1", userId);
 
 			transformedResult.title = updateDto.title ?? transformedResult.title;
 			transformedResult.description =
@@ -421,7 +409,7 @@ describe("FlashcardController", () => {
 			expect(service.update).toHaveBeenCalledWith(userId, updateDto);
 
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 
@@ -430,7 +418,7 @@ describe("FlashcardController", () => {
 
 		it("should throw exceptions thrown by service.update", async () => {
 			const userId = "test-user-id";
-			const updateDto = makeMockUpdateFlashcardDto("flashcard-id-to-update", {
+			const updateDto = makeMockUpdateDeckDto("deck-id-to-update", {
 				title: "",
 			});
 			const serviceError = new BadRequestException("Invalid title or data");
@@ -447,11 +435,11 @@ describe("FlashcardController", () => {
 
 		it("should throw NotFoundException if service.update throws NotFoundException", async () => {
 			const userId = "test-user-id";
-			const updateDto = makeMockUpdateFlashcardDto("nonexistent-id", {
+			const updateDto = makeMockUpdateDeckDto("nonexistent-id", {
 				title: "Update",
 			});
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			service.update.mockRejectedValue(serviceError);
@@ -468,14 +456,10 @@ describe("FlashcardController", () => {
 	describe("delete", () => {
 		it("should call service.delete with userId and id and return the transformed result", async () => {
 			const userId = "test-user-id";
-			const deleteDto = { id: "flashcard-id-to-delete" };
+			const deleteDto = { id: "deck-id-to-delete" };
 
-			const serviceResult = makeMockFlashcardDto(deleteDto.id, "pkg1", userId);
-			const transformedResult = makeMockFlashcardDto(
-				deleteDto.id,
-				"pkg1",
-				userId,
-			);
+			const serviceResult = makeMockDeckDto(deleteDto.id, "pkg1", userId);
+			const transformedResult = makeMockDeckDto(deleteDto.id, "pkg1", userId);
 
 			service.delete.mockResolvedValue(serviceResult);
 			mockToPlainToInstance.mockReturnValue(transformedResult);
@@ -485,7 +469,7 @@ describe("FlashcardController", () => {
 			expect(service.delete).toHaveBeenCalledWith(userId, deleteDto.id);
 
 			expect(mockToPlainToInstance).toHaveBeenCalledWith(
-				FlashcardDto,
+				DeckDto,
 				serviceResult,
 			);
 
@@ -494,8 +478,8 @@ describe("FlashcardController", () => {
 
 		it("should throw exceptions thrown by service.delete", async () => {
 			const userId = "test-user-id";
-			const deleteDto = { id: "flashcard-id-to-delete" };
-			const serviceError = new BadRequestException("Cannot delete flashcard");
+			const deleteDto = { id: "deck-id-to-delete" };
+			const serviceError = new BadRequestException("Cannot delete deck");
 
 			service.delete.mockRejectedValue(serviceError);
 
@@ -511,7 +495,7 @@ describe("FlashcardController", () => {
 			const userId = "test-user-id";
 			const deleteDto = { id: "nonexistent-id" };
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			service.delete.mockRejectedValue(serviceError);

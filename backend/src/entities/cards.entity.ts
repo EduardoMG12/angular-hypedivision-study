@@ -7,16 +7,16 @@ import {
 	ManyToOne,
 } from "typeorm";
 
-import { Flashcard } from "./flashcards.entity";
 import { CardType } from "./common/enums/cardsType.enum";
+import { Deck } from "./decks.entity";
 
 @Entity("cards")
 export class Cards {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@ManyToOne(() => Flashcard, { nullable: true })
-	flashcard: Flashcard | null;
+	@ManyToOne(() => Deck, { nullable: true })
+	deck: Deck | null;
 
 	@Column({ type: "varchar", length: 20, default: CardType.Flip })
 	type: CardType;

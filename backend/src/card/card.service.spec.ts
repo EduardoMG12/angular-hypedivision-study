@@ -3,7 +3,7 @@ import { CardService } from "./card.service";
 import { Repository } from "typeorm";
 import { Cards } from "src/entities/cards.entity";
 import { UsersService } from "src/users/users.service";
-import { FlashcardService } from "../flashcard/flashcard.service";
+import { DeckService } from "../deck/deck.service";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import {
 	BadRequestException,
@@ -11,7 +11,7 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { CardType } from "./common/enum/cardType.enum";
-import { Flashcard } from "src/entities/flashcards.entity";
+import { Deck } from "src/entities/decks.entity";
 import { CreateCardDto } from "./dto/create.dto";
 import { CreateMultipleCardsDto } from "./dto/createMultipleCards.dto";
 import { UpdateCardDto } from "./dto/update.dto";
@@ -20,7 +20,7 @@ import { FindCardDto } from "./dto/find.dto";
 
 type MockCardRepository = Partial<Record<keyof Repository<Cards>, jest.Mock>>;
 type MockUsersService = Partial<Record<keyof UsersService, jest.Mock>>;
-type MockFlashcardService = Partial<Record<keyof FlashcardService, jest.Mock>>;
+type MockDeckService = Partial<Record<keyof DeckService, jest.Mock>>;
 
 const mockCardRepository: () => MockCardRepository = () => ({
 	create: jest.fn(),
@@ -34,7 +34,7 @@ const mockUsersService: () => MockUsersService = () => ({
 	findById: jest.fn(),
 });
 
-const mockFlashcardService: () => MockFlashcardService = () => ({
+const mockDeckService: () => MockDeckService = () => ({
 	findById: jest.fn(),
 });
 
@@ -48,27 +48,27 @@ describe("CardService", () => {
 		merge: jest.Mock;
 	};
 	let usersService: MockUsersService & { findById: jest.Mock };
-	let flashcardService: MockFlashcardService & { findById: jest.Mock };
+	let deckService: MockDeckService & { findById: jest.Mock };
 
 	const userId = "user-id";
-	const flashcardId = "flashcard-id";
+	const deckId = "deck-id";
 	const cardId = "card-id";
 	const mockUser = { id: userId };
-	const mockFlashcard = { id: flashcardId, owner: mockUser } as Flashcard;
+	const mockDeck = { id: deckId, owner: mockUser } as Deck;
 	const mockCard = {
 		id: cardId,
 		frontend: "Front",
 		backend: "Back",
 		type: CardType.Flip,
-		flashcard: mockFlashcard,
+		deck: mockDeck,
 	} as Cards;
 	const createCardDto: CreateCardDto = {
 		frontend: "Front",
 		backend: "Back",
-		flashcardId: flashcardId,
+		deckId: deckId,
 	};
 	const createBulkCardsDto: CreateMultipleCardsDto = {
-		flashcardId: flashcardId,
+		deckId: deckId,
 		cards: [
 			{ frontend: "Front 1", backend: "Back 1" },
 			{ frontend: "Front 2", backend: "Back 2" },
@@ -90,14 +90,14 @@ describe("CardService", () => {
 				CardService,
 				{ provide: getRepositoryToken(Cards), useFactory: mockCardRepository },
 				{ provide: UsersService, useFactory: mockUsersService },
-				{ provide: FlashcardService, useFactory: mockFlashcardService },
+				{ provide: DeckService, useFactory: mockDeckService },
 			],
 		}).compile();
 
 		service = module.get<CardService>(CardService);
 		cardRepository = module.get(getRepositoryToken(Cards));
 		usersService = module.get(UsersService);
-		flashcardService = module.get(FlashcardService);
+		deckService = module.get(DeckService);
 	});
 
 	it("should be defined", () => {
@@ -115,7 +115,7 @@ describe("CardService", () => {
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(cardRepository.findOne).toHaveBeenCalledWith({
 				where: { id: cardId },
-				relations: ["flashcard", "flashcard.owner"],
+				relations: ["deck", "deck.owner"],
 			});
 			expect(result).toEqual(mockCard);
 		});
@@ -131,7 +131,7 @@ describe("CardService", () => {
 		it("should throw ForbiddenException if ownership verification fails (user does not own card)", async () => {
 			cardRepository.findOne.mockResolvedValue({
 				...mockCard,
-				flashcard: { ...mockFlashcard, owner: { id: "other-user" } },
+				deck: { ...mockDeck, owner: { id: "other-user" } },
 			});
 			await expect(service.findById(userId, findCardDto)).rejects.toThrow(
 				ForbiddenException,
@@ -171,7 +171,7 @@ describe("CardService", () => {
 		it("should throw ForbiddenException if ownership verification fails during changeType", async () => {
 			cardRepository.findOne.mockResolvedValue({
 				...mockCard,
-				flashcard: { ...mockFlashcard, owner: { id: "other-user" } },
+				deck: { ...mockDeck, owner: { id: "other-user" } },
 			});
 			await expect(
 				service.changeType(userId, changeCardTypeDto),
@@ -228,7 +228,7 @@ describe("CardService", () => {
 		it("should throw ForbiddenException if ownership verification fails during update", async () => {
 			cardRepository.findOne.mockResolvedValue({
 				...mockCard,
-				flashcard: { ...mockFlashcard, owner: { id: "other-user" } },
+				deck: { ...mockDeck, owner: { id: "other-user" } },
 			});
 			await expect(service.update(userId, updateCardDto)).rejects.toThrow(
 				ForbiddenException,
@@ -271,7 +271,7 @@ describe("CardService", () => {
 			usersService.findById.mockResolvedValue(mockUser);
 			cardRepository.findOne.mockResolvedValue({
 				...mockCard,
-				flashcard: { ...mockFlashcard, owner: { id: "other-user" } },
+				deck: { ...mockDeck, owner: { id: "other-user" } },
 			});
 			await expect(service.delete(userId, cardId)).rejects.toThrow(
 				ForbiddenException,

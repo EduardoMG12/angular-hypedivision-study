@@ -30,7 +30,7 @@ class LocalCreateCardDto {
 export class CreateMultipleCardsDto {
 	@IsUUID()
 	@Expose()
-	flashcardId: string;
+	deckId: string;
 
 	@Expose()
 	@IsArray()

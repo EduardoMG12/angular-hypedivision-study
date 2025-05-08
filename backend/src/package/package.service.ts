@@ -14,7 +14,7 @@ import { GetUserId } from "src/common/decorators/getUserId.decorator";
 import { ChangePackageStatusDto } from "./dto/changeStatus.dto";
 import { UpdatePackageDto } from "./dto/update.dto";
 import { PackageStatus } from "./common/enums/packageStatus.enum";
-import { PackageWithFlashcardsDto } from "./dto/packageWithFlashcards";
+import { PackageWithDecksDto } from "./dto/packageWithDecks";
 
 @Injectable()
 export class PackageService {
@@ -59,28 +59,28 @@ export class PackageService {
 		return packageEntity as PackageDto;
 	}
 
-	async findByIdWithFlashcards(
+	async findByIdWithDecks(
 		userId: string,
 		id: string,
-	): Promise<PackageWithFlashcardsDto> {
+	): Promise<PackageWithDecksDto> {
 		const user = await this.usersService.findById(userId);
 
 		const packageEntity = await this.packageRepository.findOne({
 			where: { owner: { id: userId }, id },
-			relations: ["flashcards", "owner"],
+			relations: ["decks", "owner"],
 		});
 
 		if (!packageEntity) {
 			throw new NotFoundException("Package not found");
 		}
 
-		return packageEntity as PackageWithFlashcardsDto;
+		return packageEntity as PackageWithDecksDto;
 	}
 
-	// async findByIdWithFlashcardsAndCards(
+	// async findByIdWithDecksAndCards(
 	// 	userId: string,
 	// 	id: string,
-	// ): Promise<PackageWithFlashcardsDto> {
+	// ): Promise<PackageWithDecksDto> {
 
 	// }
 

@@ -1,4 +1,4 @@
-import { FlashcardService } from "./../flashcard/flashcard.service";
+import { DeckService } from "../deck/deck.service";
 import {
 	BadRequestException,
 	ForbiddenException,
@@ -12,7 +12,7 @@ import { DeepPartial, Repository } from "typeorm";
 
 import { CardType } from "./common/enum/cardType.enum";
 import { CardDto } from "./dto/card.dto";
-import { Flashcard } from "src/entities/flashcards.entity";
+import { Deck } from "src/entities/decks.entity";
 import { CreateMultipleCardsDto } from "./dto/createMultipleCards.dto";
 import { CreateCardDto } from "./dto/create.dto";
 import { UpdateCardDto } from "./dto/update.dto";
@@ -25,20 +25,17 @@ export class CardService {
 		@InjectRepository(Cards)
 		private cardRepository: Repository<Cards>,
 		private readonly usersService: UsersService,
-		private readonly flashcardService: FlashcardService,
+		private readonly deckService: DeckService,
 	) {}
 
 	async create(userId: string, cardData: CreateCardDto) {
 		await this.usersService.findById(userId);
-		const flashcard = await this.flashcardService.findById(
-			userId,
-			cardData.flashcardId,
-		);
+		const deck = await this.deckService.findById(userId, cardData.deckId);
 
 		const card = await this.cardRepository.create({
 			frontend: cardData.frontend,
 			backend: cardData.backend,
-			flashcard: flashcard,
+			deck: deck,
 			type: cardData.type ?? CardType.Flip,
 			createdAt: new Date(),
 		});
@@ -55,16 +52,13 @@ export class CardService {
 		}
 
 		await this.usersService.findById(userId);
-		const flashcard = await this.flashcardService.findById(
-			userId,
-			cardsDataArray.flashcardId,
-		);
+		const deck = await this.deckService.findById(userId, cardsDataArray.deckId);
 
 		const cardsToCreate: DeepPartial<CardDto>[] = cardsDataArray.cards.map(
 			(cardData) => ({
 				frontend: cardData.frontend,
 				backend: cardData.backend,
-				flashcard: flashcard as Flashcard,
+				deck: deck as Deck,
 				type: cardData.type ?? CardType.Flip,
 			}),
 		);
@@ -76,7 +70,7 @@ export class CardService {
 		return savedCards;
 	}
 
-	// async findAll(userId: string, ) don't need cause exist on flashcards.findByIdWithCards
+	// async findAll(userId: string, ) don't need cause exist on decks.findByIdWithCards
 
 	async findById(userId: string, cardId: FindCardDto): Promise<CardDto> {
 		const card = await this.verifyCardOwnership(userId, cardId.id);
@@ -90,14 +84,14 @@ export class CardService {
 		await this.usersService.findById(userId);
 		const card = await this.cardRepository.findOne({
 			where: { id: cardId },
-			relations: ["flashcard", "flashcard.owner"],
+			relations: ["deck", "deck.owner"],
 		});
 
 		if (!card) {
 			throw new NotFoundException(`Card with ID "${cardId}" not found.`);
 		}
 
-		if (!card.flashcard || card.flashcard.owner.id !== userId) {
+		if (!card.deck || card.deck.owner.id !== userId) {
 			throw new ForbiddenException("You do not own this card.");
 		}
 

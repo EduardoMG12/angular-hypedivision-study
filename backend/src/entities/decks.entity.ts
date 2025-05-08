@@ -10,10 +10,10 @@ import {
 import { User } from "./user.entity";
 import { Package } from "./package.entity";
 import { Cards } from "./cards.entity";
-import { FlashcardStatus } from "./common/enums/flashcardStatus.enum";
+import { DeckStatus } from "./common/enums/deckStatus.enum";
 
-@Entity("flashcards")
-export class Flashcard {
+@Entity("Decks")
+export class Deck {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
@@ -31,13 +31,13 @@ export class Flashcard {
 
 	@OneToMany(
 		() => Cards,
-		(card) => card.flashcard,
+		(card) => card.deck,
 		{ cascade: true, nullable: true },
 	)
 	cards: Cards[];
 
-	@Column({ type: "varchar", length: 20, default: FlashcardStatus.Active })
-	status: FlashcardStatus;
+	@Column({ type: "varchar", length: 20, default: DeckStatus.Active })
+	status: DeckStatus;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

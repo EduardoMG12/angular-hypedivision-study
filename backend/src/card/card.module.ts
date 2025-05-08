@@ -4,10 +4,10 @@ import { CardService } from "./card.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Cards } from "src/entities/cards.entity";
 import { UsersModule } from "src/users/users.module";
-import { FlashcardModule } from "src/flashcard/flashcard.module";
+import { DeckModule } from "src/deck/deck.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Cards]), UsersModule, FlashcardModule],
+	imports: [TypeOrmModule.forFeature([Cards]), UsersModule, DeckModule],
 	controllers: [CardController],
 	providers: [CardService],
 	exports: [CardService],

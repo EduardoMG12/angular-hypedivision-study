@@ -23,7 +23,7 @@ import {
 	ApiParam,
 	ApiExtraModels,
 } from "@nestjs/swagger";
-import { PackageWithFlashcardsDto } from "./dto/packageWithFlashcards";
+import { PackageWithDecksDto } from "./dto/packageWithDecks";
 
 @ApiTags("Package")
 @ApiBearerAuth()
@@ -114,7 +114,7 @@ export class PackageController {
 		);
 	}
 
-	@Post("findByIdWithFlashcards")
+	@Post("findByIdWithDecks")
 	@ApiOperation({
 		summary: "Find a specific Package by ID for the authenticated user",
 		description:
@@ -138,13 +138,13 @@ export class PackageController {
 	@ApiResponse({ status: 400, description: "Bad Request" })
 	@ApiResponse({ status: 401, description: "Unauthorized" })
 	@ApiResponse({ status: 404, description: "Package not found for this user" })
-	async findByIdWithFlashcards(
+	async findByIdWithDecks(
 		@GetUserId() userId: string,
 		@Body() packageData: { id: string },
-	): Promise<PackageWithFlashcardsDto> {
+	): Promise<PackageWithDecksDto> {
 		return toPlainToInstance(
-			PackageWithFlashcardsDto,
-			await this.packageService.findByIdWithFlashcards(userId, packageData.id),
+			PackageWithDecksDto,
+			await this.packageService.findByIdWithDecks(userId, packageData.id),
 		);
 	}
 

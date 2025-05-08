@@ -10,22 +10,21 @@ import { User } from "src/entities/user.entity";
 import { PackageStatus } from "../common/enums/packageStatus.enum";
 import { ApiProperty } from "@nestjs/swagger";
 import { PackageDto } from "./package.dto";
-import { Flashcard } from "src/entities/flashcards.entity";
-import { FlashcardDto } from "src/flashcard/dto/flashcard.dto";
+import { DeckDto } from "src/deck/dto/deck.dto";
 
-export class PackageWithFlashcardsDto extends PackageDto {
+export class PackageWithDecksDto extends PackageDto {
 	@ApiProperty({
-		description: "List of Flashcards associated with this Package",
-		type: [FlashcardDto],
+		description: "List of Decks associated with this Package",
+		type: [DeckDto],
 		example: [
 			{
-				id: "flashcard-id-1",
+				id: "deck-id-1",
 				title: "Card 1",
 				description: "Answer 1",
 			},
 		],
 	})
 	@Expose()
-	@Type(() => FlashcardDto)
-	flashcards: FlashcardDto[];
+	@Type(() => DeckDto)
+	decks: DeckDto[];
 }

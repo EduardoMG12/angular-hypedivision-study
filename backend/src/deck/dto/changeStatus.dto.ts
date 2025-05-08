@@ -7,11 +7,11 @@ import {
 	IsUUID,
 	MaxLength,
 } from "class-validator";
-import { FlashcardStatus } from "../common/enums/flashcardStatus.enum";
+import { DeckStatus } from "../common/enums/deckStatus.enum";
 
-export class ChangeFlashcardStatusDto {
+export class ChangeDeckStatusDto {
 	@ApiProperty({
-		description: "ID of Flashcard can be changed",
+		description: "ID of Deck can be changed",
 		example: "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
 		format: "uuid",
 	})
@@ -21,17 +21,17 @@ export class ChangeFlashcardStatusDto {
 	id: string;
 
 	@ApiProperty({
-		description: "New status of Flashcard",
-		enum: FlashcardStatus,
-		example: FlashcardStatus.Active,
+		description: "New status of Deck",
+		enum: DeckStatus,
+		example: DeckStatus.Active,
 		maxLength: 20,
 	})
 	@Expose()
 	@IsString()
 	@IsNotEmpty()
-	@IsEnum(FlashcardStatus, {
+	@IsEnum(DeckStatus, {
 		message: "Status can be valide value: active, paused, concluded, working",
 	})
 	@MaxLength(20)
-	status: FlashcardStatus;
+	status: DeckStatus;
 }

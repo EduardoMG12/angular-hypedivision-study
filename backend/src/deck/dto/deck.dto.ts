@@ -2,10 +2,10 @@ import { Expose } from "class-transformer";
 import { IsEnum, IsString, IsUUID, MaxLength } from "class-validator";
 import { Package } from "src/entities/package.entity";
 import { User } from "src/entities/user.entity";
-import { FlashcardStatus } from "../common/enums/flashcardStatus.enum";
+import { DeckStatus } from "../common/enums/deckStatus.enum";
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
-export class FlashcardDto {
+export class DeckDto {
 	@Expose()
 	@IsUUID()
 	id: string;
@@ -26,10 +26,10 @@ export class FlashcardDto {
 	package: Package | null;
 
 	@Expose()
-	@IsEnum(FlashcardStatus, {
+	@IsEnum(DeckStatus, {
 		message: "Status can be valid value: active, paused, concluded, working",
 	})
-	status?: FlashcardStatus;
+	status?: DeckStatus;
 
 	@Expose()
 	@CreateDateColumn({ name: "created_at" })

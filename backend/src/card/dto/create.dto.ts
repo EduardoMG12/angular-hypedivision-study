@@ -20,5 +20,5 @@ export class CreateCardDto {
 
 	@IsUUID()
 	@Expose()
-	flashcardId: string;
+	deckId: string;
 }

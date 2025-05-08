@@ -1,17 +1,17 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { FlashcardService } from "./flashcard.service";
+import { DeckService } from "./deck.service";
 import { UsersService } from "src/users/users.service";
 import { PackageService } from "src/package/package.service";
-import { Flashcard } from "src/entities/flashcards.entity";
+import { Deck } from "src/entities/decks.entity";
 import { User } from "src/entities/user.entity";
 import { Package } from "src/entities/package.entity";
-import { CreateFlashcardDto } from "./dto/create.dto";
+import { CreateDeckDto } from "./dto/create.dto";
 
-import { ChangeFlashcardStatusDto } from "./dto/changeStatus.dto";
-import { UpdateFlashcardDto } from "./dto/update.dto";
-import { FlashcardStatus } from "./common/enums/flashcardStatus.enum";
+import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
+import { UpdateDeckDto } from "./dto/update.dto";
+import { DeckStatus } from "./common/enums/deckStatus.enum";
 import { PackageDto } from "src/package/dto/package.dto";
 
 import { BadRequestException, NotFoundException } from "@nestjs/common";
@@ -47,19 +47,19 @@ const makeMockPackage = (
 	status,
 	createdAt,
 	updatedAt,
-	flashcards: [],
+	decks: [],
 });
 
-const makeMockFlashcard = (
-	id = "flashcard-id",
+const makeMockDeck = (
+	id = "deck-id",
 	ownerId = "user-owner-id",
 	packageId?: string,
-	status: FlashcardStatus = FlashcardStatus.Active,
-	title = "Flashcard Title",
-	description = "Flashcard Description",
+	status: DeckStatus = DeckStatus.Active,
+	title = "Deck Title",
+	description = "Deck Description",
 	createdAt = new Date(),
 	updatedAt = new Date(),
-): Flashcard => ({
+): Deck => ({
 	id,
 	title,
 	description,
@@ -73,8 +73,8 @@ const makeMockFlashcard = (
 	cards: [],
 });
 
-const makeMockCreateFlashcardDto = (pkgId?: string): CreateFlashcardDto => ({
-	title: "Test Flashcard Title",
+const makeMockCreateDeckDto = (pkgId?: string): CreateDeckDto => ({
+	title: "Test Deck Title",
 	description: "Test Description",
 	package: pkgId,
 	owner: makeMockUser("mock-owner-id"),
@@ -82,26 +82,26 @@ const makeMockCreateFlashcardDto = (pkgId?: string): CreateFlashcardDto => ({
 	updatedAt: new Date(),
 });
 
-const makeMockChangeFlashcardStatusDto = (
-	id = "flashcard-id",
-	status: FlashcardStatus = FlashcardStatus.Paused,
-): ChangeFlashcardStatusDto => ({
+const makeMockChangeDeckStatusDto = (
+	id = "deck-id",
+	status: DeckStatus = DeckStatus.Paused,
+): ChangeDeckStatusDto => ({
 	id,
 	status,
 });
 
-const makeMockUpdateFlashcardDto = (
-	id = "flashcard-id",
-	updateData: Partial<UpdateFlashcardDto> = {},
-): UpdateFlashcardDto => ({
+const makeMockUpdateDeckDto = (
+	id = "deck-id",
+	updateData: Partial<UpdateDeckDto> = {},
+): UpdateDeckDto => ({
 	id,
 	...updateData,
 });
 
-describe("FlashcardService", () => {
-	let service: FlashcardService;
+describe("DeckService", () => {
+	let service: DeckService;
 
-	let flashcardRepository: jest.Mocked<Repository<Flashcard>>;
+	let deckRepository: jest.Mocked<Repository<Deck>>;
 
 	let usersService: jest.Mocked<UsersService>;
 
@@ -112,9 +112,9 @@ describe("FlashcardService", () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			providers: [
-				FlashcardService,
+				DeckService,
 				{
-					provide: getRepositoryToken(Flashcard),
+					provide: getRepositoryToken(Deck),
 					useValue: {
 						create: jest.fn(),
 						save: jest.fn(),
@@ -138,8 +138,8 @@ describe("FlashcardService", () => {
 			],
 		}).compile();
 
-		service = module.get<FlashcardService>(FlashcardService);
-		flashcardRepository = module.get(getRepositoryToken(Flashcard));
+		service = module.get<DeckService>(DeckService);
+		deckRepository = module.get(getRepositoryToken(Deck));
 		usersService = module.get(UsersService);
 		packageService = module.get(PackageService);
 
@@ -150,22 +150,22 @@ describe("FlashcardService", () => {
 
 	it("should be defined", () => {
 		expect(service).toBeDefined();
-		expect(flashcardRepository).toBeDefined();
+		expect(deckRepository).toBeDefined();
 		expect(usersService).toBeDefined();
 		expect(packageService).toBeDefined();
 		expect(serviceFindByIdSpy).toBeDefined();
 	});
 
 	describe("create", () => {
-		it("should create a flashcard with an associated package successfully", async () => {
+		it("should create a deck with an associated package successfully", async () => {
 			const userId = "user-owner-id";
 			const packageId = "existing-package-id";
-			const createDto = makeMockCreateFlashcardDto(packageId);
+			const createDto = makeMockCreateDeckDto(packageId);
 			const owner = makeMockUser(userId);
 			const packageEntity = makeMockPackage(packageId, userId);
 
-			const createdFlashcard = makeMockFlashcard(
-				"new-flashcard-id-temp",
+			const createdDeck = makeMockDeck(
+				"new-deck-id-temp",
 				userId,
 				undefined,
 				undefined,
@@ -173,80 +173,80 @@ describe("FlashcardService", () => {
 				createDto.description,
 			);
 
-			createdFlashcard.owner = owner;
-			createdFlashcard.package = packageEntity;
-			createdFlashcard.status = FlashcardStatus.Active;
-			createdFlashcard.createdAt = expect.any(Date) as Date;
+			createdDeck.owner = owner;
+			createdDeck.package = packageEntity;
+			createdDeck.status = DeckStatus.Active;
+			createdDeck.createdAt = expect.any(Date) as Date;
 
-			const savedFlashcard = { ...createdFlashcard, id: "saved-flashcard-id" };
+			const savedDeck = { ...createdDeck, id: "saved-deck-id" };
 
 			usersService.findById.mockResolvedValue(owner);
 
 			packageService.findById.mockResolvedValue(packageEntity as PackageDto);
-			flashcardRepository.create.mockReturnValue(createdFlashcard);
-			flashcardRepository.save.mockResolvedValue(savedFlashcard);
+			deckRepository.create.mockReturnValue(createdDeck);
+			deckRepository.save.mockResolvedValue(savedDeck);
 
 			const result = await service.create(userId, createDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packageService.findById).toHaveBeenCalledWith(userId, packageId);
-			expect(flashcardRepository.create).toHaveBeenCalledWith({
+			expect(deckRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description || "",
 				package: packageEntity,
 				owner: owner,
-				status: FlashcardStatus.Active,
+				status: DeckStatus.Active,
 				createdAt: expect.any(Date),
 			});
-			expect(flashcardRepository.save).toHaveBeenCalledWith(createdFlashcard);
+			expect(deckRepository.save).toHaveBeenCalledWith(createdDeck);
 
-			expect(result).toEqual(savedFlashcard);
+			expect(result).toEqual(savedDeck);
 		});
 
-		it("should create a flashcard without an associated package successfully", async () => {
+		it("should create a deck without an associated package successfully", async () => {
 			const userId = "user-owner-id";
-			const createDto = makeMockCreateFlashcardDto(undefined);
+			const createDto = makeMockCreateDeckDto(undefined);
 			const owner = makeMockUser(userId);
 
-			const createdFlashcard = makeMockFlashcard(
-				"new-flashcard-id-temp",
+			const createdDeck = makeMockDeck(
+				"new-deck-id-temp",
 				userId,
 				undefined,
 				undefined,
 				createDto.title,
 				createDto.description,
 			);
-			createdFlashcard.owner = owner;
-			createdFlashcard.package = null;
-			createdFlashcard.status = FlashcardStatus.Active;
-			createdFlashcard.createdAt = expect.any(Date) as Date;
+			createdDeck.owner = owner;
+			createdDeck.package = null;
+			createdDeck.status = DeckStatus.Active;
+			createdDeck.createdAt = expect.any(Date) as Date;
 
-			const savedFlashcard = { ...createdFlashcard, id: "saved-flashcard-id" };
+			const savedDeck = { ...createdDeck, id: "saved-deck-id" };
 
 			usersService.findById.mockResolvedValue(owner);
 			expect(packageService.findById).not.toHaveBeenCalled();
-			flashcardRepository.create.mockReturnValue(createdFlashcard);
-			flashcardRepository.save.mockResolvedValue(savedFlashcard);
+			deckRepository.create.mockReturnValue(createdDeck);
+			deckRepository.save.mockResolvedValue(savedDeck);
 
 			const result = await service.create(userId, createDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packageService.findById).not.toHaveBeenCalled();
-			expect(flashcardRepository.create).toHaveBeenCalledWith({
+			expect(deckRepository.create).toHaveBeenCalledWith({
 				title: createDto.title,
 				description: createDto.description || "",
 				package: null,
 				owner: owner,
-				status: FlashcardStatus.Active,
+				status: DeckStatus.Active,
 				createdAt: expect.any(Date),
 			});
-			expect(flashcardRepository.save).toHaveBeenCalledWith(createdFlashcard);
-			expect(result).toEqual(savedFlashcard);
+			expect(deckRepository.save).toHaveBeenCalledWith(createdDeck);
+			expect(result).toEqual(savedDeck);
 		});
 
 		it("should throw NotFoundException if owner is not found", async () => {
 			const userId = "nonexistent-user-id";
-			const createDto = makeMockCreateFlashcardDto("package-123");
+			const createDto = makeMockCreateDeckDto("package-123");
 			const serviceError = new NotFoundException("User not found");
 
 			usersService.findById.mockRejectedValue(serviceError);
@@ -257,14 +257,14 @@ describe("FlashcardService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packageService.findById).not.toHaveBeenCalled();
-			expect(flashcardRepository.create).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.create).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 
 		it("should throw NotFoundException if package is not found for the user", async () => {
 			const userId = "user-owner-id";
 			const packageId = "nonexistent-package-id";
-			const createDto = makeMockCreateFlashcardDto(packageId);
+			const createDto = makeMockCreateDeckDto(packageId);
 			const owner = makeMockUser(userId);
 
 			const serviceError = new NotFoundException(
@@ -280,52 +280,52 @@ describe("FlashcardService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(packageService.findById).toHaveBeenCalledWith(userId, packageId);
-			expect(flashcardRepository.create).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.create).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
 	describe("findAll", () => {
-		it("should find all flashcards for a user", async () => {
+		it("should find all decks for a user", async () => {
 			const userId = "user-owner-id";
 			const owner = makeMockUser(userId);
 
-			const expectedFlashcards = [
-				makeMockFlashcard("id1", userId, "pkg1", FlashcardStatus.Active),
-				makeMockFlashcard("id2", userId, undefined, FlashcardStatus.Paused),
+			const expectedDecks = [
+				makeMockDeck("id1", userId, "pkg1", DeckStatus.Active),
+				makeMockDeck("id2", userId, undefined, DeckStatus.Paused),
 			];
 
 			usersService.findById.mockResolvedValue(owner);
 
-			flashcardRepository.find.mockResolvedValue(expectedFlashcards);
+			deckRepository.find.mockResolvedValue(expectedDecks);
 
 			const result = await service.findAll(userId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 
-			expect(flashcardRepository.find).toHaveBeenCalledWith({
+			expect(deckRepository.find).toHaveBeenCalledWith({
 				where: { owner: { id: userId } },
 			});
 
-			expect(result).toEqual(expectedFlashcards);
+			expect(result).toEqual(expectedDecks);
 		});
 
-		it("should return an empty array if the user has no flashcards", async () => {
+		it("should return an empty array if the user has no decks", async () => {
 			const userId = "user-owner-id";
 			const owner = makeMockUser(userId);
-			const expectedFlashcards: Flashcard[] = [];
+			const expectedDecks: Deck[] = [];
 
 			usersService.findById.mockResolvedValue(owner);
 
-			flashcardRepository.find.mockResolvedValue(expectedFlashcards);
+			deckRepository.find.mockResolvedValue(expectedDecks);
 
 			const result = await service.findAll(userId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(flashcardRepository.find).toHaveBeenCalledWith({
+			expect(deckRepository.find).toHaveBeenCalledWith({
 				where: { owner: { id: userId } },
 			});
-			expect(result).toEqual(expectedFlashcards);
+			expect(result).toEqual(expectedDecks);
 			expect(result).toHaveLength(0);
 		});
 
@@ -338,73 +338,73 @@ describe("FlashcardService", () => {
 			await expect(service.findAll(userId)).rejects.toThrow(serviceError);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(flashcardRepository.find).not.toHaveBeenCalled();
+			expect(deckRepository.find).not.toHaveBeenCalled();
 		});
 
-		// NOTA: A verificação `if (!flashcard)` no seu service.findAll
+		// NOTA: A verificação `if (!deck)` no seu service.findAll
 		// está incorreta para arrays e NÃO lançará NotFoundException se o find retornar [].
 		// Os testes acima refletem o comportamento CORRETO de find (retornar array vazio).
-		// **Remova a verificação `if (!flashcard)` do seu método service.findAll.**
+		// **Remova a verificação `if (!deck)` do seu método service.findAll.**
 	});
 
 	describe("findById", () => {
-		it("should find a flashcard by id for the given user", async () => {
+		it("should find a deck by id for the given user", async () => {
 			const userId = "user-owner-id";
-			const flashcardId = "flashcard-to-find-id";
+			const deckId = "deck-to-find-id";
 			const owner = makeMockUser(userId);
-			const expectedFlashcard = makeMockFlashcard(flashcardId, userId);
+			const expectedDeck = makeMockDeck(deckId, userId);
 
 			usersService.findById.mockResolvedValue(owner);
 
-			flashcardRepository.findOne.mockResolvedValue(expectedFlashcard);
+			deckRepository.findOne.mockResolvedValue(expectedDeck);
 
-			const result = await service.findById(userId, flashcardId);
+			const result = await service.findById(userId, deckId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 
-			expect(flashcardRepository.findOne).toHaveBeenCalledWith({
-				where: { id: flashcardId, owner: { id: userId } },
+			expect(deckRepository.findOne).toHaveBeenCalledWith({
+				where: { id: deckId, owner: { id: userId } },
 			});
 
-			expect(result).toEqual(expectedFlashcard);
+			expect(result).toEqual(expectedDeck);
 		});
 
 		it("should throw NotFoundException if owner is not found", async () => {
 			const userId = "nonexistent-user-id";
-			const flashcardId = "flashcard-to-find-id";
+			const deckId = "deck-to-find-id";
 			const serviceError = new NotFoundException("User not found");
 
 			usersService.findById.mockRejectedValue(serviceError);
 
-			await expect(service.findById(userId, flashcardId)).rejects.toThrow(
+			await expect(service.findById(userId, deckId)).rejects.toThrow(
 				serviceError,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(flashcardRepository.findOne).not.toHaveBeenCalled();
+			expect(deckRepository.findOne).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if flashcard is not found for the user id", async () => {
+		it("should throw NotFoundException if deck is not found for the user id", async () => {
 			const userId = "user-owner-id";
-			const flashcardId = "nonexistent-flashcard-id-for-this-user";
+			const deckId = "nonexistent-deck-id-for-this-user";
 			const owner = makeMockUser(userId);
 
 			usersService.findById.mockResolvedValue(owner);
-			flashcardRepository.findOne.mockResolvedValue(null);
+			deckRepository.findOne.mockResolvedValue(null);
 
-			await expect(service.findById(userId, flashcardId)).rejects.toThrow(
-				new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]),
+			await expect(service.findById(userId, deckId)).rejects.toThrow(
+				new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]),
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(flashcardRepository.findOne).toHaveBeenCalledWith({
-				where: { id: flashcardId, owner: { id: userId } },
+			expect(deckRepository.findOne).toHaveBeenCalledWith({
+				where: { id: deckId, owner: { id: userId } },
 			});
 		});
 
-		// NOTA: O cenário de "flashcard encontrado, mas pertence a owner diferente"
+		// NOTA: O cenário de "deck encontrado, mas pertence a owner diferente"
 		// é IMPLICITAMENTE tratado pela sua implementação findById usando o filtro where: { id, owner: { id: userId } }.
-		// Se o flashcard existe com outro owner, flashcardRepository.findOne com o ownerId CORRETO retornará null,
+		// Se o deck existe com outro owner, deckRepository.findOne com o ownerId CORRETO retornará null,
 		// caindo no cenário acima (NotFoundException). Sua implementação NÃO lança UnauthorizedException aqui.
 	});
 
@@ -420,32 +420,32 @@ describe("FlashcardService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should change flashcard status successfully", async () => {
+		it("should change deck status successfully", async () => {
 			const userId = "user-owner-id";
 
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
-				"flashcard-id-to-change",
-				FlashcardStatus.Paused,
+			const changeStatusDto = makeMockChangeDeckStatusDto(
+				"deck-id-to-change",
+				DeckStatus.Paused,
 			);
 			const owner = makeMockUser(userId);
 
-			const existingFlashcard = makeMockFlashcard(
+			const existingDeck = makeMockDeck(
 				changeStatusDto.id,
 				userId,
 				"pkg1",
-				FlashcardStatus.Active,
+				DeckStatus.Active,
 			);
 
-			const expectedFlashcard = {
-				...existingFlashcard,
-				status: FlashcardStatus.Paused,
+			const expectedDeck = {
+				...existingDeck,
+				status: DeckStatus.Paused,
 			};
 
 			usersService.findById.mockResolvedValue(owner);
 
-			serviceFindByIdSpy.mockResolvedValue(existingFlashcard);
+			serviceFindByIdSpy.mockResolvedValue(existingDeck);
 
-			flashcardRepository.save.mockResolvedValue(expectedFlashcard);
+			deckRepository.save.mockResolvedValue(expectedDeck);
 
 			const result = await service.changeStatus(userId, changeStatusDto);
 
@@ -456,26 +456,26 @@ describe("FlashcardService", () => {
 				changeStatusDto.id,
 			);
 
-			expect(flashcardRepository.save).toHaveBeenCalledWith({
-				...existingFlashcard,
+			expect(deckRepository.save).toHaveBeenCalledWith({
+				...existingDeck,
 				status: changeStatusDto.status,
 			});
 
-			expect(result).toEqual(expectedFlashcard);
+			expect(result).toEqual(expectedDeck);
 		});
 
 		it("should throw NotFoundException if owner user is not found when changing status", async () => {
 			const userId = "nonexistent-user-id";
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
-				"flashcard-id-to-change",
-				FlashcardStatus.Concluded,
+			const changeStatusDto = makeMockChangeDeckStatusDto(
+				"deck-id-to-change",
+				DeckStatus.Concluded,
 			);
 			const serviceError = new NotFoundException("User not found");
 
 			usersService.findById.mockRejectedValue(serviceError);
 
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 
 			await expect(
 				service.changeStatus(userId, changeStatusDto),
@@ -483,26 +483,26 @@ describe("FlashcardService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if flashcard is not found for the user when changing status", async () => {
+		it("should throw NotFoundException if deck is not found for the user when changing status", async () => {
 			const userId = "user-owner-id";
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
+			const changeStatusDto = makeMockChangeDeckStatusDto(
 				"nonexistent-id",
-				FlashcardStatus.Concluded,
+				DeckStatus.Concluded,
 			);
 			const owner = makeMockUser(userId);
 
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			usersService.findById.mockResolvedValue(owner);
 
 			serviceFindByIdSpy.mockRejectedValue(serviceError);
 
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 
 			await expect(
 				service.changeStatus(userId, changeStatusDto),
@@ -513,28 +513,28 @@ describe("FlashcardService", () => {
 				userId,
 				changeStatusDto.id,
 			);
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 
 		it("should throw BadRequestException if the status is already the target status", async () => {
 			const userId = "user-owner-id";
 
-			const changeStatusDto = makeMockChangeFlashcardStatusDto(
-				"flashcard-id-to-change",
-				FlashcardStatus.Active,
+			const changeStatusDto = makeMockChangeDeckStatusDto(
+				"deck-id-to-change",
+				DeckStatus.Active,
 			);
 			const owner = makeMockUser(userId);
 
-			const existingFlashcard = makeMockFlashcard(
+			const existingDeck = makeMockDeck(
 				changeStatusDto.id,
 				userId,
 				"pkg1",
-				FlashcardStatus.Active,
+				DeckStatus.Active,
 			);
 
 			usersService.findById.mockResolvedValue(owner);
 
-			serviceFindByIdSpy.mockResolvedValue(existingFlashcard);
+			serviceFindByIdSpy.mockResolvedValue(existingDeck);
 
 			await expect(
 				service.changeStatus(userId, changeStatusDto),
@@ -547,7 +547,7 @@ describe("FlashcardService", () => {
 				userId,
 				changeStatusDto.id,
 			);
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
@@ -563,35 +563,35 @@ describe("FlashcardService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should update a flashcard successfully", async () => {
+		it("should update a deck successfully", async () => {
 			const userId = "user-owner-id";
 
-			const updateDto = makeMockUpdateFlashcardDto("flashcard-id-to-update", {
+			const updateDto = makeMockUpdateDeckDto("deck-id-to-update", {
 				title: "New Title",
 				description: "New Desc",
 			});
 			const owner = makeMockUser(userId);
 
-			const existingFlashcard = makeMockFlashcard(
+			const existingDeck = makeMockDeck(
 				updateDto.id,
 				userId,
 				"pkg1",
-				FlashcardStatus.Active,
+				DeckStatus.Active,
 				"Old Title",
 				"Old Desc",
 			);
 
-			const expectedFlashcard = {
-				...existingFlashcard,
-				title: updateDto.title || existingFlashcard.title,
-				description: updateDto.description || existingFlashcard.description,
+			const expectedDeck = {
+				...existingDeck,
+				title: updateDto.title || existingDeck.title,
+				description: updateDto.description || existingDeck.description,
 				updatedAt: expect.any(Date) as Date,
 			};
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(existingFlashcard);
+			serviceFindByIdSpy.mockResolvedValue(existingDeck);
 
-			flashcardRepository.save.mockResolvedValue(expectedFlashcard);
+			deckRepository.save.mockResolvedValue(expectedDeck);
 
 			const result = await service.update(userId, updateDto);
 
@@ -599,61 +599,61 @@ describe("FlashcardService", () => {
 
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
 
-			expect(flashcardRepository.save).toHaveBeenCalledWith({
-				...existingFlashcard,
-				title: updateDto.title || existingFlashcard.title,
-				description: updateDto.description || existingFlashcard.description,
+			expect(deckRepository.save).toHaveBeenCalledWith({
+				...existingDeck,
+				title: updateDto.title || existingDeck.title,
+				description: updateDto.description || existingDeck.description,
 
-				status: existingFlashcard.status,
+				status: existingDeck.status,
 				updatedAt: expect.any(Date),
 			});
 
-			expect(result).toEqual(expectedFlashcard);
+			expect(result).toEqual(expectedDeck);
 		});
 
 		it("should update only specified fields (e.g., title)", async () => {
 			const userId = "user-owner-id";
 
-			const updateDto = makeMockUpdateFlashcardDto("flashcard-id-to-update", {
+			const updateDto = makeMockUpdateDeckDto("deck-id-to-update", {
 				title: "Only Title Changed",
 			});
 			const owner = makeMockUser(userId);
-			const existingFlashcard = makeMockFlashcard(
+			const existingDeck = makeMockDeck(
 				updateDto.id,
 				userId,
 				"pkg1",
-				FlashcardStatus.Active,
+				DeckStatus.Active,
 				"Old Title",
 				"Old Desc",
 			);
 
-			const expectedFlashcard = {
-				...existingFlashcard,
-				title: updateDto.title || existingFlashcard.title,
+			const expectedDeck = {
+				...existingDeck,
+				title: updateDto.title || existingDeck.title,
 				updatedAt: expect.any(Date) as Date,
 			};
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(existingFlashcard);
-			flashcardRepository.save.mockResolvedValue(expectedFlashcard);
+			serviceFindByIdSpy.mockResolvedValue(existingDeck);
+			deckRepository.save.mockResolvedValue(expectedDeck);
 
 			const result = await service.update(userId, updateDto);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
-			expect(flashcardRepository.save).toHaveBeenCalledWith({
-				...existingFlashcard,
-				title: updateDto.title || existingFlashcard.title,
-				description: existingFlashcard.description,
-				status: existingFlashcard.status,
+			expect(deckRepository.save).toHaveBeenCalledWith({
+				...existingDeck,
+				title: updateDto.title || existingDeck.title,
+				description: existingDeck.description,
+				status: existingDeck.status,
 				updatedAt: expect.any(Date),
 			});
-			expect(result).toEqual(expectedFlashcard);
+			expect(result).toEqual(expectedDeck);
 		});
 
 		it("should throw NotFoundException if owner user is not found when updating", async () => {
 			const userId = "nonexistent-user-id";
-			const updateDto = makeMockUpdateFlashcardDto("flashcard-id", {
+			const updateDto = makeMockUpdateDeckDto("deck-id", {
 				title: "Update",
 			});
 			const serviceError = new NotFoundException("User not found");
@@ -661,7 +661,7 @@ describe("FlashcardService", () => {
 			usersService.findById.mockRejectedValue(serviceError);
 
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 
 			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				serviceError,
@@ -669,23 +669,23 @@ describe("FlashcardService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if flashcard is not found for the user when updating", async () => {
+		it("should throw NotFoundException if deck is not found for the user when updating", async () => {
 			const userId = "user-owner-id";
-			const updateDto = makeMockUpdateFlashcardDto("nonexistent-id", {
+			const updateDto = makeMockUpdateDeckDto("nonexistent-id", {
 				title: "Update",
 			});
 			const owner = makeMockUser(userId);
 
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			usersService.findById.mockResolvedValue(owner);
 			serviceFindByIdSpy.mockRejectedValue(serviceError);
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 
 			await expect(service.update(userId, updateDto)).rejects.toThrow(
 				serviceError,
@@ -693,7 +693,7 @@ describe("FlashcardService", () => {
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, updateDto.id);
-			expect(flashcardRepository.save).not.toHaveBeenCalled();
+			expect(deckRepository.save).not.toHaveBeenCalled();
 		});
 	});
 
@@ -709,71 +709,71 @@ describe("FlashcardService", () => {
 			serviceFindByIdSpy.mockRestore();
 		});
 
-		it("should delete a flashcard successfully", async () => {
+		it("should delete a deck successfully", async () => {
 			const userId = "user-owner-id";
-			const flashcardId = "flashcard-to-delete-id";
+			const deckId = "deck-to-delete-id";
 			const owner = makeMockUser(userId);
 
-			const flashcardToDelete = makeMockFlashcard(flashcardId, userId);
+			const deckToDelete = makeMockDeck(deckId, userId);
 
 			usersService.findById.mockResolvedValue(owner);
-			serviceFindByIdSpy.mockResolvedValue(flashcardToDelete);
+			serviceFindByIdSpy.mockResolvedValue(deckToDelete);
 
-			flashcardRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
+			deckRepository.delete.mockResolvedValue({ affected: 1, raw: {} });
 
-			const result = await service.delete(userId, flashcardId);
+			const result = await service.delete(userId, deckId);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 
-			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, flashcardId);
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, deckId);
 
-			expect(flashcardRepository.delete).toHaveBeenCalledWith(flashcardId);
+			expect(deckRepository.delete).toHaveBeenCalledWith(deckId);
 
-			expect(result).toEqual(flashcardToDelete);
+			expect(result).toEqual(deckToDelete);
 		});
 
 		it("should throw NotFoundException if owner user is not found when deleting", async () => {
 			const userId = "nonexistent-user-id";
-			const flashcardId = "flashcard-id";
+			const deckId = "deck-id";
 			const serviceError = new NotFoundException("User not found");
 
 			usersService.findById.mockRejectedValue(serviceError);
 
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.delete).not.toHaveBeenCalled();
+			expect(deckRepository.delete).not.toHaveBeenCalled();
 
-			await expect(service.delete(userId, flashcardId)).rejects.toThrow(
+			await expect(service.delete(userId, deckId)).rejects.toThrow(
 				serviceError,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
 			expect(serviceFindByIdSpy).not.toHaveBeenCalled();
-			expect(flashcardRepository.delete).not.toHaveBeenCalled();
+			expect(deckRepository.delete).not.toHaveBeenCalled();
 		});
 
-		it("should throw NotFoundException if flashcard is not found for the user when deleting", async () => {
+		it("should throw NotFoundException if deck is not found for the user when deleting", async () => {
 			const userId = "user-owner-id";
-			const flashcardId = "nonexistent-id";
+			const deckId = "nonexistent-id";
 			const owner = makeMockUser(userId);
 
 			const serviceError = new NotFoundException(
-				"Flashcard not found for this user",
+				"Deck not found for this user",
 			);
 
 			usersService.findById.mockResolvedValue(owner);
 			serviceFindByIdSpy.mockRejectedValue(serviceError);
-			expect(flashcardRepository.delete).not.toHaveBeenCalled();
+			expect(deckRepository.delete).not.toHaveBeenCalled();
 
-			await expect(service.delete(userId, flashcardId)).rejects.toThrow(
+			await expect(service.delete(userId, deckId)).rejects.toThrow(
 				serviceError,
 			);
 
 			expect(usersService.findById).toHaveBeenCalledWith(userId);
-			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, flashcardId);
-			expect(flashcardRepository.delete).not.toHaveBeenCalled();
+			expect(serviceFindByIdSpy).toHaveBeenCalledWith(userId, deckId);
+			expect(deckRepository.delete).not.toHaveBeenCalled();
 		});
 
-		// NOTA: O cenário de "flashcard encontrado, mas owner diferente" resulta em NotFoundException propagada de service.findById.
+		// NOTA: O cenário de "deck encontrado, mas owner diferente" resulta em NotFoundException propagada de service.findById.
 		// Não há um teste UnauthorizedException separado aqui.
 	});
 });

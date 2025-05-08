@@ -1,7 +1,7 @@
 import { Expose } from "class-transformer";
 import { IsEnum, IsString, IsUUID } from "class-validator";
-import { Flashcard } from "src/entities/flashcards.entity";
 import { CardType } from "../common/enum/cardType.enum";
+import { Deck } from "src/entities/decks.entity";
 
 export class CardDto {
 	@IsUUID()
@@ -9,7 +9,7 @@ export class CardDto {
 	id: string;
 
 	@Expose()
-	flashcard: Flashcard | null;
+	deck: Deck | null;
 
 	@IsEnum(CardType, {
 		message: "Status can be valide value: flip, multiple-choice",

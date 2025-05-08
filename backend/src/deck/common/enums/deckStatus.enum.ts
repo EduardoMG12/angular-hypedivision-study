@@ -1,4 +1,4 @@
-export enum FlashcardStatus {
+export enum DeckStatus {
 	Active = "active",
 	Paused = "paused",
 	Concluded = "concluded",

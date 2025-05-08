@@ -10,7 +10,6 @@ import { FindCardDto } from "./dto/find.dto";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { errorMessages } from "../common/errors/errors-message";
 import { CardType } from "./common/enum/cardType.enum";
-import { Flashcard } from "src/entities/flashcards.entity";
 
 describe("CardController", () => {
 	let controller: CardController;
@@ -30,7 +29,7 @@ describe("CardController", () => {
 		id: "e88a3595-4d51-4b86-87ac-09baf69b7654",
 		frontend: "English",
 		backend: "Learn basic English vocabulary",
-		flashcard: null,
+		deck: null,
 		type: CardType.Flip,
 		createdAt: new Date("2025-05-06T17:33:42.306Z"),
 		updatedAt: new Date("2025-05-06T20:35:10.907Z"),
@@ -60,7 +59,7 @@ describe("CardController", () => {
 			const createCardDto: CreateCardDto = {
 				frontend: "English",
 				backend: "Learn basic English vocabulary",
-				flashcardId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
+				deckId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
 			};
 
 			cardService.create.mockResolvedValue(mockCard);
@@ -79,7 +78,7 @@ describe("CardController", () => {
 			const createCardDto: CreateCardDto = {
 				frontend: "",
 				backend: "Invalid card",
-				flashcardId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
+				deckId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
 			};
 
 			cardService.create.mockRejectedValue(
@@ -99,7 +98,7 @@ describe("CardController", () => {
 	describe("createBulk", () => {
 		it("should create multiple cards and return CardDto array", async () => {
 			const createMultipleCardsDto: CreateMultipleCardsDto = {
-				flashcardId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
+				deckId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
 				cards: [
 					{
 						frontend: "English",
@@ -137,7 +136,7 @@ describe("CardController", () => {
 
 		it("should throw BadRequestException if createBulk fails", async () => {
 			const createMultipleCardsDto: CreateMultipleCardsDto = {
-				flashcardId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
+				deckId: "e88a3595-4d51-4b86-87ac-09baf69b7654",
 				cards: [{ frontend: "", backend: "Invalid", type: CardType.Flip }],
 			};
 
@@ -172,7 +171,7 @@ describe("CardController", () => {
 			const findDto: FindCardDto = { id: "non-existent-id" };
 
 			cardService.findById.mockRejectedValue(
-				new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]),
+				new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]),
 			);
 
 			await expect(controller.findById(mockUserId, findDto)).rejects.toThrow(
@@ -208,7 +207,7 @@ describe("CardController", () => {
 			};
 
 			cardService.changeType.mockRejectedValue(
-				new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]),
+				new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]),
 			);
 
 			await expect(
@@ -248,7 +247,7 @@ describe("CardController", () => {
 			};
 
 			cardService.update.mockRejectedValue(
-				new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]),
+				new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]),
 			);
 
 			await expect(
@@ -278,7 +277,7 @@ describe("CardController", () => {
 			const deleteDto = { id: "non-existent-id" };
 
 			cardService.delete.mockRejectedValue(
-				new NotFoundException(errorMessages.FLASHCARD_NOT_FOUND["pt-BR"]),
+				new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]),
 			);
 
 			await expect(controller.delete(mockUserId, deleteDto)).rejects.toThrow(

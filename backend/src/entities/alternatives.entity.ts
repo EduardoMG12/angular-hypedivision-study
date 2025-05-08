@@ -7,7 +7,6 @@ import {
 	ManyToOne,
 } from "typeorm";
 
-import { Flashcard } from "./flashcards.entity";
 import { CardType } from "./common/enums/cardsType.enum";
 import { Cards } from "./cards.entity";
 

@@ -1,9 +1,9 @@
 import { ErrorCode } from "./error-codes.enum";
 
 export const errorMessages = {
-	[ErrorCode.FLASHCARD_NOT_FOUND]: {
-		"pt-BR": "O flashcard nao existe.",
-		"en-US": "The flashcard not foun.",
+	[ErrorCode.DECK_NOT_FOUND]: {
+		"pt-BR": "O baralho nao existe.",
+		"en-US": "The deck not foun.",
 	},
 	[ErrorCode.INVALID_INPUT]: {
 		"pt-BR": "A entrada de dados é invalida.",
