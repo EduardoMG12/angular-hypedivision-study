@@ -31,136 +31,136 @@ export class DeckService {
 		private readonly groupDecksService: GroupDecksService,
 	) {}
 
-	async create(userId: string, deckData: CreateDeckDto): Promise<DeckDto> {
-		const owner = await this.usersService.findById(userId);
+	// async create(userId: string, deckData: CreateDeckDto): Promise<DeckDto> {
+	// 	const owner = await this.usersService.findById(userId);
 
-		let groupDecksEntity: GroupDecksDto | null = null;
-		if (deckData.group_decks) {
-			groupDecksEntity = await this.groupDecksService.findById(
-				userId,
-				deckData.group_decks,
-			);
-		}
+	// 	let groupDecksEntity: GroupDecksDto | null = null;
+	// 	if (deckData.group_decks) {
+	// 		groupDecksEntity = await this.groupDecksService.findById(
+	// 			userId,
+	// 			deckData.group_decks,
+	// 		);
+	// 	}
 
-		const deckEntity = this.deckRepository.create({
-			title: deckData.title,
-			description: deckData.description || "",
-			group_decks: groupDecksEntity,
-			owner,
-			status: DeckStatus.Active,
-			createdAt: new Date(),
-		}) as Deck;
+	// 	const deckEntity = this.deckRepository.create({
+	// 		title: deckData.title,
+	// 		description: deckData.description || "",
+	// 		group_decks: groupDecksEntity,
+	// 		owner,
+	// 		status: DeckStatus.Active,
+	// 		createdAt: new Date(),
+	// 	}) as Deck;
 
-		return await this.deckRepository.save(deckEntity);
-	}
-	async findAll(userId: string): Promise<DeckDto[]> {
-		const user = await this.usersService.findById(userId);
+	// 	return await this.deckRepository.save(deckEntity);
+	// }
+	// async findAll(userId: string): Promise<DeckDto[]> {
+	// 	const user = await this.usersService.findById(userId);
 
-		const deck = await this.deckRepository.find({
-			where: { owner: { id: user.id } },
-		});
+	// 	const deck = await this.deckRepository.find({
+	// 		where: { owner: { id: user.id } },
+	// 	});
 
-		if (!deck) {
-			throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
-		}
+	// 	if (!deck) {
+	// 		throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
+	// 	}
 
-		return deck;
-	}
+	// 	return deck;
+	// }
 
-	async findById(userId: string, deckId: string): Promise<Deck> {
-		const deck = await this.deckRepository.findOne({
-			where: { id: deckId, owner: { id: userId } },
-		});
+	// async findById(userId: string, deckId: string): Promise<Deck> {
+	// 	const deck = await this.deckRepository.findOne({
+	// 		where: { id: deckId, owner: { id: userId } },
+	// 	});
 
-		if (!deck) {
-			throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
-		}
+	// 	if (!deck) {
+	// 		throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
+	// 	}
 
-		return deck;
-	}
+	// 	return deck;
+	// }
 
-	async findByIdWithCards(
-		userId: string,
-		deckId: string,
-	): Promise<DeckWithCardsDto> {
-		const deck = await this.deckRepository.findOne({
-			where: { id: deckId, owner: { id: userId } },
-			relations: ["cards"],
-		});
+	// async findByIdWithCards(
+	// 	userId: string,
+	// 	deckId: string,
+	// ): Promise<DeckWithCardsDto> {
+	// 	const deck = await this.deckRepository.findOne({
+	// 		where: { id: deckId, owner: { id: userId } },
+	// 		relations: ["cards"],
+	// 	});
 
-		if (!deck) {
-			throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
-		}
+	// 	if (!deck) {
+	// 		throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
+	// 	}
 
-		return {
-			...deck,
-			cards: deck.cards || [],
-		} as unknown as DeckWithCardsDto; // testar se esta funcionando
-	}
+	// 	return {
+	// 		...deck,
+	// 		cards: deck.cards || [],
+	// 	} as unknown as DeckWithCardsDto; // testar se esta funcionando
+	// }
 
-	async changeStatus(
-		userId: string,
-		deckData: ChangeDeckStatusDto,
-	): Promise<DeckDto> {
-		const user = await this.usersService.findById(userId);
+	// async changeStatus(
+	// 	userId: string,
+	// 	deckData: ChangeDeckStatusDto,
+	// ): Promise<DeckDto> {
+	// 	const user = await this.usersService.findById(userId);
 
-		const deck = await this.findById(user.id, deckData.id);
+	// 	const deck = await this.findById(user.id, deckData.id);
 
-		if (!deck) {
-			throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
-		}
+	// 	if (!deck) {
+	// 		throw new NotFoundException(errorMessages.DECK_NOT_FOUND["pt-BR"]);
+	// 	}
 
-		const currentStatus = deck.status;
-		const targetStatus = deckData.status;
+	// 	const currentStatus = deck.status;
+	// 	const targetStatus = deckData.status;
 
-		if (currentStatus === targetStatus) {
-			throw new BadRequestException("Cannot change status for egual status");
-		}
+	// 	if (currentStatus === targetStatus) {
+	// 		throw new BadRequestException("Cannot change status for egual status");
+	// 	}
 
-		deck.status = targetStatus as DeckStatus;
+	// 	deck.status = targetStatus as DeckStatus;
 
-		return await this.deckRepository.save(deck);
-	}
+	// 	return await this.deckRepository.save(deck);
+	// }
 
-	async update(userId: string, deckData: UpdateDeckDto): Promise<DeckDto> {
-		const deckEntity = await this.findById(userId, deckData.id);
+	// async update(userId: string, deckData: UpdateDeckDto): Promise<DeckDto> {
+	// 	const deckEntity = await this.findById(userId, deckData.id);
 
-		deckEntity.title = deckData.title || deckEntity.title;
-		deckEntity.description = deckData.description || deckEntity.description;
-		deckEntity.updatedAt = new Date();
+	// 	deckEntity.title = deckData.title || deckEntity.title;
+	// 	deckEntity.description = deckData.description || deckEntity.description;
+	// 	deckEntity.updatedAt = new Date();
 
-		return await this.deckRepository.save(deckEntity);
-	}
+	// 	return await this.deckRepository.save(deckEntity);
+	// }
 
-	async updateReferenceGroupDecks(
-		userId: string,
-		updateReferenceData: UpdateDeckReferenceGroupDecksDto,
-	): Promise<DeckWithGroupDecksDto> {
-		const deck = await this.findById(userId, updateReferenceData.deckId);
+	// async updateReferenceGroupDecks(
+	// 	userId: string,
+	// 	updateReferenceData: UpdateDeckReferenceGroupDecksDto,
+	// ): Promise<DeckWithGroupDecksDto> {
+	// 	const deck = await this.findById(userId, updateReferenceData.deckId);
 
-		if (!updateReferenceData.groupDecksId) {
-			deck.group_decks = null;
-			return await this.deckRepository.save(deck);
-		}
+	// 	if (!updateReferenceData.groupDecksId) {
+	// 		deck.group_decks = null;
+	// 		return await this.deckRepository.save(deck);
+	// 	}
 
-		const groupDecksEntity = (await this.groupDecksService.findById(
-			userId,
-			updateReferenceData.groupDecksId,
-		)) as GroupDecks;
-		if (groupDecksEntity.id === deck.group_decks?.id) {
-			throw new BadRequestException(
-				"this groupDecks is egual the old groupDecks",
-			);
-		}
-		deck.group_decks = groupDecksEntity;
-		return await this.deckRepository.save(deck);
-	}
+	// 	const groupDecksEntity = (await this.groupDecksService.findById(
+	// 		userId,
+	// 		updateReferenceData.groupDecksId,
+	// 	)) as GroupDecks;
+	// 	if (groupDecksEntity.id === deck.group_decks?.id) {
+	// 		throw new BadRequestException(
+	// 			"this groupDecks is egual the old groupDecks",
+	// 		);
+	// 	}
+	// 	deck.group_decks = groupDecksEntity;
+	// 	return await this.deckRepository.save(deck);
+	// }
 
-	async delete(userId: string, id: string): Promise<DeckDto> {
-		const deckEntity = await this.findById(userId, id);
+	// async delete(userId: string, id: string): Promise<DeckDto> {
+	// 	const deckEntity = await this.findById(userId, id);
 
-		await this.deckRepository.delete(id);
+	// 	await this.deckRepository.delete(id);
 
-		return deckEntity;
-	}
+	// 	return deckEntity;
+	// }
 }

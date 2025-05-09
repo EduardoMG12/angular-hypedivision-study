@@ -35,6 +35,8 @@ export const makeUser = () => {
 	const fakeUser: User = {
 		...registerDto,
 		id: "fake-id",
+		ownedCards: [],
+		ownedDecks: [],
 		createdAt: new Date(),
 		updatedAt: new Date(),
 		created_at: new Date(),

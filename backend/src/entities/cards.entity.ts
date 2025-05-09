@@ -5,27 +5,49 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	ManyToOne,
+	OneToMany,
+	OneToOne,
 } from "typeorm";
 
 import { CardType } from "./common/enums/cardsType.enum";
-import { Deck } from "./decks.entity";
+import { User } from "./user.entity";
+import { DeckCard } from "./deckCards.entity";
+import { CardContentFlip } from "./cardContentFlip.entity";
 
 @Entity("cards")
-export class Cards {
+export class Card {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
-
-	@ManyToOne(() => Deck, { nullable: true })
-	deck: Deck | null;
 
 	@Column({ type: "varchar", length: 20, default: CardType.Flip })
 	type: CardType;
 
-	@Column({ type: "text", nullable: false })
-	frontend: string;
+	@Column({ type: "varchar", length: 255, nullable: true })
+	title: string | null;
 
-	@Column({ type: "text", nullable: false })
-	backend: string;
+	@Column({ type: "varchar", length: 255, nullable: true })
+	description: string | null;
+
+	@Column({ type: "varchar", length: 20, default: "active" })
+	status: string;
+
+	@Column({ name: "owner_id" })
+	ownerId: string;
+
+	@ManyToOne(() => User, { nullable: false })
+	owner: User;
+
+	@OneToMany(
+		() => DeckCard,
+		(deckCard) => deckCard.card,
+	)
+	deckCards: DeckCard[];
+
+	@OneToOne(
+		() => CardContentFlip,
+		(content) => content.card,
+	)
+	contentFlip: CardContentFlip;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

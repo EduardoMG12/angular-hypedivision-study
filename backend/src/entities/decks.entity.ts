@@ -6,11 +6,13 @@ import {
 	UpdateDateColumn,
 	ManyToOne,
 	OneToMany,
+	JoinColumn,
 } from "typeorm";
 import { User } from "./user.entity";
 import { GroupDecks } from "./group_decks.entity";
-import { Cards } from "./cards.entity";
+import { Card } from "./cards.entity";
 import { DeckStatus } from "./common/enums/deckStatus.enum";
+import { DeckCard } from "./deckCards.entity";
 
 @Entity("Decks")
 export class Deck {
@@ -23,21 +25,36 @@ export class Deck {
 	@Column({ type: "text", nullable: true })
 	description: string;
 
-	@ManyToOne(() => User, { nullable: false })
-	owner: User;
-
-	@ManyToOne(() => GroupDecks, { nullable: true })
-	group_decks: GroupDecks | null;
-
-	@OneToMany(
-		() => Cards,
-		(card) => card.deck,
-		{ cascade: true, nullable: true },
-	)
-	cards: Cards[];
-
 	@Column({ type: "varchar", length: 20, default: DeckStatus.Active })
 	status: DeckStatus;
+
+	@Column({ name: "owner_id" })
+	ownerId: string;
+
+	@ManyToOne(
+		() => User,
+		(user) => user.ownedDecks,
+		{ nullable: false },
+	)
+	@JoinColumn({ name: "owner_id" })
+	owner: User;
+
+	@Column({ name: "groupDecksId", nullable: true })
+	groupDecksId: string | null;
+
+	@ManyToOne(
+		() => GroupDecks,
+		(groupDeck) => groupDeck.decks,
+		{ nullable: true, onDelete: "SET NULL" },
+	)
+	@JoinColumn({ name: "groupDecksId" })
+	groupDeck: GroupDecks | null;
+
+	@OneToMany(
+		() => DeckCard,
+		(deckCard) => deckCard.deck,
+	)
+	deckCards: DeckCard[];
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

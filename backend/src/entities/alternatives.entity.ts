@@ -8,15 +8,15 @@ import {
 } from "typeorm";
 
 import { CardType } from "./common/enums/cardsType.enum";
-import { Cards } from "./cards.entity";
+import { Card } from "./cards.entity";
 
 @Entity("alternatives")
 export class Alternatives {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@ManyToOne(() => Cards, { nullable: false })
-	card: Cards;
+	@ManyToOne(() => Card, { nullable: false })
+	card: Card;
 
 	@Column({ type: "text", nullable: false })
 	alternative: string;

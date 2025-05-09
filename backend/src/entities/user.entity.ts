@@ -5,7 +5,10 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	DeleteDateColumn,
+	OneToMany,
 } from "typeorm";
+import { Deck } from "./decks.entity";
+import { Card } from "./cards.entity";
 @Entity("users")
 export class User {
 	@PrimaryGeneratedColumn("uuid")
@@ -26,6 +29,21 @@ export class User {
 
 	@Column()
 	password: string;
+
+	@OneToMany(
+		() => Deck,
+		(deck) => deck.owner,
+	)
+	ownedDecks: Deck[];
+
+	@OneToMany(
+		() => Card,
+		(card) => card.owner,
+	)
+	ownedCards: Card[];
+
+	// @OneToMany(() => Tag, tag => tag.owner)
+	// ownedTags: Tag[];
 
 	@CreateDateColumn()
 	created_at: Date;

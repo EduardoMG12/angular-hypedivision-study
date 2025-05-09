@@ -30,7 +30,7 @@ export class GroupDecks {
 
 	@OneToMany(
 		() => Deck,
-		(deck) => deck.group_decks,
+		(deck) => deck.groupDeck,
 		{ cascade: true },
 	)
 	decks: Deck[];
