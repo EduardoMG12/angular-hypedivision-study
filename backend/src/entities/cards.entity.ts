@@ -7,6 +7,7 @@ import {
 	ManyToOne,
 	OneToMany,
 	OneToOne,
+	JoinColumn,
 } from "typeorm";
 
 import { CardType } from "./common/enums/cardsType.enum";
@@ -31,10 +32,8 @@ export class Card {
 	@Column({ type: "varchar", length: 20, default: "active" })
 	status: string;
 
-	@Column({ name: "owner_id" })
-	ownerId: string;
-
 	@ManyToOne(() => User, { nullable: false })
+	@JoinColumn({ name: "owner_id" })
 	owner: User;
 
 	@OneToMany(

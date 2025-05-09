@@ -12,9 +12,9 @@ import { JwtService } from "@nestjs/jwt";
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		cors: {
-			origin: "http://localhost:4200", 
+			origin: "http://localhost:4200",
 			methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-			credentials: true, 
+			credentials: true,
 			allowedHeaders: "Content-Type, Authorization",
 		},
 	});
@@ -24,6 +24,14 @@ async function bootstrap() {
 			transform: true,
 			transformOptions: { excludeExtraneousValues: true },
 		}),
+		// new ValidationPipe({
+		// 	whitelist: true, // Remove propriedades que não estão no DTO
+		// 	transform: true, // Transforma os dados de entrada para a classe DTO
+		// 	forbidNonWhitelisted: true, // Retorna erro se houver propriedades não permitidas
+		// 	transformOptions: {
+		// 		enableImplicitConversion: true, // Permite conversão implícita de tipos básicos (ex: string para number em @Param)
+		// 	},
+		// }),
 	);
 
 	setupSwagger(app);
