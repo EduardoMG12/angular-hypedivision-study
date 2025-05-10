@@ -17,15 +17,20 @@ import {
 } from "./content-create/content-creator.interface";
 import { FlipContentCreator } from "./content-create/flip-content.creator";
 import { CardController } from "./card.controller";
+import { CardTag } from "src/entities/cardTags.entity";
+import { TagsModule } from "src/tags/tags.module";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Card, CardContentFlip]), UsersModule],
+	imports: [
+		TypeOrmModule.forFeature([Card, CardContentFlip, CardTag]),
+		TagsModule,
+		UsersModule,
+	],
 	controllers: [CardController],
 	providers: [
 		CardService,
 		CardContentOrchestratorService,
 		ContentCreatorRegistry,
-
 		{
 			provide: CONTENT_CREATORS,
 			useFactory: (

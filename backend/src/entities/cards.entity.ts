@@ -15,6 +15,8 @@ import { User } from "./user.entity";
 import { DeckCard } from "./deckCards.entity";
 import { CardContentFlip } from "./cardContentFlip.entity";
 
+import { CardTag } from "./cardTags.entity";
+
 @Entity("cards")
 export class Card {
 	@PrimaryGeneratedColumn("uuid")
@@ -47,6 +49,12 @@ export class Card {
 		(content) => content.card,
 	)
 	contentFlip: CardContentFlip;
+
+	@OneToMany(
+		() => CardTag,
+		(tag) => tag.card,
+	)
+	card_tag: CardTag;
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

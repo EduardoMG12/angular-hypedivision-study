@@ -1,4 +1,10 @@
-import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
+import {
+	IsArray,
+	IsEnum,
+	IsOptional,
+	IsString,
+	ValidateNested,
+} from "class-validator";
 import { Expose, Type } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -69,4 +75,16 @@ export class CreateCardDto {
 	@IsOptional()
 	@Expose()
 	contentMultipleChoice?: CreateCardContentMultipleChoiceDto;
+
+	@ApiProperty({
+		description: "Array of tag paths to associate with the card (optional).",
+		example: ["programacao::javascript::code", "programacao::python::basics"],
+		required: false,
+		type: [String],
+	})
+	@Expose()
+	@IsOptional()
+	@IsArray()
+	@IsString({ each: true })
+	tagPaths?: string[];
 }

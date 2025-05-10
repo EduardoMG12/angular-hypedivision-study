@@ -1,3 +1,4 @@
+import { TagService } from "./../tags/tags.service";
 import {
 	BadRequestException,
 	Injectable,
@@ -19,16 +20,18 @@ import { plainToInstance } from "class-transformer";
 import { CardContentOrchestratorService } from "./content-create/card-content.orchestrator.service";
 import { User } from "src/entities/user.entity";
 import { FindCardDto } from "./dto/find.dto";
+import { CardTag } from "src/entities/cardTags.entity";
 
 @Injectable()
 export class CardService {
 	constructor(
 		@InjectRepository(Card)
 		private cardRepository: Repository<Card>,
-
+		@InjectRepository(CardTag)
+		private cardTagRepository: Repository<CardTag>,
 		private readonly cardContentOrchestratorService: CardContentOrchestratorService,
-
 		private readonly usersService: UsersService,
+		private readonly tagService: TagService,
 	) {}
 
 	async create(userId: string, cardData: CreateCardDto): Promise<CardDto> {
@@ -48,14 +51,47 @@ export class CardService {
 					savedCard,
 					cardData,
 				);
-				// thinking about maybe my card be create but my content is empty
+
+				// Associar tags, se fornecidas
+				if (cardData.tagPaths && cardData.tagPaths.length > 0) {
+					for (const path of cardData.tagPaths) {
+						// Buscar ou criar a tag
+						let tag = await this.tagService.findByPath(path);
+						if (!tag) {
+							const segments = path.split("::");
+							let parentId: string | undefined;
+							let currentPath = "";
+							for (const name of segments) {
+								if (!name) {
+									throw new BadRequestException("Segmento de tag inválido");
+								}
+								currentPath = currentPath ? `${currentPath}::${name}` : name;
+								let existingTag = await this.tagService.findByPath(currentPath);
+								if (!existingTag) {
+									existingTag = await this.tagService.create(name, parentId);
+								}
+								parentId = existingTag.id;
+							}
+							tag = await this.tagService.findByPath(path);
+						}
+
+						// Criar associação na tabela card_tags
+						const cardTag = manager.create(CardTag, {
+							cardId: savedCard.id,
+							tagId: tag?.id,
+						});
+						await manager.save(cardTag);
+					}
+				}
+
 				return savedCard;
 			},
 		);
 
+		// Carregar o cartão com conteúdo e tags
 		const cardWithContent = await this.cardRepository.findOne({
 			where: { id: createdCard.id },
-			relations: ["contentFlip"],
+			relations: ["contentFlip", "card_tag", "card_tag.tag"],
 		});
 
 		if (!cardWithContent) {
@@ -64,7 +100,7 @@ export class CardService {
 			);
 		}
 
-		return cardWithContent;
+		return plainToInstance(CardDto, cardWithContent);
 	}
 
 	private async verifyCardOwnership(
@@ -116,7 +152,6 @@ export class CardService {
 							description: cardData.description,
 							status: "active",
 						});
-
 						const savedCard = await manager.save(card);
 
 						await this.cardContentOrchestratorService.createContentForCard(
@@ -124,6 +159,41 @@ export class CardService {
 							savedCard,
 							cardData,
 						);
+
+						if (cardData.tagPaths && cardData.tagPaths.length > 0) {
+							for (const path of cardData.tagPaths) {
+								let tag = await this.tagService.findByPath(path);
+								if (!tag) {
+									const segments = path.split("::");
+									let parentId: string | undefined;
+									let currentPath = "";
+									for (const name of segments) {
+										if (!name) {
+											throw new BadRequestException("Segmento de tag inválido");
+										}
+										currentPath = currentPath
+											? `${currentPath}::${name}`
+											: name;
+										let existingTag =
+											await this.tagService.findByPath(currentPath);
+										if (!existingTag) {
+											existingTag = await this.tagService.create(
+												name,
+												parentId,
+											);
+										}
+										parentId = existingTag.id;
+									}
+									tag = await this.tagService.findByPath(path);
+								}
+
+								const cardTag = manager.create(CardTag, {
+									cardId: savedCard.id,
+									tagId: tag?.id,
+								});
+								await manager.save(cardTag);
+							}
+						}
 
 						savedCards.push(savedCard);
 					}
@@ -140,10 +210,10 @@ export class CardService {
 
 		const cardsWithContent = await this.cardRepository.find({
 			where: { id: In(createdCardIds) },
-			relations: ["contentFlip"],
+			relations: ["contentFlip", "card_tag", "card_tag.tag"],
 		});
 
-		return cardsWithContent;
+		return plainToInstance(CardDto, cardsWithContent);
 	}
 
 	async findById(userId: string, findDto: FindCardDto): Promise<CardDto> {

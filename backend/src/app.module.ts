@@ -11,6 +11,7 @@ import { DeckModule } from "./deck/deck.module";
 import { CardModule } from "./card/card.module";
 import { JwtModule } from "@nestjs/jwt";
 import { DeckCardModule } from "./deck-card/deck-card.module";
+import { TagsModule } from './tags/tags.module';
 
 @Module({
 	imports: [
@@ -45,6 +46,7 @@ import { DeckCardModule } from "./deck-card/deck-card.module";
 		DeckModule,
 		CardModule,
 		DeckCardModule,
+		TagsModule,
 	],
 	controllers: [],
 	providers: [AppService],
