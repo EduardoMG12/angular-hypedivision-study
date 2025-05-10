@@ -1,5 +1,6 @@
 <main class="min-h-[100vh] bg-[#0E0E15]">
   <app-side-bar />
+  <app-side-bar-cards-library *ngIf="showCardsLibrary" (close)="closeCardsLibrary()" />
   <div class="px-[25rem] pt-6 pb-8 flex flex-col gap-8">
     <section *ngIf="!showJsonImport" @slideAnimation class="w-full flex flex-col gap-8">
       <div class="w-full flex flex-col justify-baseline items-start gap-2">
@@ -14,6 +15,13 @@
       </div>
       <div class="flex flex-col justify-center items-center gap-4">
         <div class="w-full flex flex-row justify-end items-center gap-2">
+          <button
+          (click)="toggleCardsLibrary()"
+            class="flex justify-center items-center gap-2 px-4 py-2.5 border border-charade rounded-lg cursor-pointer self-end"
+          >
+            <app-lupe-icon [stroke]="'#fffff'"/>
+            <p class="text-small text-alabaster">Procurar Cards Existentes</p>
+          </button>
           <button
             class="flex justify-center items-center gap-2 px-4 py-2.5 border border-charade rounded-lg cursor-pointer self-end"
           >

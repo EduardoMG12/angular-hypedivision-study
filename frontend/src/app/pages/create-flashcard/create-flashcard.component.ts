@@ -8,19 +8,23 @@ import { PlusIconComponent } from "../../components/icons/plus-icon/plus-icon.co
 import { EyeIconComponent } from "../../components/icons/eye-icon/eye-icon.component";
 import { CreateFlashcardsWithJsonComponent } from "../../components/create-flashcards-with-json/create-flashcards-with-json.component";
 import { CommonModule } from "@angular/common";
+import { LupeIconComponent } from "../../components/icons/lupe-icon/lupe-icon.component";
+import { SideBarCardsLibraryComponent } from "../../components/side-bar-cards-library/side-bar-cards-library.component";
 
 @Component({
 	selector: "app-create-flashcards",
 	standalone: true,
 	imports: [
-		CommonModule,
-		SideBarComponent,
-		RobotIconComponent,
-		ImportIconComponent,
-		PlusIconComponent,
-		EyeIconComponent,
-		CreateFlashcardsWithJsonComponent,
-	],
+    CommonModule,
+    SideBarComponent,
+    RobotIconComponent,
+    ImportIconComponent,
+    PlusIconComponent,
+    EyeIconComponent,
+    CreateFlashcardsWithJsonComponent,
+    LupeIconComponent,
+    SideBarCardsLibraryComponent
+],
 	templateUrl: "./create-flashcard.component.html",
 	styleUrls: ["./create-flashcard.component.css"],
 	animations: [
@@ -48,6 +52,7 @@ import { CommonModule } from "@angular/common";
 })
 export class CreateFlashcardComponent {
 	showJsonImport = false;
+	showCardsLibrary = false;
 
 	toggleJsonImport() {
 		this.showJsonImport = !this.showJsonImport;
@@ -61,4 +66,12 @@ export class CreateFlashcardComponent {
 	onJsonImported(jsonData: any) {
 		this.showJsonImport = false;
 	}
+
+  toggleCardsLibrary() {
+    this.showCardsLibrary = !this.showCardsLibrary; 
+  }
+
+  closeCardsLibrary() {
+  this.showCardsLibrary = false; 
+}
 }
