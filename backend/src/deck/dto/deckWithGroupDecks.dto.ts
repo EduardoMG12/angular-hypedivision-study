@@ -5,6 +5,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { CardType } from "src/card/common/enum/cardType.enum";
 import { GroupDecksDto } from "src/group-decks/dto/group-decks.dto";
 import { GroupDecks } from "src/entities/group_decks.entity";
+import { IsOptional, IsString } from "class-validator";
 
 export class DeckWithGroupDecksDto extends DeckDto {
 	@ApiProperty({
@@ -23,4 +24,14 @@ export class DeckWithGroupDecksDto extends DeckDto {
 	@Expose()
 	@Type(() => GroupDecksDto)
 	declare group_decks: GroupDecks | null;
+
+	@IsString()
+	@IsOptional()
+	@Expose()
+	declare title: string;
+
+	@IsString()
+	@IsOptional()
+	@Expose()
+	declare description: string;
 }

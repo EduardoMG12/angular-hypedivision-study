@@ -14,6 +14,7 @@ import { ChangeGroupDecksStatusDto } from "./dto/change-status.dto";
 import { UpdateGroupDecksDto } from "./dto/update.dto";
 import { GroupDecksStatus } from "./common/enums/group-decksStatus.enum";
 import { GroupDecksWithDecksDto } from "./dto/group-decks-with-decks";
+import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
 
 @Injectable()
 export class GroupDecksService {
@@ -44,16 +45,22 @@ export class GroupDecksService {
 		return this.groupDecksRepository.find({ where: { owner: { id: userId } } });
 	}
 
-	async findById(userId: string, id: string): Promise<GroupDecksDto> {
-		const groupDecksEntity = await this.groupDecksRepository.findOne({
-			where: { owner: { id: userId }, id },
+	async findByIdEntity(
+		userId: string,
+		groupDecksId: string,
+	): Promise<GroupDecks> {
+		const groupDeck = await this.groupDecksRepository.findOne({
+			where: { id: groupDecksId, owner: { id: userId } },
 		});
-
-		if (!groupDecksEntity) {
-			throw new NotFoundException("GroupDecks not found");
+		if (!groupDeck) {
+			throw new NotFoundException("Group deck not found.");
 		}
+		return groupDeck;
+	}
 
-		return groupDecksEntity as GroupDecksDto;
+	async findById(userId: string, groupDecksId: string): Promise<GroupDecksDto> {
+		const groupDeck = await this.findByIdEntity(userId, groupDecksId);
+		return toPlainToInstance(GroupDecksDto, groupDeck);
 	}
 
 	async findByIdWithDecks(

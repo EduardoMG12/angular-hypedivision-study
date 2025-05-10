@@ -10,10 +10,10 @@ import { GroupDecksModule } from "./group-decks/group-decks.module";
 import { DeckModule } from "./deck/deck.module";
 import { CardModule } from "./card/card.module";
 import { JwtModule } from "@nestjs/jwt";
+import { DeckCardModule } from "./deck-card/deck-card.module";
 
 @Module({
 	imports: [
-		ConfigModule.forRoot({ isGlobal: true }),
 		ConfigModule.forRoot({ isGlobal: true }),
 		JwtModule.registerAsync({
 			useFactory: (configService: ConfigService) => ({
@@ -44,6 +44,7 @@ import { JwtModule } from "@nestjs/jwt";
 		GroupDecksModule,
 		DeckModule,
 		CardModule,
+		DeckCardModule,
 	],
 	controllers: [],
 	providers: [AppService],

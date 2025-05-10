@@ -1,32 +1,19 @@
 import { Expose } from "class-transformer";
-import { IsOptional, IsString, IsUUID } from "class-validator";
-import { User } from "src/entities/user.entity";
-
-import { CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateDeckDto {
-	@Expose()
 	@IsString()
+	@IsNotEmpty()
+	@Expose()
 	title: string;
 
-	@Expose()
-	@IsOptional()
 	@IsString()
+	@IsOptional()
+	@Expose()
 	description?: string;
 
-	@Expose()
-	owner: User;
-
-	@Expose()
-	@IsOptional()
 	@IsUUID()
-	group_decks?: string;
-
+	@IsOptional()
 	@Expose()
-	@CreateDateColumn({ name: "created_at" })
-	createdAt: Date;
-
-	@Expose()
-	@UpdateDateColumn({ name: "updated_at", nullable: true })
-	updatedAt: Date;
+	groupDecksId?: string;
 }
