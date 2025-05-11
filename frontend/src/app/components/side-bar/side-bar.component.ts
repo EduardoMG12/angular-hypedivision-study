@@ -10,6 +10,7 @@ import { ClosedBookIconComponent } from "../icons/closed-book-icon/closed-book-i
 import { RouterModule } from "@angular/router";
 import { LogOutIconComponent } from "../icons/log-out-icon/log-out-icon.component";
 import { AuthService } from "../../services/auth.service";
+import { NotebookTabsIconComponent } from "../icons/notebook-tabs-icon/notebook-tabs-icon.component";
 
 @Component({
 	selector: "app-side-bar",
@@ -17,13 +18,12 @@ import { AuthService } from "../../services/auth.service";
 	imports: [
 		RouterModule,
 		HomeIconComponent,
-		PlusIconComponent,
 		ChartIconComponent,
 		SettingsIconComponent,
 		SideBooksIconComponent,
 		ClosedBookIconComponent,
 		OpenBookIconComponent,
-		LogOutIconComponent,
+		NotebookTabsIconComponent,
 	],
 	templateUrl: "./side-bar.component.html",
 	styleUrl: "./side-bar.component.css",
