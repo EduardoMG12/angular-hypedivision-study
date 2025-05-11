@@ -8,12 +8,14 @@ import { SideBooksIconComponent } from "../icons/side-books-icon/side-books-icon
 import { OpenBookIconComponent } from "../icons/open-book-icon/open-book-icon.component";
 import { ClosedBookIconComponent } from "../icons/closed-book-icon/closed-book-icon.component";
 import { RouterModule } from "@angular/router";
+import { LogOutIconComponent } from "../icons/log-out-icon/log-out-icon.component";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
 	selector: "app-side-bar",
 	standalone: true,
 	imports: [
-    RouterModule,
+		RouterModule,
 		HomeIconComponent,
 		PlusIconComponent,
 		ChartIconComponent,
@@ -21,6 +23,7 @@ import { RouterModule } from "@angular/router";
 		SideBooksIconComponent,
 		ClosedBookIconComponent,
 		OpenBookIconComponent,
+		LogOutIconComponent,
 	],
 	templateUrl: "./side-bar.component.html",
 	styleUrl: "./side-bar.component.css",
@@ -42,23 +45,25 @@ export class SideBarComponent {
 		const labels = this.sidebar.nativeElement.querySelectorAll(".label");
 		const flexContainers = this.sidebar.nativeElement.querySelectorAll(".flex");
 
-
-
 		if (labels && labels instanceof NodeList && labels.length > 0) {
-		  for (const label of labels) {
-			const htmlLabel = label as HTMLElement;
-			htmlLabel.style.opacity = "0";
-			htmlLabel.style.transform = "translateX(-10px)";
-			htmlLabel.style.transition = "none";
-		  }
+			for (const label of labels) {
+				const htmlLabel = label as HTMLElement;
+				htmlLabel.style.opacity = "0";
+				htmlLabel.style.transform = "translateX(-10px)";
+				htmlLabel.style.transition = "none";
+			}
 		} else {
 		}
 
-		if (flexContainers && flexContainers instanceof NodeList && flexContainers.length > 0) {
-		  for (const flex of flexContainers) {
-			const htmlFlex = flex as HTMLElement;
-			htmlFlex.style.justifyContent = "center";
-		  }
+		if (
+			flexContainers &&
+			flexContainers instanceof NodeList &&
+			flexContainers.length > 0
+		) {
+			for (const flex of flexContainers) {
+				const htmlFlex = flex as HTMLElement;
+				htmlFlex.style.justifyContent = "center";
+			}
 		} else {
 		}
 
@@ -67,7 +72,7 @@ export class SideBarComponent {
 
 		this.sidebar.nativeElement.classList.remove("expanded");
 		this.isExpanded = false;
-	  }
+	}
 
 	onMouseEnter() {
 		clearTimeout(this.retractTimer);
@@ -142,5 +147,11 @@ export class SideBarComponent {
 				this.isAnimating = false;
 			}, 100);
 		}, 100);
+	}
+
+	constructor(private authService: AuthService) {}
+
+	logout(): void {
+		this.authService.logout();
 	}
 }

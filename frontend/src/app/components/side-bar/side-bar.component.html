@@ -1,16 +1,9 @@
-<div
-  #sidebar
+<div #sidebar
   class="sidebar w-20 bg-sidebar border-r border-r-[#2E2E38] h-screen fixed pt-7 pb-6 flex flex-col justify-between items-center z-50"
-  (mouseenter)="onMouseEnter()"
-  (mouseleave)="onMouseLeave()"
-  [class.expanded]="isExpanded"
->
-  <div class="flex flex-col justify-center items-center gap-10 px-3">
-    <div class="flex flex-row justify-center items-center first-item-container">
-      <a
-        class="flex flex-row items-center"
-        routerLink="/home"
-      >
+  (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()" [class.expanded]="isExpanded">
+  <div class="icon-container flex flex-col justify-center items-center gap-10 px-3">
+    <div class="icon-container flex flex-row justify-center items-center first-item-container">
+      <a class="icon-container flex flex-row items-center" routerLink="/home">
         <div class="icon-wrapper p-3">
           <app-closed-book-icon class="icon-closed" />
           <app-open-book-icon class="icon-open" />
@@ -18,52 +11,43 @@
         <p class="label">HypeDivision</p>
       </a>
     </div>
-    <div class="flex flex-col items-center justify-baseline gap-4">
-      <a
-        class="flex flex-row items-center"
-        routerLink="/home"
-        routerLinkActive="active"
-      >
+    <div class="icon-container flex flex-col items-center justify-baseline gap-4">
+      <a class="icon-container flex flex-row items-center" routerLink="/home" routerLinkActive="active">
         <app-home-icon class="p-3" [stroke]="'#D1D5DB'" />
         <p class="label">Home</p>
       </a>
-      <a
-        class="flex flex-row items-center"
-        routerLink="/decks"
-        routerLinkActive="active"
-      >
+      <a class="icon-container flex flex-row items-center" routerLink="/decks" routerLinkActive="active">
         <app-side-books-icon class="p-3" [stroke]="'#D1D5DB'" />
         <p class="label">Decks</p>
       </a>
-      <a
-        class="flex flex-row items-center"
-        routerLink="/create-flashcard"
-        routerLinkActive="active"
-      >
+      <a class="icon-container flex flex-row items-center" routerLink="/create-flashcard" routerLinkActive="active">
         <app-plus-icon class="p-3" [stroke]="'#D1D5DB'" />
         <p class="label">Criar Flashcard</p>
       </a>
-      <a
-        class="flex flex-row items-center"
-        routerLink="/statistics"
-        routerLinkActive="active"
-      >
+      <a class="icon-container flex flex-row items-center" routerLink="/statistics" routerLinkActive="active">
         <app-chart-icon class="p-3" [stroke]="'#D1D5DB'" />
         <p class="label">Estatísticas</p>
       </a>
-      <a
-        class="flex flex-row items-center"
-        routerLink="/settings"
-        routerLinkActive="active"
-      >
+      <a class="icon-container flex flex-row items-center" routerLink="/settings" routerLinkActive="active">
         <app-settings-icon class="p-3" [stroke]="'#D1D5DB'" />
         <p class="label">Configurações</p>
       </a>
     </div>
   </div>
-  <div class="flex flex-row justify-center items-center pb-8">
-    <a class="flex flex-row items-center">
-      <div class="w-8 h-8 rounded-full bg-portage"></div>
+  <div class="w-full flex flex-col justify-center items-center pb-8 gap-6 px-3">
+    <a (click)="logout()"
+      class="group flex flex-row items-center hover:bg-red-500/10 hover:rounded-lg transition-colors p-3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        class="lucide lucide-log-out-icon lucide-log-out text-white group-hover:text-red-400 transition-colors">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <polyline points="16 17 21 12 16 7" />
+        <line x1="21" x2="9" y1="12" y2="12" />
+      </svg>
+      <p class="label group-hover:text-red-400! transition-colors!">Sair</p>
+    </a>
+    <a class="flex  flex-row items-center">
+      <div class="max-w-8 max-h-8 min-h-8 min-w-8 rounded-full bg-portage"></div>
       <p class="label">Study Hub</p>
     </a>
   </div>

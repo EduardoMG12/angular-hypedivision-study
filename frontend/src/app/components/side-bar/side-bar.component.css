@@ -70,7 +70,7 @@
 	transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
-.sidebar .flex {
+.sidebar .icon-container {
 	width: 100%;
 	justify-content: center;
 	transition: justify-content 0.3s ease-in-out;
@@ -80,7 +80,7 @@
 	width: 260px;
 }
 
-.sidebar.expanded .flex {
+.sidebar.expanded .icon-container {
 	justify-content: flex-start;
 }
 
@@ -113,7 +113,7 @@
 }
 
 .sidebar a.active {
-  border: 1px solid rgba(94, 129, 244, 0.5);
-  background-color: rgba(186, 143, 239, 0.2);
-  border-radius: 8px;
+	border: 1px solid rgba(94, 129, 244, 0.5);
+	background-color: rgba(186, 143, 239, 0.2);
+	border-radius: 8px;
 }
