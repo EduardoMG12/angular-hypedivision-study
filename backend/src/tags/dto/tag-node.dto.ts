@@ -17,6 +17,9 @@ export class TagNodeDto {
 
 	@Expose()
 	children: TagNodeDto[];
+
+	@Expose()
+	childrenCardsCount: number;
 }
 
 export class GetAllTagsDto {

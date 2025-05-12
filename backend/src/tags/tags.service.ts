@@ -40,6 +40,7 @@ export class TagService {
 				name: tag.name,
 				cards: [],
 				children: [],
+				childrenCardsCount: 0,
 			};
 			if (!tag.parentId) {
 				rootTags.push(tagMap[tag.id]);
@@ -57,6 +58,21 @@ export class TagService {
 			if (tagMap[tagId]) {
 				tagMap[tagId].cards.push(card);
 			}
+		}
+
+		function countAllCards(tag: TagNodeDto): number {
+			let total = tag.cards.length;
+
+			for (const child of tag.children) {
+				total += countAllCards(child);
+			}
+
+			tag.childrenCardsCount = total;
+			return total;
+		}
+
+		for (const root of rootTags) {
+			countAllCards(root);
 		}
 
 		return { tags: rootTags };
