@@ -21,9 +21,9 @@ export class TagService {
 	) {}
 
 	async getAllTags(userId: string): Promise<GetAllTagsDto> {
-		const cardTags = await this.cardTagRepository.find({
+		const cardTagsForUser = await this.cardTagRepository.find({
 			where: { card: { owner: { id: userId } } },
-			relations: ["tag", "card"],
+			relations: ["tag", "card", "card.owner"],
 		});
 
 		const allTags = await this.tagRepository.find({
@@ -32,8 +32,6 @@ export class TagService {
 		});
 
 		const tagMap: { [id: string]: TagNodeDto } = {};
-		const rootTags: TagNodeDto[] = [];
-
 		for (const tag of allTags) {
 			tagMap[tag.id] = {
 				id: tag.id,
@@ -42,40 +40,68 @@ export class TagService {
 				children: [],
 				childrenCardsCount: 0,
 			};
+		}
+
+		const potentialRootTags: TagNodeDto[] = [];
+		for (const tag of allTags) {
 			if (!tag.parentId) {
-				rootTags.push(tagMap[tag.id]);
+				potentialRootTags.push(tagMap[tag.id]);
 			} else {
-				const parent = tagMap[tag.parentId];
-				if (parent) {
-					parent.children.push(tagMap[tag.id]);
+				const parentTagNode = tagMap[tag.parentId];
+				if (parentTagNode) {
+					parentTagNode.children.push(tagMap[tag.id]);
 				}
 			}
 		}
 
-		for (const cardTag of cardTags) {
-			const tagId = cardTag.tagId;
-			const card = toPlainToInstance(SimpleCardDto, cardTag.card);
+		// biome-ignore lint/complexity/noForEach: <explanation>
+		Object.values(tagMap).forEach((tagNode) => {
+			tagNode.children.sort((a, b) => a.name.localeCompare(b.name));
+		});
+
+		for (const cardTag of cardTagsForUser) {
+			const tagId = cardTag.tag.id;
+
+			const card = toPlainToInstance(SimpleCardDto, {
+				...cardTag.card,
+				owner_id: cardTag.card.owner.id,
+			});
 			if (tagMap[tagId]) {
 				tagMap[tagId].cards.push(card);
 			}
 		}
 
-		function countAllCards(tag: TagNodeDto): number {
-			let total = tag.cards.length;
+		const finalRootTags: TagNodeDto[] = [];
 
-			for (const child of tag.children) {
-				total += countAllCards(child);
+		function processTagNode(tagNode: TagNodeDto): number {
+			let totalCardsInBranch = tagNode.cards.length;
+
+			const childrenWithOwnedCards: TagNodeDto[] = [];
+			for (const childNode of tagNode.children) {
+				const cardsInChildBranch = processTagNode(childNode);
+				if (cardsInChildBranch > 0) {
+					childrenWithOwnedCards.push(childNode);
+					totalCardsInBranch += cardsInChildBranch;
+				}
 			}
 
-			tag.childrenCardsCount = total;
-			return total;
+			tagNode.children = childrenWithOwnedCards;
+
+			tagNode.childrenCardsCount = totalCardsInBranch;
+
+			return totalCardsInBranch;
 		}
 
-		for (const root of rootTags) {
-			countAllCards(root);
+		for (const rootNode of potentialRootTags) {
+			const totalOwnedCardsInRoot = processTagNode(rootNode);
+			if (totalOwnedCardsInRoot > 0) {
+				finalRootTags.push(rootNode);
+			}
 		}
 
-		return { tags: rootTags };
+		finalRootTags.sort((a, b) => a.name.localeCompare(b.name));
+
+		return { tags: finalRootTags };
 	}
 
 	async findByPath(path: string): Promise<Tag | null> {
