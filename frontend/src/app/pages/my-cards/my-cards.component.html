@@ -1,0 +1,47 @@
+<main class="min-h-[120vh] bg-[#0E0E15] text-gray-300">
+  <app-side-bar />
+  <div class="px-[6rem] pr-[3rem] min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-10 pb-8 flex flex-col gap-8 z-10">
+
+    <div class="flex flex-col justify-center">
+      <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-portage">Minha Biblioteca de Cards</h1>
+        <button
+          class="textPurpleShadow bg-portage/80 hover:bg-portage text-alabaster font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Criar Card
+        </button>
+      </div>
+      <p class="text-santas-gray">Organize, gerencie e estude sua coleção de Cards</p>
+    </div>
+
+
+    <div class="bg-wood-smoke border border-portage/20 p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl text-white font-semibold mb-4">Cards Organizados por Tópicos</h2>
+      <p class="text-gray-400 text-sm mb-6">Explore e selecione cartões pelos tópicos ou use a pesquisa para encontrar
+        informações específicas</p>
+
+      <div class="relative mb-6">
+        <input type="text" placeholder="Pesquisar flashcards..."
+          class="w-full p-3 bg-[#2E2E3A] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-portage pl-10" />
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </div>
+
+      <div class="mb-4 text-right">
+        <button (click)="toggleAllTopics()" class="text-sm text-portage hover:text-portage">
+          {{ allExpanded ? 'Fechar Todos' : 'Abrir Todos' }}
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <app-topic-item *ngFor="let topic of topics" [topic]="topic" [level]="0" [expandedTopics]="expandedTopics"
+          (toggle)="toggleTopic($event)"> </app-topic-item>
+      </div>
+    </div>
+  </div>
+</main>

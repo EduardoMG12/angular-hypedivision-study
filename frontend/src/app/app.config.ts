@@ -1,17 +1,23 @@
 // biome-ignore lint/style/useImportType: <explanation>
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
+import { ApplicationConfig, provideZoneChangeDetection } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { provideAnimations } from "@angular/platform-browser/animations";
 
-import { routes } from './app.routes';
+import { routes } from "./app.routes";
 import {
 	provideClientHydration,
 	withEventReplay,
-} from '@angular/platform-browser';
-import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { AuthService } from './services/auth.service';
-import { AuthGuard } from './guards/auth.guard';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+} from "@angular/platform-browser";
+import { provideCharts, withDefaultRegisterables } from "ng2-charts";
+import { AuthService } from "./services/auth-service/auth.service";
+import { AuthGuard } from "./guards/auth.guard";
+import {
+	HTTP_INTERCEPTORS,
+	provideHttpClient,
+	withFetch,
+	withInterceptors,
+} from "@angular/common/http";
+import { AuthInterceptor } from "./interceptors/add-authorization-header/add-authorization-header.interceptor";
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -23,6 +29,6 @@ export const appConfig: ApplicationConfig = {
 		provideRouter(routes),
 		AuthService,
 		AuthGuard,
-		provideHttpClient(withFetch())
+		provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
 	],
 };

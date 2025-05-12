@@ -9,7 +9,7 @@ import { OpenBookIconComponent } from "../icons/open-book-icon/open-book-icon.co
 import { ClosedBookIconComponent } from "../icons/closed-book-icon/closed-book-icon.component";
 import { RouterModule } from "@angular/router";
 import { LogOutIconComponent } from "../icons/log-out-icon/log-out-icon.component";
-import { AuthService } from "../../services/auth.service";
+import { AuthService } from "../../services/auth-service/auth.service";
 import { NotebookTabsIconComponent } from "../icons/notebook-tabs-icon/notebook-tabs-icon.component";
 
 @Component({
