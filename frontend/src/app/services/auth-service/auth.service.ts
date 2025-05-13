@@ -13,7 +13,7 @@ interface AuthResponse {
 	providedIn: "root",
 })
 export class AuthService {
-	private apiUrl = "http://localhost:3000";
+	private apiUrl = "http://localhost:3000"; // Reminder Change in production to your domain URL
 	private tokenKey = "authToken";
 	private isAuthenticatedSubject = new BehaviorSubject<boolean>(
 		this.hasToken(),
@@ -32,7 +32,7 @@ export class AuthService {
 		if (typeof window !== "undefined") {
 			const token = localStorage.getItem(this.tokenKey);
 			if (token) {
-				this.setTokenInternal(token); // Usar método interno para evitar logs duplicados
+				this.setTokenInternal(token);
 			}
 		}
 	}
@@ -58,6 +58,7 @@ export class AuthService {
 			: null;
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	login(credentials: any): Observable<AuthResponse> {
 		return this.http
 			.post<AuthResponse>(`${this.apiUrl}/auth/login`, credentials)
@@ -76,6 +77,7 @@ export class AuthService {
 			);
 	}
 
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	register(userData: any): Observable<AuthResponse> {
 		return this.http
 			.post<AuthResponse>(`${this.apiUrl}/auth/register`, userData)

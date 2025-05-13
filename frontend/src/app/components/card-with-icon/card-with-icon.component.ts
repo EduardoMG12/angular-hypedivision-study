@@ -19,6 +19,6 @@ import { AlbumIconComponent } from "../icons/album-icon/album-icon.component";
 export class CardWihtIconComponent {
 	@Input() title = "";
 	@Input() value = "";
-	@Input() icon = ""; // Nome do ícone: 'open-book', 'book-mark', 'album'
-	@Input() strokeColor = "#FFFFFF"; // Cor padrão branca
+	@Input() icon = ""; // icon name: 'open-book', 'book-mark', 'album'
+	@Input() strokeColor = "#FFFFFF";
 }

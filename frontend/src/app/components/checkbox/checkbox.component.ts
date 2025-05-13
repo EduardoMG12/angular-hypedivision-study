@@ -10,7 +10,7 @@ import { FormsModule } from "@angular/forms";
 	styleUrl: "./checkbox.component.css",
 })
 export class CheckboxComponent {
-	@Input() label = ""; // Lembrar de mim
+	@Input() label = "";
 	@Input() value = false;
 	@Input() urlLabel = "";
 	@Input() url = "";

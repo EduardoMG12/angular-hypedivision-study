@@ -1,0 +1,22 @@
+<main class="min-h-[120vh] bg-[#0E0E15] text-gray-300">
+  <app-side-bar />
+  <div class="px-[6rem] pr-[3rem] min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-10 pb-8 flex flex-col gap-8 z-10">
+    <div class="w-full flex flex-row justify-start items-center gap-7 pl-3">
+      <div class="cursor-pointer">
+        <!-- (click)="onCancel()" -->
+        <app-arrow-left-icon />
+      </div>
+      <div class="w-full flex flex-col justify-baseline items-start gap-2">
+        <div class="flex justify-baseline items-center gap-2">
+          <h1 class="text-portage text-ultra textPurpleShadow font-bold">
+            Criar novo Card
+          </h1>
+        </div>
+        <!-- <p class="text-santas-gray">
+          Importe um deck de flashcards usando formato JSON
+        </p> -->
+      </div>
+    </div>
+    <app-formulary-create-card />
+  </div>
+</main>

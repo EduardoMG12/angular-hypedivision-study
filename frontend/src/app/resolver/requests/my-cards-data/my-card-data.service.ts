@@ -15,7 +15,7 @@ import { TopicService } from "../../../services/topic/topic.service";
 	providedIn: "root",
 })
 export class MyCardsDataResolver implements Resolve<Topic[] | null> {
-	// Pode retornar Topic[] ou null
+	// should be return Topic[] or null
 	constructor(
 		private topicService: TopicService,
 		private router: Router,
@@ -36,11 +36,9 @@ export class MyCardsDataResolver implements Resolve<Topic[] | null> {
 			}),
 			catchError((error) => {
 				console.error("Erro no resolver ao carregar dados de tópicos:", error);
-				// Em caso de erro na requisição, você pode redirecionar para uma página de erro
-				// ou retornar um Observable de array vazio, dependendo do comportamento desejado.
-				// Por simplicidade, vamos redirecionar para 'no-cards' ou uma página de erro genérica.
-				this.router.navigate(["/no-cards"]); // ou para uma rota de erro específica
-				return of(null); // Retorna um observable de null para finalizar o resolver
+
+				this.router.navigate(["/no-cards"]);
+				return of(null);
 			}),
 		);
 	}

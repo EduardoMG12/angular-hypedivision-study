@@ -1,7 +1,7 @@
 <section class="w-full flex flex-col gap-8">
   <div class="w-full flex flex-row justify-start items-center gap-7 pl-3">
     <div (click)="onCancel()" class="cursor-pointer">
-      <app-arrow-left-icon  />
+      <app-arrow-left-icon />
     </div>
     <div class="w-full flex flex-col justify-baseline items-start gap-2">
       <div class="flex justify-baseline items-center gap-2">
@@ -18,10 +18,7 @@
     <p class="text-alabaster font-bold text-medium">
       Importar Flashcards como JSON
     </p>
-    <textarea
-      name="json-input"
-      id="json-input"
-      [(ngModel)]="jsonString"
+    <textarea name="json-input" id="json-input" [(ngModel)]="jsonString"
       class="w-full h-64 bg-sidebar border border-[#2E2E38] placeholder:text-santas-gray rounded-lg py-3 px-4 text-alabaster resize-y overflow-y-auto scrollbar-thin scrollbar-thumb-charade scrollbar-track-transparent focus:outline-none focus:ring-2 focus:ring-portage/50"
       placeholder='{
   "name": "",
@@ -40,19 +37,13 @@
       "correctAlternative": 2
     }
   ]
-}'
-    ></textarea>
+}'></textarea>
     <div class="w-full flex justify-end items-center gap-2">
-      <button
-        (click)="onCancel()"
-        class="px-4 py-2.5 bg-background-500 border border-charade rounded-lg cursor-pointer"
-      >
+      <button (click)="onCancel()" class="px-4 py-2.5 bg- border border-charade rounded-lg cursor-pointer">
         <p class="text-alabaster text-small">Cancelar</p>
       </button>
-      <button
-        (click)="onImport()"
-        class="bg-[#BA8FEF]/80 border border-portage/50 px-4 py-2.5 rounded-lg cursor-pointer"
-      >
+      <button (click)="onImport()"
+        class="bg-[#BA8FEF]/80 border border-portage/50 px-4 py-2.5 rounded-lg cursor-pointer">
         <p class="text-alabaster text-small">Importar</p>
       </button>
     </div>
