@@ -15,6 +15,7 @@ import { CreateCardDto } from "./dto/create-card.dto";
 import { CardDto } from "./dto/card.dto";
 import { FindCardDto } from "./dto/find.dto";
 import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { RemoveSpecificCardOnTag } from "./dto/remove-specific-card-on-tag.dto";
 
 @Controller("card")
 export class CardController {
@@ -184,6 +185,49 @@ export class CardController {
 		return toPlainToInstance(
 			CardDto,
 			await this.cardService.delete(userId, deleteDto.id),
+		);
+	}
+
+	@Delete("/remove-tag-by-id")
+	@ApiOperation({
+		summary: "Remove a tag from a card by CardTag ID",
+		description:
+			"Removes a specific tag association from a card using the CardTag ID.",
+	})
+	@ApiBody({
+		type: RemoveSpecificCardOnTag,
+		description: "Card ID and CardTag ID to remove",
+		examples: {
+			example: {
+				value: { id: "uuid", cardTagId: "uuid" },
+			},
+		},
+	})
+	@ApiResponse({
+		status: 200,
+		description: "Tag removed successfully",
+		type: CardDto,
+	})
+	@ApiResponse({
+		status: 400,
+		description: "Invalid card ID or CardTag ID provided",
+	})
+	@ApiResponse({
+		status: 401,
+		description: "Unauthorized - Invalid or missing token",
+	})
+	@ApiResponse({
+		status: 403,
+		description: "Forbidden - User does not own the card",
+	})
+	@ApiResponse({ status: 404, description: "Card or CardTag not found" })
+	async removeTagByCardTagId(
+		@GetUserId() userId: string,
+		@Body() removeTagDto: RemoveSpecificCardOnTag,
+	): Promise<CardDto> {
+		return toPlainToInstance(
+			CardDto,
+			await this.cardService.removeSpecificCardOnTag(userId, removeTagDto),
 		);
 	}
 }

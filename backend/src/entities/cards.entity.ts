@@ -54,7 +54,7 @@ export class Card {
 		() => CardTag,
 		(tag) => tag.card,
 	)
-	card_tag: CardTag;
+	card_tag: CardTag[];
 
 	@CreateDateColumn({ name: "created_at" })
 	createdAt: Date;

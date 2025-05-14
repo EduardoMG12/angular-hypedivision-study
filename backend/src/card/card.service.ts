@@ -21,6 +21,7 @@ import { CardContentOrchestratorService } from "./content-create/card-content.or
 import { User } from "src/entities/user.entity";
 import { FindCardDto } from "./dto/find.dto";
 import { CardTag } from "src/entities/cardTags.entity";
+import { RemoveSpecificCardOnTag } from "./dto/remove-specific-card-on-tag.dto";
 
 @Injectable()
 export class CardService {
@@ -308,8 +309,61 @@ export class CardService {
 	async delete(userId: string, cardId: string): Promise<CardDto> {
 		const cardToDelete = await this.verifyCardOwnership(userId, cardId);
 
-		await this.cardRepository.delete(cardId);
+		await this.cardRepository.manager.transaction(
+			async (manager: EntityManager) => {
+				await manager.delete(CardTag, { cardId });
 
-		return cardToDelete;
+				await manager.delete(Card, cardId);
+			},
+		);
+
+		return plainToInstance(CardDto, cardToDelete);
+	}
+
+	async removeSpecificCardOnTag(
+		userId: string,
+		removeTagDto: RemoveSpecificCardOnTag,
+	): Promise<CardDto> {
+		const { cardId, tagId } = removeTagDto;
+
+		const card = await this.cardRepository.findOne({
+			where: { id: cardId },
+			relations: ["owner", "card_tag", "card_tag.tag"],
+		});
+
+		if (!card) {
+			throw new NotFoundException(`Card with ID "${cardId}" not found.`);
+		}
+
+		if (!card.owner || card.owner.id !== userId) {
+			throw new ForbiddenException("You do not own this card.");
+		}
+
+		const cardTag = card.card_tag.find((ct) => ct.tagId === tagId);
+
+		if (!cardTag) {
+			throw new NotFoundException(
+				`Tag with ID "${tagId}" is not associated with card "${cardId}".`,
+			);
+		}
+
+		await this.cardRepository.manager.transaction(
+			async (manager: EntityManager) => {
+				await manager.delete(CardTag, { id: cardTag.id });
+			},
+		);
+
+		const updatedCard = await this.cardRepository.findOne({
+			where: { id: cardId },
+			relations: ["contentFlip", "card_tag", "card_tag.tag"],
+		});
+
+		if (!updatedCard) {
+			throw new NotFoundException(
+				`Card with ID "${cardId}" not found after tag removal.`,
+			);
+		}
+
+		return updatedCard;
 	}
 }

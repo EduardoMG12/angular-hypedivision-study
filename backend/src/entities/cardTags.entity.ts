@@ -16,7 +16,7 @@ export class CardTag {
 	@Column()
 	cardId: string;
 
-	@ManyToOne(() => Card)
+	@ManyToOne(() => Card, { onDelete: "CASCADE" })
 	card: Card;
 
 	@Column()
