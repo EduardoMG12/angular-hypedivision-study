@@ -69,18 +69,7 @@ export const routes: Routes = [
 			),
 		resolve: {
 			seo: MyCardsSeoResolver,
-			topics: MyCardsDataResolver,
-		},
-		canActivate: [AuthGuard],
-	},
-	{
-		path: "create-card",
-		loadComponent: () =>
-			import("./pages/create-card/create-card.component").then(
-				(m) => m.CreateCardComponent,
-			),
-		resolve: {
-			// seo: MyCardsSeoResolver, // don't forget implement seo when finally page
+			myCardsDataRequest: MyCardsDataResolver,
 		},
 		canActivate: [AuthGuard],
 	},

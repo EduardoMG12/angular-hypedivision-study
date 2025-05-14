@@ -1,0 +1,30 @@
+<div class="bg-wood-smoke border border-portage/20 p-6 rounded-lg shadow-lg">
+  <h2 class="text-xl text-white font-semibold mb-4">Cards Organizados por Tópicos</h2>
+  <p class="text-santas-gray text-sm mb-6">Explore e selecione cartões pelos tópicos ou use a pesquisa para
+    encontrar
+    informações específicas</p>
+
+  <div class="relative mb-6">
+
+    <input type="text" placeholder="Pesquisar flashcards..."
+      class="w-full p-3 bg-[#2E2E3A] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-portage pl-10" />
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-santas-gray" fill="none" stroke="currentColor"
+      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+  </div>
+
+  <div class="mb-4 text-right">
+
+    <button (click)="toggleAllTopics.emit()" class="text-sm text-portage hover:text-portage">
+      {{ allExpanded ? 'Fechar Todos' : 'Abrir Todos' }}
+    </button>
+  </div>
+
+  <div class="space-y-2">
+
+    <app-topic-item *ngFor="let topic of topics" [topic]="topic" [level]="0" [expandedTopics]="expandedTopics"
+      [cardsWithoutTags]="cardsWithoutTags" (toggle)="toggleTopic.emit($event)"> </app-topic-item>
+  </div>
+</div>

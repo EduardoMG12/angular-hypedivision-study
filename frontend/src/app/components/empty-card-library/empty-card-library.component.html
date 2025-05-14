@@ -1,0 +1,28 @@
+<div
+  class="bg-portage/8 border border-portage/20 p-6 py-12 rounded-lg shadow-lg text-center flex flex-col justify-center items-center gap-8">
+  <div class="bg-portage/20 p-8 rounded-full only-fade-spot">
+    <app-open-book-icon [stroke]="'#9b87f5'"
+      class=" scale-200 flex justify-center items-center only-fade-spot animate-ping" />
+  </div>
+  <h2 class="text-subheading text-portage font-semibold">Sua Biblioteca de Cards está Vazia</h2>
+  <p class="text-santas-gray text-sm w-80">Você ainda não possui nenhum card. Comece criando seu primeiro card para
+    iniciar sua jornada de estudos.</p>
+  <div class="flex justify-center items-center gap-4">
+    <button (click)="openCreateCard.emit()"
+      class="mt-4 textPurpleShadow bg-portage hover:bg-cinder hover:border hover:border-portage/80 transition-colors  text-alabaster font-medium py-2 px-4 rounded-lg flex flex-row justify-center items-center gap-2">
+      <app-plus-icon [stroke]="'#FAFAFA'" class="flex justify-center items-center -scale-75" />
+      <p>
+        Criar Meu Primeiro Card
+      </p>
+    </button>
+    <a [routerLink]="['/create-card']"
+      class="inline-block mt-4 textPurpleShadow bg-cinder hover:bg-portage transition-colors border border-portage/60 text-alabaster font-medium py-2 px-6 rounded-lg">
+      Importar Cards
+    </a>
+  </div>
+  <div class="w-96 bg-cinder/60 border border-charade rounded-lg p-6 flex flex-col justify-center items-start">
+    <p class="text-portage font-bold text-base">Dica:</p>
+    <p class="text-start text-base text-santas-gray">Flashcards são ótimos para memorização espaçada. Crie cards com
+      perguntas e respostas para revisar conceitos importantes e fortalecer sua memória.</p>
+  </div>
+</div>
