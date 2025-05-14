@@ -15,9 +15,14 @@ export class CardListComponent {
 	@Input() topics: Topic[] = [];
 	@Input() expandedTopics: Map<string, boolean> = new Map<string, boolean>();
 	@Input() allExpanded = false;
-
 	@Input() cardsWithoutTags: Card[] = [];
 
 	@Output() toggleAllTopics = new EventEmitter<void>();
 	@Output() toggleTopic = new EventEmitter<string>();
+
+	areCardsWithoutTagsExpanded = false;
+
+	toggleCardsWithoutTags(): void {
+		this.areCardsWithoutTagsExpanded = !this.areCardsWithoutTagsExpanded;
+	}
 }

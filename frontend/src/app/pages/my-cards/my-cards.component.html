@@ -1,12 +1,10 @@
 <main class="min-h-[120vh] bg-[#0E0E15] text-gray-300">
   <app-side-bar />
   <div class="px-[6rem] pr-[3rem] min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-10 pb-8 flex flex-col gap-8 z-10">
-
     <div *ngIf="showListContent" @fadeAnimation (@fadeAnimation.done)="onAnimationDone($event, 'list')">
       <div class="flex flex-col justify-center mb-8">
-        <div class="flex justify-between items-center ">
+        <div class="flex justify-between items-center">
           <h1 class="text-3xl font-bold text-portage textPurpleShadow">Minha Biblioteca de Cards</h1>
-
           <button (click)="goToCreateCardForm()"
             class="textPurpleShadow bg-portage hover:bg-portage/80 text-alabaster font-bold py-2 px-4 rounded-lg flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -19,13 +17,14 @@
         <p class="text-santas-gray">Organize, gerencie e estude sua coleção de Cards</p>
       </div>
       <ng-container>
-        <app-card-list *ngIf="topics && topics.length > 0" [topics]="topics" [cardsWithoutTags]="cardsWithoutTags"
-          [expandedTopics]="expandedTopics" [allExpanded]="allExpanded" (toggleAllTopics)="toggleAllTopics()"
-          (toggleTopic)="toggleTopic($event)">
-        </app-card-list>
+        <app-card-list *ngIf="(topics && topics.length > 0) || (cardsWithoutTags && cardsWithoutTags.length > 0)"
+          [topics]="topics" [cardsWithoutTags]="cardsWithoutTags" [expandedTopics]="expandedTopics"
+          [allExpanded]="allExpanded" (toggleAllTopics)="toggleAllTopics()"
+          (toggleTopic)="toggleTopic($event)"></app-card-list>
 
-        <app-empty-card-library *ngIf="!topics || topics.length === 0" (openCreateCard)="goToCreateCardForm()">
-        </app-empty-card-library>
+        <app-empty-card-library
+          *ngIf="(!topics || topics.length === 0) && (!cardsWithoutTags || cardsWithoutTags.length === 0)"
+          (openCreateCard)="goToCreateCardForm()"></app-empty-card-library>
       </ng-container>
     </div>
 
@@ -34,22 +33,14 @@
         <button (click)="goBackMyCards()" class="cursor-pointer">
           <app-arrow-left-icon />
         </button>
-
         <div class="w-full flex flex-col justify-baseline items-start gap-2">
           <div class="flex justify-baseline items-center gap-2">
-            <h1 class="text-portage text-ultra textPurpleShadow font-bold">
-              Criar novo Card
-            </h1>
+            <h1 class="text-portage text-ultra textPurpleShadow font-bold">Criar novo Card</h1>
           </div>
           <p class="text-santas-gray">Preencha os detalhes para criar um novo flashcard.</p>
         </div>
       </div>
       <app-formulary-create-card (goBack)="goBackMyCards()"></app-formulary-create-card>
     </div>
-
-
-
-
-
   </div>
 </main>

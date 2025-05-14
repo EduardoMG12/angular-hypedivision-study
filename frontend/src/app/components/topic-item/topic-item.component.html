@@ -1,41 +1,5 @@
 <div [ngStyle]="{'padding-left': (level * 1.5) + 'rem'}" class="transition-all duration-200 ease-in-out"
   (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
-
-  <div *ngIf="level === 0 && cardsWithoutTags && cardsWithoutTags.length > 0" class="mt-2">
-    <div class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2"
-      (click)="toggleCardsWithoutTags()">
-
-      <div class="flex items-center gap-2">
-        <span class="text-portage text-lg transition-transform duration-200 ease-in-out"
-          [ngClass]="{'rotate-90': areCardsWithoutTagsExpanded}">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </span>
-        <span class="text-white font-semibold text-lg">Cards Sem Tag</span>
-      </div>
-
-      <div class="flex items-center rounded-lg bg-portage/50 px-2 h-6 text-alabaster">
-        <span>{{ cardsWithoutTags.length }}</span>
-      </div>
-    </div>
-
-
-    <div *ngIf="areCardsWithoutTagsExpanded" class="flex flex-col justify-center items-stretch gap-3 mt-1">
-      <div *ngFor="let card of cardsWithoutTags"
-        class="flex justify-between items-center py-1 text-gray-300 hover:bg-portage/20 border border-alabaster/10 rounded-md cursor-pointer px-2">
-        <div class="flex flex-col justify-center items-start">
-          <span class="text-lg text-portage">{{ card.title }}</span>
-          <span class="text-sm text-gray-400">{{ card.description || 'Sem descrição' }}</span>
-        </div>
-        <div class="flex items-center gap-2">
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-
   <div class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2"
     (click)="toggleTopic(topic.id)">
     <div class="flex items-center gap-2">
@@ -48,7 +12,6 @@
       </span>
       <span class="text-white text-xl font-medium">{{ topic.name }}</span>
     </div>
-
     <div class="flex items-center rounded-lg bg-portage/50 px-2 h-6 text-alabaster">
       <span *ngIf="!isHovered">{{ topic.childrenCardsCount }}</span>
       <svg *ngIf="isHovered" class="w-4 h-4 text-alabaster cursor-pointer" fill="none" stroke="currentColor"
@@ -57,7 +20,6 @@
       </svg>
     </div>
   </div>
-
 
   <div *ngIf="isExpanded(topic.id)" class="overflow-hidden transition-all duration-300 ease-in-out">
     <div *ngIf="topic.cards?.length" [ngStyle]="{'padding-left': '1.5rem'}"
@@ -68,9 +30,7 @@
           <span class="text-lg text-portage">{{ card.title }}</span>
           <span class="text-sm text-gray-400">{{ card.description || 'Sem descrição' }}</span>
         </div>
-        <div class="flex items-center gap-2">
-
-        </div>
+        <div class="flex items-center gap-2"></div>
       </div>
     </div>
 

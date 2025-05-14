@@ -5,7 +5,7 @@ import {
 	RouterStateSnapshot,
 } from "@angular/router";
 import { Observable, of, forkJoin } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 
 import type { Topic } from "../../../common/api/interfaces/my-cards-list.interface";
 import { TopicService } from "../../../services/topic/topic.service";
@@ -38,10 +38,12 @@ export class MyCardsDataResolver
 			topics: this.topicService.getTopics(),
 			cardsWithoutTags: this.cardService.findAllWithoutTags(),
 		}).pipe(
-			catchError((error) => {
-				console.error("Erro no resolver ao carregar dados:", error);
-				return of(null);
-			}),
+			map(({ topics, cardsWithoutTags }) => ({
+				topics: Array.isArray(topics) ? topics : [],
+				cardsWithoutTags: Array.isArray(cardsWithoutTags)
+					? cardsWithoutTags
+					: [],
+			})),
 		);
 	}
 }
