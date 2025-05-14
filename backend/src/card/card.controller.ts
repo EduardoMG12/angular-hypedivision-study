@@ -130,6 +130,27 @@ export class CardController {
 		return toPlainToInstance(CardDto, await this.cardService.findAll(userId));
 	}
 
+	@Get("/findAllWithoutTags")
+	@ApiOperation({
+		summary: "Find all cards without tags",
+		description:
+			"Retrieves all cards owned by the authenticated user that do not have any tags.",
+	})
+	@ApiResponse({
+		status: 200,
+		description: "List of cards without tags",
+		type: [CardDto],
+	})
+	@ApiResponse({
+		status: 401,
+		description: "Unauthorized - Invalid or missing token",
+	})
+	async findAllWithoutTags(@GetUserId() userId: string): Promise<CardDto[]> {
+		return toPlainToInstance(
+			CardDto,
+			await this.cardService.findAllWithoutTags(userId),
+		);
+	}
 	@Delete()
 	@ApiOperation({
 		summary: "Delete a card",

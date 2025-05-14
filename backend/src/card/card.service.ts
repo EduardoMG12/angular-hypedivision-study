@@ -9,7 +9,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Card } from "src/entities/cards.entity";
 import { UsersService } from "src/users/users.service";
-import { EntityManager, In, Repository } from "typeorm";
+import { EntityManager, In, IsNull, Repository } from "typeorm";
 
 import { CardType } from "./common/enum/cardType.enum";
 import { CardDto } from "./dto/card.dto";
@@ -242,6 +242,19 @@ export class CardService {
 		});
 
 		return cards;
+	}
+
+	async findAllWithoutTags(userId: string): Promise<CardDto[]> {
+		const cards = await this.cardRepository
+			.createQueryBuilder("card")
+			.leftJoin("card.owner", "owner")
+			.leftJoin("card.card_tag", "cardTag")
+			.where("owner.id = :userId", { userId })
+			.andWhere("cardTag.id IS NULL")
+			.leftJoinAndSelect("card.contentFlip", "contentFlip")
+			.getMany();
+
+		return cards as CardDto[];
 	}
 
 	// async update(userId: string, updateData: UpdateCardDto): Promise<CardDto> {
