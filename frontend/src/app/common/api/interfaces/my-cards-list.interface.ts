@@ -26,7 +26,7 @@ export interface Card {
 export interface Topic {
 	id: string;
 	name: string;
-	cards: CardSimple[];
+	cards?: (Card | CardSimple)[];
 	children: Topic[];
 	childrenCardsCount: number;
 	isExpanded?: boolean;

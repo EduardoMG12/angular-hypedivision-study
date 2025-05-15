@@ -15,16 +15,16 @@ import { SideBarCardsLibraryComponent } from "../../components/side-bar-cards-li
 	selector: "app-create-flashcards",
 	standalone: true,
 	imports: [
-    CommonModule,
-    SideBarComponent,
-    RobotIconComponent,
-    ImportIconComponent,
-    PlusIconComponent,
-    EyeIconComponent,
-    CreateFlashcardsWithJsonComponent,
-    LupeIconComponent,
-    SideBarCardsLibraryComponent
-],
+		CommonModule,
+		SideBarComponent,
+		RobotIconComponent,
+		ImportIconComponent,
+		PlusIconComponent,
+		EyeIconComponent,
+		CreateFlashcardsWithJsonComponent,
+		LupeIconComponent,
+		SideBarCardsLibraryComponent,
+	],
 	templateUrl: "./create-flashcard.component.html",
 	styleUrls: ["./create-flashcard.component.css"],
 	animations: [
@@ -62,16 +62,15 @@ export class CreateFlashcardComponent {
 		this.showJsonImport = false;
 	}
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	onJsonImported(jsonData: any) {
 		this.showJsonImport = false;
 	}
 
-  toggleCardsLibrary() {
-    this.showCardsLibrary = !this.showCardsLibrary; 
-  }
+	toggleCardsLibrary() {
+		this.showCardsLibrary = !this.showCardsLibrary;
+	}
 
-  closeCardsLibrary() {
-  this.showCardsLibrary = false; 
-}
+	closeCardsLibrary() {
+		this.showCardsLibrary = false;
+	}
 }

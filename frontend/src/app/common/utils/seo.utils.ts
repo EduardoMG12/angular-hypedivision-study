@@ -14,7 +14,6 @@ export interface SeoData {
 	twitterTitle?: string;
 	twitterDescription?: string;
 	twitterImage?: string;
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	[key: string]: any;
 }
 
@@ -79,7 +78,6 @@ export function createSeoData(
 	keywords: string,
 	imageUrl?: string,
 	currentUrl?: string,
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	extraData?: { [key: string]: any },
 ): SeoData {
 	const url = currentUrl || "";

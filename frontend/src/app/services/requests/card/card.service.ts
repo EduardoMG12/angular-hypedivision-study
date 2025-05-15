@@ -50,6 +50,20 @@ export class CardService {
 			);
 	}
 
+	moveCardToTopic(
+		cardId: string,
+		targetTopicId: string,
+		originalTopicId: string | undefined,
+	): Observable<any> {
+		const url = `${this.apiUrl}/${cardId}/move-to-topic`; // Exemplo de endpoint
+		const body = {
+			targetTopicId: targetTopicId,
+			originalTopicId: originalTopicId, // Incluir origem para a API saber de onde remover
+		};
+		// Use PUT ou PATCH dependendo da sua API
+		return this.http.put(url, body); // Ou this.http.patch(url, body);
+	}
+
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private handleError(error: any) {
 		console.error("Ocorreu um erro na requisição:", error);

@@ -17,10 +17,11 @@
         <p class="text-santas-gray">Organize, gerencie e estude sua coleção de Cards</p>
       </div>
       <ng-container>
-        <app-card-list *ngIf="(topics && topics.length > 0) || (cardsWithoutTags && cardsWithoutTags.length > 0)"
-          [topics]="topics" [cardsWithoutTags]="cardsWithoutTags" [expandedTopics]="expandedTopics"
-          [allExpanded]="allExpanded" (toggleAllTopics)="toggleAllTopics()" (toggleTopic)="toggleTopic($event)"
-          [expandAllCardsWithoutTags]="expandCardsWithoutTags"></app-card-list>
+        <app-card-list *ngIf="(topics && topics.length) || (cardsWithoutTags && cardsWithoutTags.length > 0)"
+          @fadeAnimation [topics]="topics" [expandedTopics]="expandedTopics" [allExpanded]="allExpanded"
+          [cardsWithoutTags]="cardsWithoutTags" [expandAllCardsWithoutTags]="expandCardsWithoutTags"
+          (toggleTopic)="toggleTopic($event)" (toggleAllTopics)="toggleAllTopics()"
+          (cardDroppedOnTopic)="handleCardDropped($event)"> </app-card-list>
 
         <app-empty-card-library
           *ngIf="(!topics || topics.length === 0) && (!cardsWithoutTags || cardsWithoutTags.length === 0)"
