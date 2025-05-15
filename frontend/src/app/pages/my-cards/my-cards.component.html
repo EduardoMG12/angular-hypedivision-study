@@ -19,8 +19,8 @@
       <ng-container>
         <app-card-list *ngIf="(topics && topics.length > 0) || (cardsWithoutTags && cardsWithoutTags.length > 0)"
           [topics]="topics" [cardsWithoutTags]="cardsWithoutTags" [expandedTopics]="expandedTopics"
-          [allExpanded]="allExpanded" (toggleAllTopics)="toggleAllTopics()"
-          (toggleTopic)="toggleTopic($event)"></app-card-list>
+          [allExpanded]="allExpanded" (toggleAllTopics)="toggleAllTopics()" (toggleTopic)="toggleTopic($event)"
+          [expandAllCardsWithoutTags]="expandCardsWithoutTags"></app-card-list>
 
         <app-empty-card-library
           *ngIf="(!topics || topics.length === 0) && (!cardsWithoutTags || cardsWithoutTags.length === 0)"

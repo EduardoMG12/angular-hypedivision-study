@@ -1,4 +1,10 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import {
+	Component,
+	Input,
+	Output,
+	EventEmitter,
+	SimpleChanges,
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { TopicItemComponent } from "../topic-item/topic-item.component";
 import type { Topic } from "../../common/api/interfaces/my-cards-list.interface";
@@ -16,6 +22,14 @@ export class CardListComponent {
 	@Input() expandedTopics: Map<string, boolean> = new Map<string, boolean>();
 	@Input() allExpanded = false;
 	@Input() cardsWithoutTags: Card[] = [];
+	@Input() expandAllCardsWithoutTags = false;
+
+	ngOnChanges(changes: SimpleChanges): void {
+		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
+		if (changes["expandAllCardsWithoutTags"]) {
+			this.areCardsWithoutTagsExpanded = this.expandAllCardsWithoutTags;
+		}
+	}
 
 	@Output() toggleAllTopics = new EventEmitter<void>();
 	@Output() toggleTopic = new EventEmitter<string>();

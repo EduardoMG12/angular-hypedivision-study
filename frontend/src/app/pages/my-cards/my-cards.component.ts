@@ -39,6 +39,8 @@ export class MyCardsComponent implements OnInit {
 	topics: Topic[] = [];
 	expandedTopics: Map<string, boolean> = new Map<string, boolean>();
 	allExpanded = false;
+	expandCardsWithoutTags = false;
+
 	cardsWithoutTags: Card[] = [];
 
 	showListContent = true;
@@ -135,6 +137,8 @@ export class MyCardsComponent implements OnInit {
 	toggleAllTopics(): void {
 		this.allExpanded = !this.allExpanded;
 		this.setExpandedStateForAll(this.topics, this.allExpanded);
+
+		this.expandCardsWithoutTags = this.allExpanded;
 	}
 
 	private setExpandedStateForAll(topics: Topic[], state: boolean): void {
