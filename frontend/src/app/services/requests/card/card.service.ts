@@ -2,7 +2,10 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { tap, catchError } from "rxjs/operators";
-import { Card } from "../../../common/api/interfaces/my-cards-list.interface";
+import {
+	Card,
+	MoveCardDto,
+} from "../../../common/api/interfaces/my-cards-list.interface";
 
 interface CreateCardSuccessResponse {
 	id: string;
@@ -50,21 +53,41 @@ export class CardService {
 			);
 	}
 
+	/**
+	 * Envia requisição para mover um card para um tópico/tag no backend.
+	 * @param cardId O ID do card a ser movido.
+	 * @param targetTopicId O ID do tópico de destino.
+	 * @param originalTopicId Opcional: O ID do tópico de origem.
+	 * @returns Um Observable com a resposta do backend (o CardDto atualizado, por exemplo).
+	 */
+	// Ajuste a tipagem do retorno conforme o backend retorna (CardDto, any, etc.)
 	moveCardToTopic(
 		cardId: string,
 		targetTopicId: string,
 		originalTopicId: string | undefined,
-	): Observable<any> {
-		const url = `${this.apiUrl}/${cardId}/move-to-topic`; // Exemplo de endpoint
-		const body = {
+	): Observable<Card> {
+		// Usando Card como exemplo de retorno, ajuste conforme backend
+		// Crie o objeto DTO que o backend espera
+		const requestBody: MoveCardDto = {
+			cardId: cardId,
 			targetTopicId: targetTopicId,
-			originalTopicId: originalTopicId, // Incluir origem para a API saber de onde remover
+			originalTopicId: originalTopicId,
 		};
-		// Use PUT ou PATCH dependendo da sua API
-		return this.http.put(url, body); // Ou this.http.patch(url, body);
+
+		// Use a URL correta que o Controller está escutando
+		const url = `${this.apiUrl}/card/move-to-topic`; // <-- URL CORRETA
+
+		// Envie o DTO completo no corpo da requisição PUT
+		return this.http
+			.put<Card>(url, requestBody) // <-- Envie requestBody no corpo
+			.pipe(
+				tap((updatedCard) =>
+					console.log("Card movido com sucesso:", updatedCard),
+				),
+				catchError(this.handleError),
+			);
 	}
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private handleError(error: any) {
 		console.error("Ocorreu um erro na requisição:", error);
 

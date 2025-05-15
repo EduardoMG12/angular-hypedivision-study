@@ -35,3 +35,9 @@ export interface Topic {
 export interface TopicsApiResponse {
 	tags: Topic[];
 }
+
+export interface MoveCardDto {
+	cardId: string;
+	targetTopicId: string;
+	originalTopicId?: string;
+}
