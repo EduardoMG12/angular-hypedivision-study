@@ -40,14 +40,7 @@
         </div>
       </div>
       <div *ngIf="areCardsWithoutTagsExpanded" class="flex flex-col justify-center items-stretch gap-3 mt-1">
-        <div *ngFor="let card of cardsWithoutTags"
-          class="flex justify-between items-center py-1 text-gray-300 hover:bg-portage/20 border border-alabaster/10 rounded-md cursor-pointer px-2">
-          <div class="flex flex-col justify-center items-start">
-            <span class="text-lg text-portage">{{ card.title }}</span>
-            <span class="text-sm text-gray-400">{{ card.description || "Sem descrição" }}</span>
-          </div>
-          <div class="flex items-center gap-2"></div>
-        </div>
+        <app-card-drag-drop *ngFor="let card of cardsWithoutTags" [card]="card"></app-card-drag-drop>
       </div>
     </div>
 

@@ -7,12 +7,12 @@ import {
 import { Observable, of, forkJoin } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 
-import type { Topic } from "../../../common/api/interfaces/my-cards-list.interface";
-import { TopicService } from "../../../services/topic/topic.service";
-import {
-	CardService,
+import type {
 	Card,
-} from "../../../services/requests/card/card.service";
+	Topic,
+} from "../../../common/api/interfaces/my-cards-list.interface";
+import { TopicService } from "../../../services/topic/topic.service";
+import { CardService } from "../../../services/requests/card/card.service";
 
 export interface MyCardsResolvedData {
 	topics: Topic[];

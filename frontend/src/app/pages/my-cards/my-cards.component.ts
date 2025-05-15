@@ -2,14 +2,17 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { SideBarComponent } from "../../components/side-bar/side-bar.component";
-import type { Topic } from "../../common/api/interfaces/my-cards-list.interface";
+import type {
+	Card,
+	Topic,
+} from "../../common/api/interfaces/my-cards-list.interface";
 import { ActivatedRoute, Data } from "@angular/router";
 import { EmptyCardLibraryComponent } from "../../components/empty-card-library/empty-card-library.component";
 import { CardListComponent } from "../../components/card-list/card-list.component";
 import { FormularyCreateCardComponent } from "../../components/formulary-create-card/formulary-create-card.component";
 import { trigger, transition, style, animate } from "@angular/animations";
 import { ArrowLeftIconComponent } from "../../components/icons/arrow-left-icon/arrow-left-icon.component";
-import { CardService, Card } from "../../services/requests/card/card.service";
+import { CardService } from "../../services/requests/card/card.service";
 import { MyCardsResolvedData } from "../../resolver/requests/my-cards-data/my-card-data.service";
 import { TopicService } from "../../services/topic/topic.service";
 

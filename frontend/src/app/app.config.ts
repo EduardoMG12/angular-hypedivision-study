@@ -18,6 +18,8 @@ import {
 	withInterceptors,
 } from "@angular/common/http";
 import { AuthInterceptor } from "./interceptors/add-authorization-header/add-authorization-header.interceptor";
+import { provideDnd } from "@ng-dnd/core";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -30,5 +32,6 @@ export const appConfig: ApplicationConfig = {
 		AuthService,
 		AuthGuard,
 		provideHttpClient(withFetch(), withInterceptors([AuthInterceptor])),
+		provideDnd({backend:HTML5Backend}),
 	],
 };

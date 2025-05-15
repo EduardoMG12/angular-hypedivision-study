@@ -2,25 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { tap, catchError } from "rxjs/operators";
-
-export interface Card {
-	type: string;
-	title: string;
-	description?: string;
-	contentFlip?: {
-		front: string;
-		back: string;
-	};
-	// contentMultipleChoice?: {
-	//  question: string;
-	//  options: { text: string; isCorrect: boolean }[];
-	//  correctAnswer: string | number;
-	// };
-	tagPaths: string[];
-
-	id: string;
-	owner_id: string;
-}
+import { Card } from "../../../common/api/interfaces/my-cards-list.interface";
 
 interface CreateCardSuccessResponse {
 	id: string;

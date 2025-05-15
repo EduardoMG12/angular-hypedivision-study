@@ -7,13 +7,17 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { TopicItemComponent } from "../topic-item/topic-item.component";
-import type { Topic } from "../../common/api/interfaces/my-cards-list.interface";
-import { Card } from "../../services/requests/card/card.service";
+import type {
+	Card,
+	Topic,
+} from "../../common/api/interfaces/my-cards-list.interface";
+
+import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
 
 @Component({
 	selector: "app-card-list",
 	standalone: true,
-	imports: [CommonModule, TopicItemComponent],
+	imports: [CommonModule, TopicItemComponent, CardDragDropComponent],
 	templateUrl: "./card-list.component.html",
 	styleUrl: "./card-list.component.css",
 })

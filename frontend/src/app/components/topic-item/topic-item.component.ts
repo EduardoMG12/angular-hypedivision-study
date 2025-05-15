@@ -2,11 +2,12 @@
 import { CommonModule, NgClass, NgStyle } from "@angular/common";
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 import { Topic } from "../../common/api/interfaces/my-cards-list.interface";
+import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
 
 @Component({
 	selector: "app-topic-item",
 	standalone: true,
-	imports: [CommonModule, NgStyle, NgClass],
+	imports: [CommonModule, NgStyle, NgClass, CardDragDropComponent],
 	templateUrl: "./topic-item.component.html",
 })
 export class TopicItemComponent {
