@@ -9,6 +9,7 @@ import { CommonModule } from "@angular/common";
 import { TopicItemComponent } from "../topic-item/topic-item.component";
 import type {
 	Card,
+	CardSimple,
 	Topic,
 	// CardSimple // Pode precisar importar CardSimple se usado no tipo do Output
 } from "../../common/api/interfaces/my-cards-list.interface";
@@ -26,7 +27,7 @@ export class CardListComponent {
 	@Input() topics: Topic[] = [];
 	@Input() expandedTopics: Map<string, boolean> = new Map<string, boolean>();
 	@Input() allExpanded = false;
-	@Input() cardsWithoutTags: Card[] = [];
+	@Input() cardsWithoutTags: (Card | CardSimple)[] = [];
 	@Input() expandAllCardsWithoutTags = false;
 
 	ngOnChanges(changes: SimpleChanges): void {

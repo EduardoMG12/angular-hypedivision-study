@@ -7,7 +7,7 @@ export interface CardSimple {
 export interface Card {
 	type: string;
 	title: string;
-	description?: string;
+	description?: string | null;
 	contentFlip?: {
 		front: string;
 		back: string;

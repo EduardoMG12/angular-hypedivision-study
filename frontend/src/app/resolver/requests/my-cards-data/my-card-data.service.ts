@@ -9,6 +9,7 @@ import { catchError, map } from "rxjs/operators";
 
 import type {
 	Card,
+	CardSimple,
 	Topic,
 } from "../../../common/api/interfaces/my-cards-list.interface";
 import { TopicService } from "../../../services/topic/topic.service";
@@ -16,7 +17,7 @@ import { CardService } from "../../../services/requests/card/card.service";
 
 export interface MyCardsResolvedData {
 	topics: Topic[];
-	cardsWithoutTags: Card[];
+	cardsWithoutTags: (Card | CardSimple)[];
 }
 
 @Injectable({
