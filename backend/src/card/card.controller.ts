@@ -16,6 +16,7 @@ import { CardDto } from "./dto/card.dto";
 import { FindCardDto } from "./dto/find.dto";
 import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { RemoveSpecificCardOnTag } from "./dto/remove-specific-card-on-tag.dto";
+import { MoveCardToTopicDto } from "./dto/move-card-to-topic.dto";
 
 @Controller("card")
 export class CardController {
@@ -228,6 +229,42 @@ export class CardController {
 		return toPlainToInstance(
 			CardDto,
 			await this.cardService.removeSpecificCardOnTag(userId, removeTagDto),
+		);
+	}
+
+	@Put("/move-to-topic") // ou @Patch, dependendo da sua preferência REST
+	@ApiOperation({
+		summary: "Move a card to a specific topic/tag",
+		description:
+			"Moves an authenticated user's card from its original topic (or no topic) to a new topic.",
+	})
+	@ApiBody({
+		type: MoveCardToTopicDto,
+		description: "Data for moving the card",
+	})
+	@ApiResponse({
+		status: 200,
+		description: "Card moved successfully",
+		type: CardDto,
+	})
+	@ApiResponse({ status: 400, description: "Invalid move data provided" })
+	@ApiResponse({
+		status: 401,
+		description: "Unauthorized - Invalid or missing token",
+	})
+	@ApiResponse({
+		status: 403,
+		description: "Forbidden - User does not own the card or target topic",
+	})
+	@ApiResponse({ status: 404, description: "Card or target topic not found" })
+	async moveCard(
+		@GetUserId() userId: string,
+		@Body() moveCardToTopicDto: MoveCardToTopicDto,
+	): Promise<CardDto> {
+		return toPlainToInstance(
+			CardDto,
+
+			await this.cardService.moveCardToTopic(userId, moveCardToTopicDto),
 		);
 	}
 }

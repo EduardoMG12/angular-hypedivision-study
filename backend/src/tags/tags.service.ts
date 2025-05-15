@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import {
+	Injectable,
+	BadRequestException,
+	NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IsNull, Repository } from "typeorm";
 import { Tag } from "src/entities/tags.entity";
@@ -127,5 +131,15 @@ export class TagService {
 
 		const tag = this.tagRepository.create({ name, parentId, path });
 		return this.tagRepository.save(tag);
+	}
+
+	async findById(tagId: string): Promise<Tag | null> {
+		const tag = await this.tagRepository.findOne({
+			where: { id: tagId },
+		});
+		if (!tag) {
+			throw new NotFoundException(`Tag with ID "${tagId}" not found.`);
+		}
+		return tag;
 	}
 }
