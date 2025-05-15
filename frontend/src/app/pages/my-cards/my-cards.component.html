@@ -40,7 +40,7 @@
           <p class="text-santas-gray">Preencha os detalhes para criar um novo flashcard.</p>
         </div>
       </div>
-      <app-formulary-create-card (goBack)="goBackMyCards()"></app-formulary-create-card>
+      <app-formulary-create-card (goBack)="goBackMyCards()" (cardSaved)="onCardSaved()" />
     </div>
   </div>
 </main>

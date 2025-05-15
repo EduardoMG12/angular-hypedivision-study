@@ -11,6 +11,7 @@ import { trigger, transition, style, animate } from "@angular/animations";
 import { ArrowLeftIconComponent } from "../../components/icons/arrow-left-icon/arrow-left-icon.component";
 import { CardService, Card } from "../../services/requests/card/card.service";
 import { MyCardsResolvedData } from "../../resolver/requests/my-cards-data/my-card-data.service";
+import { TopicService } from "../../services/topic/topic.service";
 
 @Component({
 	selector: "app-my-cards",
@@ -49,6 +50,7 @@ export class MyCardsComponent implements OnInit {
 	constructor(
 		private route: ActivatedRoute,
 		private cardService: CardService,
+		private topicService: TopicService,
 	) {}
 
 	ngOnInit(): void {
@@ -148,6 +150,20 @@ export class MyCardsComponent implements OnInit {
 			if (topic.children && topic.children.length > 0) {
 				this.setExpandedStateForAll(topic.children, state);
 			}
+		});
+	}
+
+	onCardSaved(): void {
+		console.log("rodou o onCardSaved");
+		this.loadCardsWithoutTags();
+		this.topicService.getTopics().subscribe({
+			next: (topics) => {
+				this.topics = Array.isArray(topics) ? topics : [];
+				this.initializeExpandedState(this.topics);
+			},
+			error: (error) => {
+				console.log("Erro ao carregar topicos:", error);
+			},
 		});
 	}
 }
