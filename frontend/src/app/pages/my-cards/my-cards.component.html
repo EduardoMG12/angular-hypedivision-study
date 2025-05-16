@@ -1,7 +1,8 @@
 <main class="min-h-[120vh] bg-[#0E0E15] text-gray-300">
   <app-side-bar />
   <div class="px-[6rem] pr-[3rem] min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-10 pb-8 flex flex-col gap-8 z-10">
-    <div *ngIf="showListContent" @fadeAnimation (@fadeAnimation.done)="onAnimationDone($event, 'list')">
+    <div *ngIf="showListContent" @fadeAnimation (@fadeAnimation.done)="onAnimationDone($event, 'list')"
+      [dropTarget]="containerDropTarget">
       <div class="flex flex-col justify-center mb-8">
         <div class="flex justify-between items-center">
           <h1 class="text-3xl font-bold text-portage textPurpleShadow">Minha Biblioteca de Cards</h1>

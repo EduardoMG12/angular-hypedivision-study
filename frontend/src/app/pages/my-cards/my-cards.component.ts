@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef, OnDestroy } from "@angular/core";
 import { SideBarComponent } from "../../components/side-bar/side-bar.component";
 import type {
 	Card,
@@ -7,6 +7,7 @@ import type {
 	Topic,
 	MoveCardDto,
 	MoveTopicDto,
+	DraggedTopicItem,
 } from "../../common/api/interfaces/my-cards-list.interface";
 import { ActivatedRoute, Data } from "@angular/router";
 import { EmptyCardLibraryComponent } from "../../components/empty-card-library/empty-card-library.component";
@@ -18,6 +19,14 @@ import { HttpClient } from "@angular/common/http";
 import { CardService } from "../../services/requests/card/card.service";
 import { MyCardsResolvedData } from "../../resolver/requests/my-cards-data/my-card-data.service";
 import { TopicService } from "../../services/topic/topic.service";
+import {
+	DndService,
+	DropTarget,
+	DropTargetMonitor,
+	DropTargetDirective,
+} from "@ng-dnd/core";
+import { Subject } from "rxjs";
+import { TOPIC_TYPE } from "../../common/api/interfaces/my-cards-list.interface";
 
 @Component({
 	selector: "app-my-cards",
@@ -29,6 +38,7 @@ import { TopicService } from "../../services/topic/topic.service";
 		CardListComponent,
 		FormularyCreateCardComponent,
 		ArrowLeftIconComponent,
+		DropTargetDirective,
 	],
 	templateUrl: "./my-cards.component.html",
 	styleUrl: "./my-cards.component.css",
@@ -42,7 +52,7 @@ import { TopicService } from "../../services/topic/topic.service";
 		]),
 	],
 })
-export class MyCardsComponent implements OnInit {
+export class MyCardsComponent implements OnInit, OnDestroy {
 	topics: Topic[] = [];
 	expandedTopics: Map<string, boolean> = new Map<string, boolean>();
 	allExpanded = false;
@@ -63,12 +73,16 @@ export class MyCardsComponent implements OnInit {
 		targetParentId?: string | null;
 	} | null = null;
 
+	private destroy$ = new Subject<void>();
+	containerDropTarget!: DropTarget<DraggedTopicItem, { targetParentId: null }>;
+
 	constructor(
 		private route: ActivatedRoute,
 		private cardService: CardService,
 		private topicService: TopicService,
 		private http: HttpClient,
 		private cdr: ChangeDetectorRef,
+		private dnd: DndService,
 	) {}
 
 	ngOnInit(): void {
@@ -104,6 +118,47 @@ export class MyCardsComponent implements OnInit {
 				this.cardsWithoutTags.length,
 			);
 		});
+
+		// Initialize container drop target
+		this.containerDropTarget = this.dnd.dropTarget<
+			DraggedTopicItem,
+			{ targetParentId: null }
+		>(TOPIC_TYPE, {
+			canDrop: (
+				monitor: DropTargetMonitor<DraggedTopicItem, { targetParentId: null }>,
+			) => {
+				const item = monitor.getItem();
+				return !!item && item.topicId !== "";
+			},
+			drop: (
+				monitor: DropTargetMonitor<DraggedTopicItem, { targetParentId: null }>,
+			) => {
+				const draggedItem = monitor.getItem();
+				if (!draggedItem) {
+					console.error("Drop chamado sem item arrastado disponível.");
+					return;
+				}
+
+				console.log(
+					`Tópico ${draggedItem.topicId} soltado no container principal (top-level)`,
+				);
+				this.handleTopicDropped({
+					topicId: draggedItem.topicId,
+					originalParentId: draggedItem.originalParentId,
+					targetParentId: null,
+				});
+
+				return { targetParentId: null };
+			},
+		});
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+		if (this.containerDropTarget) {
+			this.containerDropTarget.unsubscribe();
+		}
 	}
 
 	private findCard(
