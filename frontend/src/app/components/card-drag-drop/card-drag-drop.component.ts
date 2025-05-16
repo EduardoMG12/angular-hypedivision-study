@@ -1,31 +1,26 @@
 import { Component, Input, OnInit, OnDestroy } from "@angular/core";
-import { CommonModule, NgStyle } from "@angular/common"; // Mantenha NgStyle por enquanto se o template o usar
+import { CommonModule, NgStyle } from "@angular/common";
 import {
 	DndService,
 	DragSource,
 	DragSourceMonitor,
 	DragSourceDirective,
 } from "@ng-dnd/core";
-import { Observable, Subject } from "rxjs"; // Mantenha Observable/Subject para destroy$
-import { map, takeUntil } from "rxjs/operators";
+import { Subject } from "rxjs";
 
-import type {
-	Card,
-	CardSimple,
+import {
+	CARD_TYPE,
+	type Card,
+	type CardSimple,
+	type DraggedCardItem,
 } from "../../common/api/interfaces/my-cards-list.interface";
 
 type CardDropResult = { moved: boolean } | undefined;
 
-// Adicione EXPORT para que outros arquivos possam importar esta interface
-export interface DraggedCardItem {
-	card: Card | CardSimple;
-	originalTopicId?: string;
-}
-
 @Component({
 	selector: "app-card-drag-drop",
 	standalone: true,
-	imports: [CommonModule, DragSourceDirective], // Mantenha NgStyle se o template ainda o usar para algo
+	imports: [CommonModule, DragSourceDirective],
 	templateUrl: "./card-drag-drop.component.html",
 	styleUrl: "./card-drag-drop.component.css",
 })
@@ -33,14 +28,11 @@ export class CardDragDropComponent implements OnInit, OnDestroy {
 	@Input() card!: Card | CardSimple;
 	@Input() originalTopicId?: string;
 
-	private readonly CARD_TYPE = "YOUR_CARD_TYPE";
+	private readonly CARD_TYPE = CARD_TYPE;
 
 	private destroy$ = new Subject<void>();
 
 	cardSource!: DragSource<DraggedCardItem, CardDropResult>;
-
-	// REMOVA A DECLARAÇÃO DE isDragging$ AQUI
-	// isDragging$!: Observable<boolean>;
 
 	constructor(private dnd: DndService) {}
 
@@ -82,12 +74,6 @@ export class CardDragDropComponent implements OnInit, OnDestroy {
 				},
 			},
 		);
-
-		// REMOVA A LINHA QUE ATRIBUIA isDragging$ AQUI (pois já está comentada)
-		// @ts-ignore: Property 'isDragging$' does not exist on type 'DragSource<...>'
-		// this.isDragging$ = this.cardSource.isDragging$.pipe(
-		//  takeUntil(this.destroy$),
-		// );
 	}
 
 	ngOnDestroy(): void {

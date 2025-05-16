@@ -11,7 +11,6 @@ import type {
 	Card,
 	CardSimple,
 	Topic,
-	// CardSimple // Pode precisar importar CardSimple se usado no tipo do Output
 } from "../../common/api/interfaces/my-cards-list.interface";
 
 import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
@@ -43,8 +42,6 @@ export class CardListComponent {
 		cardId: string;
 		originalTopicId: string | undefined;
 		targetTopicId: string;
-		// Se o dropResult for mais complexo e você quiser repassá-lo:
-		// dropResult: { moved: boolean } | undefined; // Adicione aqui
 	}>();
 
 	areCardsWithoutTagsExpanded = false;
@@ -53,13 +50,12 @@ export class CardListComponent {
 		this.areCardsWithoutTagsExpanded = !this.areCardsWithoutTagsExpanded;
 	}
 
-	// Método para capturar o evento do TopicItemComponent e repassá-lo
 	onCardDroppedOnTopic(event: {
 		cardId: string;
 		originalTopicId: string | undefined;
 		targetTopicId: string;
 	}): void {
 		console.log("CardListComponent recebeu drop:", event);
-		this.cardDroppedOnTopic.emit(event); // Emite o evento para o MyCardsComponent
+		this.cardDroppedOnTopic.emit(event);
 	}
 }

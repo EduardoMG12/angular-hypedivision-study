@@ -6,14 +6,14 @@ import {
 	EventEmitter,
 	OnInit,
 	OnDestroy,
-} from "@angular/core"; // Importe OnInit e OnDestroy
-import { Topic } from "../../common/api/interfaces/my-cards-list.interface";
+} from "@angular/core";
 import {
-	CardDragDropComponent,
+	CARD_TYPE,
 	DraggedCardItem,
-} from "../card-drag-drop/card-drag-drop.component"; // Já deve estar importado
+	Topic,
+} from "../../common/api/interfaces/my-cards-list.interface";
+import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
 
-// Importe o que precisa para DropTarget
 import {
 	DndService,
 	DropTarget,
@@ -22,11 +22,7 @@ import {
 } from "@ng-dnd/core";
 import { Observable, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
-// Importe o tipo do item arrastado (deve ser o mesmo definido no CardDragDropComponent)
 
-// Defina o tipo do drop result que este DropTarget pode retornar (opcional)
-// Poderia ser o ID do tópico onde o card foi solto, por exemplo.
-// Vamos retornar o ID do tópico para que o endDrag do card saiba onde caiu.
 type TopicDropResult = { targetTopicId: string };
 
 @Component({
@@ -36,12 +32,11 @@ type TopicDropResult = { targetTopicId: string };
 		CommonModule,
 		NgStyle,
 		NgClass,
-		CardDragDropComponent, // Para renderizar cards filhos
-		DropTargetDirective, // <-- ADICIONE A DIRETIVA DropTargetDirective
+		CardDragDropComponent,
+		DropTargetDirective,
 	],
 	templateUrl: "./topic-item.component.html",
 })
-// Implemente OnInit e OnDestroy
 export class TopicItemComponent implements OnInit, OnDestroy {
 	@Input() topic!: Topic;
 	@Input() level = 0;
@@ -50,32 +45,24 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 	isHovered = false;
 
 	@Output() toggle = new EventEmitter<string>();
-	// Evento que será emitido quando um card for solto NESTE tópico
+
 	@Output() cardDroppedOnTopic = new EventEmitter<{
 		cardId: string;
 		originalTopicId: string | undefined;
 		targetTopicId: string;
 	}>();
 
-	private readonly CARD_TYPE = "YOUR_CARD_TYPE"; // <-- Use O MESMO tipo do CardDragDropComponent
+	private readonly CARD_TYPE = CARD_TYPE;
 
 	private destroy$ = new Subject<void>();
 
-	// A instância do DropTarget para este componente
 	topicTarget!: DropTarget<DraggedCardItem, TopicDropResult>;
 
-	// Opcional: Observable para estado de hover, se o erro foi resolvido na sua instalação
-	// @ts-ignore: Property 'isOver$' does not exist on type 'DropTarget<...>'
-	// isOver$!: Observable<boolean>;
-
-	// Injete o DndService
 	constructor(private dnd: DndService) {}
 
 	ngOnInit(): void {
-		// Crie a instância do DropTarget
-		// Especifique os tipos genéricos: <Tipo do item arrastado, Tipo do drop result>
 		this.topicTarget = this.dnd.dropTarget<DraggedCardItem, TopicDropResult>(
-			this.CARD_TYPE, // Aceita itens do tipo CARD_TYPE
+			this.CARD_TYPE,
 			{
 				// canDrop é opcional, para controlar se o item pode ser solto aqui
 				// canDrop: (monitor: DropTargetMonitor<DraggedCardItem, TopicDropResult>) => {
@@ -122,9 +109,8 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 			},
 		);
 
-		// Opcional: Se o erro 'isOver$' foi resolvido, descomente esta parte para feedback visual
 		/*
-    // @ts-ignore: Property 'isOver$' does not exist on type 'DropTarget<...>'
+
     this.isOver$ = this.topicTarget.isOver$.pipe(
       takeUntil(this.destroy$)
     );
@@ -134,7 +120,7 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.destroy$.next();
 		this.destroy$.complete();
-		// Cancele a subscrição do DropTarget
+
 		if (this.topicTarget) {
 			this.topicTarget.unsubscribe();
 		}
