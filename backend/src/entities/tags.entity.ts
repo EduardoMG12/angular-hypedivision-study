@@ -7,6 +7,7 @@ import {
 	CreateDateColumn,
 	UpdateDateColumn,
 	Index,
+	DeleteDateColumn,
 } from "typeorm";
 
 @Entity("tags")
@@ -16,8 +17,8 @@ export class Tag {
 	@PrimaryGeneratedColumn("uuid")
 	id: string;
 
-	@Column({ nullable: true })
-	parentId?: string;
+	@Column({ type: "uuid", nullable: true })
+	parentId?: string | null;
 
 	@ManyToOne(() => Tag, { nullable: true, onDelete: "CASCADE" })
 	parent?: Tag;
@@ -40,6 +41,6 @@ export class Tag {
 	@UpdateDateColumn({ nullable: true })
 	updatedAt?: Date;
 
-	@Column({ nullable: true })
-	deletedAt?: Date;
+	@DeleteDateColumn({ name: "delete_at", nullable: true })
+	deletedAt?: Date | null;
 }

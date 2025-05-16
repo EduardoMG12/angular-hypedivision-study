@@ -1,10 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class MigrationsBuild1747236948058 implements MigrationInterface {
-    name = 'MigrationsBuild1747236948058'
+export class MigrationsBuild1747366953735 implements MigrationInterface {
+    name = 'MigrationsBuild1747366953735'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "tags" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "parentId" uuid, "name" character varying(100) NOT NULL, "path" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_e7dc17249a1148a1970748eda99" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "tags" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "parentId" uuid, "name" character varying(100) NOT NULL, "path" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP DEFAULT now(), "delete_at" TIMESTAMP, CONSTRAINT "PK_e7dc17249a1148a1970748eda99" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_be94cbf65113b67b835227f7eb" ON "tags" ("path") `);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_a1bce919e3ca58ee06bfd1ffa2" ON "tags" ("parentId", "name") `);
         await queryRunner.query(`CREATE TABLE "card_content_flip" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "front" text NOT NULL, "back" text NOT NULL, "card_id" uuid NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP DEFAULT now(), CONSTRAINT "REL_addeb12c13d2fe3fab9bb5d2a4" UNIQUE ("card_id"), CONSTRAINT "PK_84312797ef76c80d47b9a875033" PRIMARY KEY ("id"))`);
