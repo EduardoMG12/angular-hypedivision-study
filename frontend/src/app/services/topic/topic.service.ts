@@ -3,6 +3,8 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError, tap, map } from "rxjs/operators";
 import type {
+	MoveTagDto,
+	TagDto,
 	Topic,
 	TopicsApiResponse,
 } from "../../common/api/interfaces/my-cards-list.interface";
@@ -15,10 +17,6 @@ export class TopicService {
 
 	constructor(private http: HttpClient) {}
 
-	/**
-	 * Find all tags.
-	 * Return a Observable to emit array of Topics.
-	 */
 	getTopics(): Observable<Topic[]> {
 		return this.http.get<TopicsApiResponse>(this.apiUrl).pipe(
 			map((response) => response.tags),
@@ -26,8 +24,15 @@ export class TopicService {
 			catchError(this.handleError),
 		);
 	}
+	moveTag(moveTagDto: MoveTagDto): Observable<TagDto> {
+		const url = `${this.apiUrl}/move`;
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		return this.http.put<TagDto>(url, moveTagDto).pipe(
+			tap((updatedTag) => console.log("Tag movida com sucesso:", updatedTag)),
+			catchError(this.handleError),
+		);
+	}
+
 	private handleError(error: any) {
 		console.error("Erro ao buscar tópicos:", error);
 		return throwError(
