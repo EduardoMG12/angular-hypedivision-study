@@ -62,6 +62,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 
 	showListContent = true;
 	showFormContent = false;
+	isContainerHovered = false; // New property for container hover state
 
 	private pendingMove: {
 		cardId?: string;
@@ -119,7 +120,6 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			);
 		});
 
-		// Initialize container drop target
 		this.containerDropTarget = this.dnd.dropTarget<
 			DraggedTopicItem,
 			{ targetParentId: null }
@@ -130,9 +130,17 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				const item = monitor.getItem();
 				return !!item && item.topicId !== "";
 			},
+			hover: (monitor) => {
+				if (monitor.canDrop()) {
+					this.isContainerHovered = true; // Set hover state
+					this.cdr.markForCheck();
+				}
+			},
 			drop: (
 				monitor: DropTargetMonitor<DraggedTopicItem, { targetParentId: null }>,
 			) => {
+				this.isContainerHovered = false; // Reset hover state
+				this.cdr.markForCheck();
 				const draggedItem = monitor.getItem();
 				if (!draggedItem) {
 					console.error("Drop chamado sem item arrastado disponível.");
@@ -151,6 +159,15 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				return { targetParentId: null };
 			},
 		});
+
+		this.containerDropTarget
+			.listen((monitor) => {
+				if (!monitor.isOver() || !monitor.canDrop()) {
+					this.isContainerHovered = false; // Reset hover state when leaving
+					this.cdr.markForCheck();
+				}
+			})
+			.subscribe();
 	}
 
 	ngOnDestroy(): void {

@@ -50,6 +50,7 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 	@Input() topics: Topic[] = [];
 
 	isHovered = false;
+	isDropTargetHovered = false; // New property for drag hover state
 
 	@Output() toggle = new EventEmitter<string>();
 	@Output() cardDroppedOnTopic = new EventEmitter<MoveCardDto>();
@@ -127,21 +128,22 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 				return true;
 			},
 			hover: (monitor) => {
-				if (
-					monitor.canDrop() &&
-					!this.isExpanded(this.topic.id) &&
-					!this.isHovering
-				) {
-					this.isHovering = true;
-					this.hoverTimeout = setTimeout(() => {
-						if (this.isHovering && !this.isExpanded(this.topic.id)) {
-							this.toggleTopic(this.topic.id); // Expand the topic
-						}
-						this.hoverTimeout = null;
-					}, this.HOVER_DELAY);
+				if (monitor.canDrop()) {
+					this.isDropTargetHovered = true; // Set hover state
+					if (!this.isExpanded(this.topic.id) && !this.isHovering) {
+						this.isHovering = true;
+						this.hoverTimeout = setTimeout(() => {
+							if (this.isHovering && !this.isExpanded(this.topic.id)) {
+								console.log(`Expanding topic ${this.topic.id}`);
+								this.toggleTopic(this.topic.id);
+							}
+							this.hoverTimeout = null;
+						}, this.HOVER_DELAY);
+					}
 				}
 			},
 			drop: (monitor) => {
+				this.isDropTargetHovered = false; // Reset hover state
 				this.isHovering = false;
 				if (this.hoverTimeout) {
 					clearTimeout(this.hoverTimeout);
@@ -180,6 +182,7 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 		this.topicTarget
 			.listen((monitor) => {
 				if (!monitor.isOver() || !monitor.canDrop()) {
+					this.isDropTargetHovered = false; // Reset hover state when leaving
 					if (this.hoverTimeout) {
 						clearTimeout(this.hoverTimeout);
 						this.hoverTimeout = null;

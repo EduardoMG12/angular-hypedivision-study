@@ -1,34 +1,29 @@
 <div [ngStyle]="{'padding-left': (level * 1.5) + 'rem'}" class="transition-all duration-200 ease-in-out"
   (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
   <div [dropTarget]="topicTarget" [dragSource]="topicSource"
-    class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2"
-    (click)="toggleTopic(topic.id)">
+    class="flex items-center justify-between py-2 cursor-pointer rounded-md px-2 transition-colors" [ngClass]="{
+      'hover:bg-portage/20': isHovered && !isDropTargetHovered,
+      'bg-portage/30 border border-portage/50': isDropTargetHovered
+    }" (click)="toggleTopic(topic.id)">
     <div class="flex items-center gap-2">
-      <span *ngIf="topic.children?.length || topic.cards?.length"
-        class="text-portage text-lg transition-transform duration-200 ease-in-out"
+      <span class="text-portage text-lg transition-transform duration-200 ease-in-out"
         [ngClass]="{'rotate-90': isExpanded(topic.id)}">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
       </span>
-      <span class="text-white text-xl font-medium">{{ topic.name }}</span>
+      <span class="text-white font-semibold text-lg">{{ topic.name }}</span>
     </div>
     <div class="flex items-center rounded-lg bg-portage/50 px-2 h-6 text-alabaster">
-      <span *ngIf="!isHovered">{{ topic.childrenCardsCount }}</span>
-      <svg *ngIf="isHovered" class="w-4 h-4 text-alabaster cursor-pointer" fill="none" stroke="currentColor"
-        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-      </svg>
+      <span>{{ topic.cards?.length || 0 }}</span>
     </div>
   </div>
-
   <div *ngIf="isExpanded(topic.id)" class="overflow-hidden transition-all duration-300 ease-in-out">
-    <app-topic-item *ngFor="let childTopic of topic.children" [topic]="childTopic" [level]="level + 1"
-      [expandedTopics]="expandedTopics" [topics]="topics" (toggle)="toggle.emit($event)"
-      (cardDroppedOnTopic)="cardDroppedOnTopic.emit($event)" (topicDropped)="topicDropped.emit($event)" />
-    <div *ngIf="topic.cards?.length" [ngStyle]="{'padding-left': '1.5rem'}"
-      class="mt-1 flex flex-col justify-center items-stretch gap-3">
+    <div class="flex flex-col justify-center items-stretch gap-3 mt-1">
       <app-card-drag-drop *ngFor="let card of topic.cards" [card]="card" [originalTopicId]="topic.id" />
     </div>
+    <app-topic-item *ngFor="let child of topic.children" [topic]="child" [level]="level + 1"
+      [expandedTopics]="expandedTopics" [topics]="topics" (toggle)="toggle.emit($event)"
+      (cardDroppedOnTopic)="cardDroppedOnTopic.emit($event)" (topicDropped)="topicDropped.emit($event)" />
   </div>
 </div>
