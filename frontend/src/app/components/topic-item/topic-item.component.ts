@@ -59,6 +59,9 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 	private readonly TOPIC_TYPE = TOPIC_TYPE;
 
 	private destroy$ = new Subject<void>();
+	private hoverTimeout: any = null;
+	private readonly HOVER_DELAY = 500;
+	private isHovering = false;
 
 	topicSource!: DragSource<DraggedTopicItem, TopicDropResult>;
 	topicTarget!: DropTarget<DraggedCardItem | DraggedTopicItem, TopicDropResult>;
@@ -100,7 +103,6 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 			},
 		);
 
-		// Drop Target for Cards and Topics
 		this.topicTarget = this.dnd.dropTarget<
 			DraggedCardItem | DraggedTopicItem,
 			TopicDropResult
@@ -124,12 +126,27 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 				}
 				return true;
 			},
-			drop: (
-				monitor: DropTargetMonitor<
-					DraggedCardItem | DraggedTopicItem,
-					TopicDropResult
-				>,
-			) => {
+			hover: (monitor) => {
+				if (
+					monitor.canDrop() &&
+					!this.isExpanded(this.topic.id) &&
+					!this.isHovering
+				) {
+					this.isHovering = true;
+					this.hoverTimeout = setTimeout(() => {
+						if (this.isHovering && !this.isExpanded(this.topic.id)) {
+							this.toggleTopic(this.topic.id); // Expand the topic
+						}
+						this.hoverTimeout = null;
+					}, this.HOVER_DELAY);
+				}
+			},
+			drop: (monitor) => {
+				this.isHovering = false;
+				if (this.hoverTimeout) {
+					clearTimeout(this.hoverTimeout);
+					this.hoverTimeout = null;
+				}
 				const draggedItem = monitor.getItem();
 				if (!draggedItem) {
 					console.error("Drop chamado sem item arrastado disponível.");
@@ -159,6 +176,18 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 				return { targetTopicId: this.topic.id };
 			},
 		});
+
+		this.topicTarget
+			.listen((monitor) => {
+				if (!monitor.isOver() || !monitor.canDrop()) {
+					if (this.hoverTimeout) {
+						clearTimeout(this.hoverTimeout);
+						this.hoverTimeout = null;
+					}
+					this.isHovering = false;
+				}
+			})
+			.subscribe();
 	}
 
 	ngOnDestroy(): void {
@@ -169,6 +198,9 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 		}
 		if (this.topicTarget) {
 			this.topicTarget.unsubscribe();
+		}
+		if (this.hoverTimeout) {
+			clearTimeout(this.hoverTimeout);
 		}
 	}
 
