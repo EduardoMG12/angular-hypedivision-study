@@ -62,7 +62,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 
 	showListContent = true;
 	showFormContent = false;
-	isContainerHovered = false; // New property for container hover state
+	isContainerHovered = false;
 
 	private pendingMove: {
 		cardId?: string;
@@ -132,14 +132,14 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			},
 			hover: (monitor) => {
 				if (monitor.canDrop()) {
-					this.isContainerHovered = true; // Set hover state
+					this.isContainerHovered = true;
 					this.cdr.markForCheck();
 				}
 			},
 			drop: (
 				monitor: DropTargetMonitor<DraggedTopicItem, { targetParentId: null }>,
 			) => {
-				this.isContainerHovered = false; // Reset hover state
+				this.isContainerHovered = false;
 				this.cdr.markForCheck();
 				const draggedItem = monitor.getItem();
 				if (!draggedItem) {
@@ -163,7 +163,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 		this.containerDropTarget
 			.listen((monitor) => {
 				if (!monitor.isOver() || !monitor.canDrop()) {
-					this.isContainerHovered = false; // Reset hover state when leaving
+					this.isContainerHovered = false;
 					this.cdr.markForCheck();
 				}
 			})
@@ -175,6 +175,23 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 		this.destroy$.complete();
 		if (this.containerDropTarget) {
 			this.containerDropTarget.unsubscribe();
+		}
+	}
+
+	private recalculateChildrenCardsCount(topic: Topic): number {
+		let count = topic.cards?.length || 0;
+		if (topic.children) {
+			for (const child of topic.children) {
+				count += this.recalculateChildrenCardsCount(child);
+			}
+		}
+		topic.childrenCardsCount = count;
+		return count;
+	}
+
+	private updateAllChildrenCardsCount(topics: Topic[]): void {
+		for (const topic of topics) {
+			this.recalculateChildrenCardsCount(topic);
 		}
 	}
 
@@ -252,6 +269,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 							console.log(
 								`Card ${cardId} removido do tópico ${originalTopicId}.`,
 							);
+							this.recalculateChildrenCardsCount(topic); // Update count
 							return card;
 						}
 						console.warn(
@@ -260,7 +278,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 					}
 					if (topic.children && topic.children.length > 0) {
 						const foundInChildren = findAndRemoveInTopics(topic.children);
-						if (foundInChildren) return foundInChildren;
+						if (foundInChildren) {
+							this.recalculateChildrenCardsCount(topic); // Update parent count
+							return foundInChildren;
+						}
 					}
 				}
 				return undefined;
@@ -305,6 +326,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Card ${card.id} adicionado ao tópico ${targetTopicId}.`,
 						);
+						this.recalculateChildrenCardsCount(topic); // Update count
 						return topic;
 					}
 					console.warn(
@@ -314,7 +336,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				}
 				if (topic.children && topic.children.length > 0) {
 					const foundInChildren = findTopicAndAdd(topic.children);
-					if (foundInChildren) return foundInChildren;
+					if (foundInChildren) {
+						this.recalculateChildrenCardsCount(topic); // Update parent count
+						return foundInChildren;
+					}
 				}
 			}
 			return undefined;
@@ -335,6 +360,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			if (foundIndex > -1) {
 				const [removed] = topics.splice(foundIndex, 1);
 				console.log(`Tópico ${tagId} removido de tópicos de nível superior.`);
+				this.updateAllChildrenCardsCount(topics); // Update counts
 				return removed;
 			}
 			console.warn(
@@ -352,6 +378,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Tópico ${tagId} removido do tópico pai ${originalParentId}.`,
 						);
+						this.recalculateChildrenCardsCount(topic); // Update parent count
 						return removed;
 					}
 					console.warn(
@@ -360,7 +387,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				}
 				if (topic.children && topic.children.length > 0) {
 					const foundInChildren = findAndRemoveInTopics(topic.children);
-					if (foundInChildren) return foundInChildren;
+					if (foundInChildren) {
+						this.recalculateChildrenCardsCount(topic); // Update parent count
+						return foundInChildren;
+					}
 				}
 			}
 			return undefined;
@@ -394,6 +424,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				console.log(
 					`Tópico ${topic.id} adicionado a tópicos de nível superior.`,
 				);
+				this.updateAllChildrenCardsCount(topics); // Update counts
 				return true;
 			}
 			console.warn(
@@ -420,6 +451,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Tópico ${topic.id} adicionado ao tópico pai ${targetParentId}.`,
 						);
+						this.recalculateChildrenCardsCount(parent); // Update parent count
 						return parent;
 					}
 					console.warn(
@@ -429,7 +461,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				}
 				if (parent.children && parent.children.length > 0) {
 					const foundInChildren = findTopicAndAdd(parent.children);
-					if (foundInChildren) return foundInChildren;
+					if (foundInChildren) {
+						this.recalculateChildrenCardsCount(parent); // Update parent count
+						return foundInChildren;
+					}
 				}
 			}
 			return undefined;
@@ -512,6 +547,16 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				next: () => {
 					console.log("Movimento de card persistido com sucesso na API.");
 					this.pendingMove = null;
+					// Refresh topics to ensure childrenCardsCount is correct
+					this.topicService.getTopics().subscribe({
+						next: (topics) => {
+							this.topics = Array.isArray(topics) ? topics : [];
+							this.initializeExpandedState(this.topics);
+							this.cdr.markForCheck();
+						},
+						error: (err) =>
+							console.error("Erro ao recarregar tópicos após mover card:", err),
+					});
 				},
 				error: (error: any) => {
 					console.error("Erro ao persistir movimento do card na API:", error);
@@ -627,7 +672,16 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			next: () => {
 				console.log("Movimento de tópico persistido com sucesso na API.");
 				this.pendingMove = null;
-				this.cdr.markForCheck();
+				// Refresh topics to ensure childrenCardsCount is correct
+				this.topicService.getTopics().subscribe({
+					next: (topics) => {
+						this.topics = Array.isArray(topics) ? topics : [];
+						this.initializeExpandedState(this.topics);
+						this.cdr.markForCheck();
+					},
+					error: (err) =>
+						console.error("Erro ao recarregar tópicos após mover tópico:", err),
+				});
 			},
 			error: (error: any) => {
 				console.error("Erro ao persistir movimento do tópico na API:", error);

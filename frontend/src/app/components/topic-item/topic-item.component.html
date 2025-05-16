@@ -15,7 +15,7 @@
       <span class="text-white font-semibold text-lg">{{ topic.name }}</span>
     </div>
     <div class="flex items-center rounded-lg bg-portage/50 px-2 h-6 text-alabaster">
-      <span>{{ topic.cards?.length || 0 }}</span>
+      <span>{{ topic.childrenCardsCount || 0 }}</span>
     </div>
   </div>
   <div *ngIf="isExpanded(topic.id)" class="overflow-hidden transition-all duration-300 ease-in-out">
