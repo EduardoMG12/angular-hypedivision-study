@@ -8,20 +8,25 @@ import {
 	OnDestroy,
 } from "@angular/core";
 import {
+	DndService,
+	DragSource,
+	DropTarget,
+	DragSourceMonitor,
+	DropTargetMonitor,
+	DragSourceDirective,
+	DropTargetDirective,
+} from "@ng-dnd/core";
+import { Subject } from "rxjs";
+import {
 	CARD_TYPE,
-	DraggedCardItem,
+	TOPIC_TYPE,
 	Topic,
+	DraggedCardItem,
+	DraggedTopicItem,
+	MoveCardDto,
+	MoveTopicDto,
 } from "../../common/api/interfaces/my-cards-list.interface";
 import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
-
-import {
-	DndService,
-	DropTarget,
-	DropTargetDirective,
-	DropTargetMonitor,
-} from "@ng-dnd/core";
-import { Observable, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
 
 type TopicDropResult = { targetTopicId: string };
 
@@ -32,8 +37,9 @@ type TopicDropResult = { targetTopicId: string };
 		CommonModule,
 		NgStyle,
 		NgClass,
-		CardDragDropComponent,
+		DragSourceDirective,
 		DropTargetDirective,
+		CardDragDropComponent,
 	],
 	templateUrl: "./topic-item.component.html",
 })
@@ -41,86 +47,126 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 	@Input() topic!: Topic;
 	@Input() level = 0;
 	@Input() expandedTopics!: Map<string, boolean>;
+	@Input() topics: Topic[] = [];
 
 	isHovered = false;
 
 	@Output() toggle = new EventEmitter<string>();
-
-	@Output() cardDroppedOnTopic = new EventEmitter<{
-		cardId: string;
-		originalTopicId: string | undefined;
-		targetTopicId: string;
-	}>();
+	@Output() cardDroppedOnTopic = new EventEmitter<MoveCardDto>();
+	@Output() topicDropped = new EventEmitter<MoveTopicDto>();
 
 	private readonly CARD_TYPE = CARD_TYPE;
+	private readonly TOPIC_TYPE = TOPIC_TYPE;
 
 	private destroy$ = new Subject<void>();
 
-	topicTarget!: DropTarget<DraggedCardItem, TopicDropResult>;
+	topicSource!: DragSource<DraggedTopicItem, TopicDropResult>;
+	topicTarget!: DropTarget<DraggedCardItem | DraggedTopicItem, TopicDropResult>;
 
 	constructor(private dnd: DndService) {}
 
 	ngOnInit(): void {
-		this.topicTarget = this.dnd.dropTarget<DraggedCardItem, TopicDropResult>(
-			this.CARD_TYPE,
+		this.topicSource = this.dnd.dragSource<DraggedTopicItem, TopicDropResult>(
+			this.TOPIC_TYPE,
 			{
-				// canDrop é opcional, para controlar se o item pode ser solto aqui
-				// canDrop: (monitor: DropTargetMonitor<DraggedCardItem, TopicDropResult>) => {
-				//   // Exemplo: não permite soltar um card no próprio tópico
-				//   const draggedItem = monitor.getItem();
-				//   return draggedItem.originalTopicId !== this.topic.id;
-				// },
-
-				// drop é chamado quando um item é solto NESTE target
-				drop: (
-					monitor: DropTargetMonitor<DraggedCardItem, TopicDropResult>,
+				beginDrag: () => {
+					console.log("Iniciando arrasto do tópico:", this.topic.name);
+					const parentId = this.findParentId(this.topic.id, this.topics);
+					const item: DraggedTopicItem = {
+						topicId: this.topic.id,
+						originalParentId: parentId,
+					};
+					return item;
+				},
+				endDrag: (
+					monitor: DragSourceMonitor<DraggedTopicItem, TopicDropResult>,
 				) => {
-					const draggedItem = monitor.getItem(); // O item arrastado (do tipo DraggedCardItem)
-					const didDrop = monitor.didDrop(); // Deve ser true aqui
+					const draggedItem = monitor.getItem();
+					const dropResult = monitor.getDropResult();
+					const didDrop = monitor.didDrop();
 
 					if (!draggedItem) {
-						console.error("Drop chamado sem item arrastado disponível.");
+						console.error("endDrag chamado sem item arrastado disponível.");
 						return;
 					}
 
-					console.log(
-						`Card ${draggedItem.card.title} soltado no tópico ${this.topic.name}`,
-					);
-					console.log(`Origem: ${draggedItem.originalTopicId || "Sem Tag"}`);
-					console.log(`Destino: ${this.topic.id}`);
-
-					// EMITIR O EVENTO AQUI!
-					// Este componente DropTarget notifica o pai (CardListComponent)
-					// que um card foi solto, passando as informações necessárias.
-					this.cardDroppedOnTopic.emit({
-						cardId: draggedItem.card.id, // Assume que o Card tem _id
-						originalTopicId: draggedItem.originalTopicId,
-						targetTopicId: this.topic.id,
-					});
-
-					// Opcional: Retornar um resultado para o endDrag do DragSource
-					return { targetTopicId: this.topic.id };
+					console.log("Arrasto finalizado para o tópico:", draggedItem.topicId);
+					if (didDrop && dropResult) {
+						console.log("Soltado em:", dropResult);
+					} else {
+						console.log("Arrasto cancelado ou não soltado em um local válido.");
+					}
 				},
-
-				// hover: Opcional, chamado enquanto um item arrastado está sobre este target
-				// hover: (monitor: DropTargetMonitor<DraggedCardItem, TopicDropResult>) => {
-				//   // Adicionar feedback visual aqui, se necessário
-				// }
 			},
 		);
 
-		/*
+		// Drop Target for Cards and Topics
+		this.topicTarget = this.dnd.dropTarget<
+			DraggedCardItem | DraggedTopicItem,
+			TopicDropResult
+		>([this.CARD_TYPE, this.TOPIC_TYPE], {
+			canDrop: (
+				monitor: DropTargetMonitor<
+					DraggedCardItem | DraggedTopicItem,
+					TopicDropResult
+				>,
+			) => {
+				const item = monitor.getItem();
+				if (!item) return false;
 
-    this.isOver$ = this.topicTarget.isOver$.pipe(
-      takeUntil(this.destroy$)
-    );
-    */
+				if ("card" in item) {
+					return item.originalTopicId !== this.topic.id;
+				}
+				if ("topicId" in item) {
+					return (
+						item.topicId !== this.topic.id && !this.isDescendant(item.topicId)
+					);
+				}
+				return true;
+			},
+			drop: (
+				monitor: DropTargetMonitor<
+					DraggedCardItem | DraggedTopicItem,
+					TopicDropResult
+				>,
+			) => {
+				const draggedItem = monitor.getItem();
+				if (!draggedItem) {
+					console.error("Drop chamado sem item arrastado disponível.");
+					return;
+				}
+
+				if ("card" in draggedItem) {
+					console.log(
+						`Card ${draggedItem.card.title} soltado no tópico ${this.topic.name}`,
+					);
+					this.cardDroppedOnTopic.emit({
+						cardId: draggedItem.card.id,
+						originalTopicId: draggedItem.originalTopicId,
+						targetTopicId: this.topic.id,
+					});
+				} else if ("topicId" in draggedItem) {
+					console.log(
+						`Tópico ${draggedItem.topicId} soltado no tópico ${this.topic.name}`,
+					);
+					this.topicDropped.emit({
+						topicId: draggedItem.topicId,
+						originalParentId: draggedItem.originalParentId,
+						targetParentId: this.topic.id,
+					});
+				}
+
+				return { targetTopicId: this.topic.id };
+			},
+		});
 	}
 
 	ngOnDestroy(): void {
 		this.destroy$.next();
 		this.destroy$.complete();
-
+		if (this.topicSource) {
+			this.topicSource.unsubscribe();
+		}
 		if (this.topicTarget) {
 			this.topicTarget.unsubscribe();
 		}
@@ -132,5 +178,29 @@ export class TopicItemComponent implements OnInit, OnDestroy {
 
 	isExpanded(topicId: string): boolean {
 		return this.expandedTopics.get(topicId) || false;
+	}
+
+	private findParentId(topicId: string, topics: Topic[]): string | undefined {
+		for (const topic of topics) {
+			if (topic.children?.some((child) => child.id === topicId)) {
+				return topic.id;
+			}
+			if (topic.children && topic.children.length > 0) {
+				const parentId = this.findParentId(topicId, topic.children);
+				if (parentId) return parentId;
+			}
+		}
+		return undefined;
+	}
+
+	private isDescendant(topicId: string): boolean {
+		const checkChildren = (children: Topic[]): boolean => {
+			return children.some((child) => {
+				if (child.id === topicId) return true;
+				if (child.children) return checkChildren(child.children);
+				return false;
+			});
+		};
+		return checkChildren(this.topic.children || []);
 	}
 }

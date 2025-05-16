@@ -20,8 +20,7 @@
     </button>
   </div>
 
-  <div class="space-y-2">
-
+  <div class="space-y-2" [dropTarget]="topLevelTarget">
     <div *ngIf="cardsWithoutTags && cardsWithoutTags.length > 0" class="mb-4 pb-4 border-b border-charade">
       <div class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2"
         (click)="toggleCardsWithoutTags()">
@@ -40,13 +39,12 @@
         </div>
       </div>
       <div *ngIf="areCardsWithoutTagsExpanded" class="flex flex-col justify-center items-stretch gap-3 mt-1">
-        <app-card-drag-drop *ngFor="let card of cardsWithoutTags" [card]="card"
-          [originalTopicId]="undefined"></app-card-drag-drop>
+        <app-card-drag-drop *ngFor="let card of cardsWithoutTags" [card]="card" [originalTopicId]="undefined" />
       </div>
     </div>
 
-
     <app-topic-item *ngFor="let topic of topics" [topic]="topic" [level]="0" [expandedTopics]="expandedTopics"
-      (toggle)="toggleTopic.emit($event)" (cardDroppedOnTopic)="onCardDroppedOnTopic($event)"></app-topic-item>
+      [topics]="topics" (toggle)="toggleTopic.emit($event)" (cardDroppedOnTopic)="onCardDroppedOnTopic($event)"
+      (topicDropped)="onTopicDropped($event)" />
   </div>
 </div>

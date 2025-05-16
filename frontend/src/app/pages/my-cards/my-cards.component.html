@@ -21,11 +21,10 @@
           @fadeAnimation [topics]="topics" [expandedTopics]="expandedTopics" [allExpanded]="allExpanded"
           [cardsWithoutTags]="cardsWithoutTags" [expandAllCardsWithoutTags]="expandCardsWithoutTags"
           (toggleTopic)="toggleTopic($event)" (toggleAllTopics)="toggleAllTopics()"
-          (cardDroppedOnTopic)="handleCardDropped($event)"> </app-card-list>
-
+          (cardDroppedOnTopic)="handleCardDropped($event)" (topicDropped)="handleTopicDropped($event)" />
         <app-empty-card-library
           *ngIf="(!topics || topics.length === 0) && (!cardsWithoutTags || cardsWithoutTags.length === 0)"
-          (openCreateCard)="goToCreateCardForm()"></app-empty-card-library>
+          (openCreateCard)="goToCreateCardForm()" />
       </ng-container>
     </div>
 

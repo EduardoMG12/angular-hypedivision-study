@@ -13,12 +13,12 @@ import type {
 	providedIn: "root",
 })
 export class TopicService {
-	private apiUrl = "http://localhost:3000/tags/getAllTags";
+	private apiUrl = "http://localhost:3000/tags";
 
 	constructor(private http: HttpClient) {}
 
 	getTopics(): Observable<Topic[]> {
-		return this.http.get<TopicsApiResponse>(this.apiUrl).pipe(
+		return this.http.get<TopicsApiResponse>(`${this.apiUrl}/getAllTags`).pipe(
 			map((response) => response.tags),
 			tap((data) => console.log("Dados de tópicos carregados:", data)),
 			catchError(this.handleError),

@@ -1,29 +1,23 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
 import { SideBarComponent } from "../../components/side-bar/side-bar.component";
 import type {
 	Card,
-	Topic,
 	CardSimple,
+	Topic,
 	MoveCardDto,
+	MoveTopicDto,
 } from "../../common/api/interfaces/my-cards-list.interface";
 import { ActivatedRoute, Data } from "@angular/router";
 import { EmptyCardLibraryComponent } from "../../components/empty-card-library/empty-card-library.component";
 import { CardListComponent } from "../../components/card-list/card-list.component";
 import { FormularyCreateCardComponent } from "../../components/formulary-create-card/formulary-create-card.component";
-import {
-	trigger,
-	transition,
-	style,
-	animate,
-	query,
-} from "@angular/animations";
+import { trigger, transition, style, animate } from "@angular/animations";
 import { ArrowLeftIconComponent } from "../../components/icons/arrow-left-icon/arrow-left-icon.component";
 import { HttpClient } from "@angular/common/http";
 import { CardService } from "../../services/requests/card/card.service";
 import { MyCardsResolvedData } from "../../resolver/requests/my-cards-data/my-card-data.service";
 import { TopicService } from "../../services/topic/topic.service";
-import { Observable } from "rxjs";
 
 @Component({
 	selector: "app-my-cards",
@@ -60,10 +54,13 @@ export class MyCardsComponent implements OnInit {
 	showFormContent = false;
 
 	private pendingMove: {
-		cardId: string;
-		originalTopicId: string | undefined | null;
-		targetTopicId: string | undefined | null;
-		card: Card | CardSimple;
+		cardId?: string;
+		tagId?: string;
+		originalTopicId?: string | null;
+		targetTopicId?: string | null;
+		card?: Card | CardSimple;
+		originalParentId?: string | null;
+		targetParentId?: string | null;
 	} | null = null;
 
 	constructor(
@@ -71,6 +68,7 @@ export class MyCardsComponent implements OnInit {
 		private cardService: CardService,
 		private topicService: TopicService,
 		private http: HttpClient,
+		private cdr: ChangeDetectorRef,
 	) {}
 
 	ngOnInit(): void {
@@ -84,7 +82,6 @@ export class MyCardsComponent implements OnInit {
 				this.topics = Array.isArray(resolvedData.topics)
 					? resolvedData.topics
 					: [];
-
 				this.cardsWithoutTags = Array.isArray(resolvedData.cardsWithoutTags)
 					? (resolvedData.cardsWithoutTags as (Card | CardSimple)[])
 					: [];
@@ -137,6 +134,17 @@ export class MyCardsComponent implements OnInit {
 		return findInTopics(topics);
 	}
 
+	private findTopic(tagId: string, topics: Topic[]): Topic | undefined {
+		for (const topic of topics) {
+			if (topic.id === tagId) return topic;
+			if (topic.children && topic.children.length > 0) {
+				const foundInChildren = this.findTopic(tagId, topic.children);
+				if (foundInChildren) return foundInChildren;
+			}
+		}
+		return undefined;
+	}
+
 	private removeCardFromOriginalLocation(
 		cardId: string,
 		originalTopicId: string | undefined | null,
@@ -146,12 +154,11 @@ export class MyCardsComponent implements OnInit {
 		let removedCard: (Card | CardSimple) | undefined = undefined;
 
 		if (originalTopicId === undefined || originalTopicId === null) {
-			const initialLength = cardsWithoutTags.length;
-			const originalArray = this.cardsWithoutTags;
-
-			const foundIndex = originalArray.findIndex((card) => card.id === cardId);
+			const foundIndex = cardsWithoutTags.findIndex(
+				(card) => card.id === cardId,
+			);
 			if (foundIndex > -1) {
-				const [removed] = originalArray.splice(foundIndex, 1);
+				const [removed] = cardsWithoutTags.splice(foundIndex, 1);
 				removedCard = removed;
 				console.log(`Card ${cardId} removido de cardsWithoutTags.`);
 			} else {
@@ -173,19 +180,15 @@ export class MyCardsComponent implements OnInit {
 							console.log(
 								`Card ${cardId} removido do tópico ${originalTopicId}.`,
 							);
-
 							return card;
 						}
 						console.warn(
 							`Card with ID ${cardId} not found in topic ${originalTopicId}'s cards for removal.`,
 						);
 					}
-
 					if (topic.children && topic.children.length > 0) {
 						const foundInChildren = findAndRemoveInTopics(topic.children);
-						if (foundInChildren) {
-							return foundInChildren;
-						}
+						if (foundInChildren) return foundInChildren;
 					}
 				}
 				return undefined;
@@ -210,9 +213,8 @@ export class MyCardsComponent implements OnInit {
 		if (targetTopicId === undefined || targetTopicId === null) {
 			const alreadyExists = cardsWithoutTags.some((c) => c.id === card.id);
 			if (!alreadyExists) {
-				this.cardsWithoutTags.push(card);
+				cardsWithoutTags.push(card);
 				console.log(`Card ${card.id} adicionado a cardsWithoutTags.`);
-
 				return true;
 			}
 			console.warn(
@@ -224,17 +226,13 @@ export class MyCardsComponent implements OnInit {
 		const findTopicAndAdd = (topicList: Topic[]): Topic | undefined => {
 			for (const topic of topicList) {
 				if (topic.id === targetTopicId) {
-					if (!topic.cards) {
-						topic.cards = [];
-					}
-
+					if (!topic.cards) topic.cards = [];
 					const alreadyExists = topic.cards.some((c) => c.id === card.id);
 					if (!alreadyExists) {
 						topic.cards.push(card);
 						console.log(
 							`Card ${card.id} adicionado ao tópico ${targetTopicId}.`,
 						);
-
 						return topic;
 					}
 					console.warn(
@@ -242,20 +240,132 @@ export class MyCardsComponent implements OnInit {
 					);
 					return undefined;
 				}
-
 				if (topic.children && topic.children.length > 0) {
 					const foundInChildren = findTopicAndAdd(topic.children);
-					if (foundInChildren) {
-						return foundInChildren;
-					}
+					if (foundInChildren) return foundInChildren;
 				}
 			}
 			return undefined;
 		};
 		const targetTopic = findTopicAndAdd(topics);
-
 		return (
 			!!targetTopic && targetTopic.cards?.some((c) => c.id === card.id) === true
+		);
+	}
+
+	private removeTopicFromOriginalLocation(
+		tagId: string,
+		originalParentId: string | undefined | null,
+		topics: Topic[],
+	): Topic | undefined {
+		if (originalParentId === undefined || originalParentId === null) {
+			const foundIndex = topics.findIndex((t) => t.id === tagId);
+			if (foundIndex > -1) {
+				const [removed] = topics.splice(foundIndex, 1);
+				console.log(`Tópico ${tagId} removido de tópicos de nível superior.`);
+				return removed;
+			}
+			console.warn(
+				`Tópico ${tagId} não encontrado em tópicos de nível superior para remoção.`,
+			);
+			return undefined;
+		}
+
+		const findAndRemoveInTopics = (topicList: Topic[]): Topic | undefined => {
+			for (const topic of topicList) {
+				if (topic.id === originalParentId && topic.children) {
+					const foundIndex = topic.children.findIndex((t) => t.id === tagId);
+					if (foundIndex > -1) {
+						const [removed] = topic.children.splice(foundIndex, 1);
+						console.log(
+							`Tópico ${tagId} removido do tópico pai ${originalParentId}.`,
+						);
+						return removed;
+					}
+					console.warn(
+						`Tópico ${tagId} não encontrado nos filhos do tópico ${originalParentId}.`,
+					);
+				}
+				if (topic.children && topic.children.length > 0) {
+					const foundInChildren = findAndRemoveInTopics(topic.children);
+					if (foundInChildren) return foundInChildren;
+				}
+			}
+			return undefined;
+		};
+		return findAndRemoveInTopics(topics);
+	}
+
+	private addTopicToTargetLocation(
+		topic: Topic,
+		targetParentId: string | undefined | null,
+		topics: Topic[],
+		position?: number,
+	): boolean {
+		if (!topic) {
+			console.error("Attempted to add a null/undefined topic.");
+			return false;
+		}
+
+		if (targetParentId === undefined || targetParentId === null) {
+			const alreadyExists = topics.some((t) => t.id === topic.id);
+			if (!alreadyExists) {
+				if (
+					position !== undefined &&
+					position >= 0 &&
+					position <= topics.length
+				) {
+					topics.splice(position, 0, topic);
+				} else {
+					topics.push(topic);
+				}
+				console.log(
+					`Tópico ${topic.id} adicionado a tópicos de nível superior.`,
+				);
+				return true;
+			}
+			console.warn(
+				`Tópico ${topic.id} já existe em tópicos de nível superior. Pulando adição.`,
+			);
+			return false;
+		}
+
+		const findTopicAndAdd = (topicList: Topic[]): Topic | undefined => {
+			for (const parent of topicList) {
+				if (parent.id === targetParentId) {
+					if (!parent.children) parent.children = [];
+					const alreadyExists = parent.children.some((t) => t.id === topic.id);
+					if (!alreadyExists) {
+						if (
+							position !== undefined &&
+							position >= 0 &&
+							position <= parent.children.length
+						) {
+							parent.children.splice(position, 0, topic);
+						} else {
+							parent.children.push(topic);
+						}
+						console.log(
+							`Tópico ${topic.id} adicionado ao tópico pai ${targetParentId}.`,
+						);
+						return parent;
+					}
+					console.warn(
+						`Tópico ${topic.id} já existe nos filhos do tópico ${targetParentId}. Pulando adição.`,
+					);
+					return undefined;
+				}
+				if (parent.children && parent.children.length > 0) {
+					const foundInChildren = findTopicAndAdd(parent.children);
+					if (foundInChildren) return foundInChildren;
+				}
+			}
+			return undefined;
+		};
+		const targetParent = findTopicAndAdd(topics);
+		return (
+			!!targetParent &&
+			targetParent.children?.some((t) => t.id === topic.id) === true
 		);
 	}
 
@@ -308,14 +418,12 @@ export class MyCardsComponent implements OnInit {
 			console.error(
 				`Falha ao adicionar card ${cardId} otimisticamente ao destino ${targetTopicId || "Sem Tag"}. Revertendo remoção.`,
 			);
-
 			this.addCardToTargetLocation(
 				cardToMove,
 				originalTopicId,
 				this.topics,
 				this.cardsWithoutTags,
 			);
-
 			return;
 		}
 
@@ -335,7 +443,6 @@ export class MyCardsComponent implements OnInit {
 				},
 				error: (error: any) => {
 					console.error("Erro ao persistir movimento do card na API:", error);
-
 					console.warn(
 						"Falha na chamada da API. Revertendo atualização da UI.",
 					);
@@ -349,7 +456,8 @@ export class MyCardsComponent implements OnInit {
 						} = this.pendingMove;
 
 						const cardToRollback = this.removeCardFromOriginalLocation(
-							movedCardId,
+							// biome-ignore lint/style/noNonNullAssertion: <explanation>
+							movedCardId!,
 							target,
 							this.topics,
 							this.cardsWithoutTags,
@@ -390,6 +498,118 @@ export class MyCardsComponent implements OnInit {
 			});
 	}
 
+	handleTopicDropped(event: MoveTopicDto): void {
+		console.log("Topic Dropped Event Received in MyCardsComponent:", event);
+		const { topicId, originalParentId, targetParentId } = event;
+
+		if (
+			(originalParentId === undefined || originalParentId === null) &&
+			(targetParentId === undefined || targetParentId === null)
+		) {
+			console.log(
+				"Attempted to drop topic in the same location (top-level to top-level). No action needed.",
+			);
+			return;
+		}
+		if (originalParentId === targetParentId) {
+			console.log(
+				`Attempted to drop topic ${topicId} in the same parent ${originalParentId}. No action needed.`,
+			);
+			return;
+		}
+
+		const topicToMove = this.removeTopicFromOriginalLocation(
+			topicId,
+			originalParentId,
+			this.topics,
+		);
+
+		if (!topicToMove) {
+			console.error(
+				`Falha ao encontrar tópico com ID ${topicId} para remoção otimista na origem ${originalParentId || "top-level"}.`,
+			);
+			return;
+		}
+
+		const addedSuccessfully = this.addTopicToTargetLocation(
+			topicToMove,
+			targetParentId,
+			this.topics,
+		);
+
+		if (!addedSuccessfully) {
+			console.error(
+				`Falha ao adicionar tópico ${topicId} otimisticamente ao destino ${targetParentId || "top-level"}. Revertendo remoção.`,
+			);
+			this.addTopicToTargetLocation(topicToMove, originalParentId, this.topics);
+			return;
+		}
+
+		this.pendingMove = {
+			tagId: topicId,
+			originalParentId,
+			targetParentId,
+		};
+
+		this.topicService.moveTag({ tagId: topicId, targetParentId }).subscribe({
+			next: () => {
+				console.log("Movimento de tópico persistido com sucesso na API.");
+				this.pendingMove = null;
+				this.cdr.markForCheck();
+			},
+			error: (error: any) => {
+				console.error("Erro ao persistir movimento do tópico na API:", error);
+				console.warn("Falha na chamada da API. Revertendo atualização da UI.");
+
+				if (this.pendingMove) {
+					const {
+						tagId: movedTopicId,
+						originalParentId: original,
+						targetParentId: target,
+					} = this.pendingMove;
+
+					const topicToRollback = this.removeTopicFromOriginalLocation(
+						// biome-ignore lint/style/noNonNullAssertion: <explanation>
+						movedTopicId!,
+						target,
+						this.topics,
+					);
+
+					if (topicToRollback) {
+						this.addTopicToTargetLocation(
+							topicToRollback,
+							original,
+							this.topics,
+						);
+						console.log(
+							`Rolled back topic ${movedTopicId} de volta para ${original || "top-level"}.`,
+						);
+					} else {
+						console.error(
+							`Falha catastrófica no rollback: Não foi possível encontrar o tópico ${movedTopicId} na localização de destino ${target || "top-level"} durante a reversão.`,
+						);
+						console.warn(
+							"Fallback: Forçando recarga completa dos dados após falha crítica no rollback.",
+						);
+						this.loadCardsWithoutTags();
+						this.topicService.getTopics().subscribe({
+							next: (topics) => {
+								this.topics = Array.isArray(topics) ? topics : [];
+								this.initializeExpandedState(this.topics);
+								this.cdr.markForCheck();
+							},
+							error: (err) =>
+								console.error("Erro durante a recarga de fallback:", err),
+						});
+					}
+					this.pendingMove = null;
+				}
+
+				alert("Falha ao mover o tópico. Por favor, tente novamente.");
+			},
+		});
+	}
+
 	loadCardsWithoutTags(): void {
 		this.cardService.findAllWithoutTags().subscribe({
 			next: (cards) => {
@@ -402,10 +622,12 @@ export class MyCardsComponent implements OnInit {
 					"Length:",
 					this.cardsWithoutTags.length,
 				);
+				this.cdr.markForCheck();
 			},
 			error: (error: any) => {
 				console.error("Erro ao carregar cards sem tags:", error);
 				this.cardsWithoutTags = [];
+				this.cdr.markForCheck();
 			},
 		});
 	}
@@ -420,8 +642,8 @@ export class MyCardsComponent implements OnInit {
 		this.topicService.getTopics().subscribe({
 			next: (topics) => {
 				this.topics = Array.isArray(topics) ? topics : [];
-
 				this.initializeExpandedState(this.topics);
+				this.cdr.markForCheck();
 			},
 			error: (error: any) =>
 				console.error("Erro ao recarregar tópicos:", error),
@@ -444,11 +666,12 @@ export class MyCardsComponent implements OnInit {
 		this.expandedTopics = new Map(this.expandedTopics);
 	}
 
-	toggleTopic(topicId: string): void {
-		const currentState = this.expandedTopics.get(topicId) || false;
+	toggleTopic(tagId: string): void {
+		const currentState = this.expandedTopics.get(tagId) || false;
 		this.expandedTopics = new Map(
-			this.expandedTopics.set(topicId, !currentState),
+			this.expandedTopics.set(tagId, !currentState),
 		);
+		this.cdr.markForCheck();
 	}
 
 	toggleAllTopics(): void {
@@ -456,6 +679,7 @@ export class MyCardsComponent implements OnInit {
 		this.setExpandedStateForAll(this.topics, this.allExpanded);
 		this.expandCardsWithoutTags = this.allExpanded;
 		this.expandedTopics = new Map(this.expandedTopics);
+		this.cdr.markForCheck();
 	}
 
 	private setExpandedStateForAll(topics: Topic[], state: boolean): void {
@@ -475,6 +699,7 @@ export class MyCardsComponent implements OnInit {
 			next: (topics) => {
 				this.topics = Array.isArray(topics) ? topics : [];
 				this.initializeExpandedState(this.topics);
+				this.cdr.markForCheck();
 			},
 			error: (error: any) => {
 				console.log("Erro ao carregar topicos:", error);

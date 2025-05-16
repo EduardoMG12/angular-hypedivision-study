@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, OnDestroy } from "@angular/core";
-import { CommonModule, NgStyle } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import {
 	DndService,
 	DragSource,

@@ -1,7 +1,8 @@
 <div [ngStyle]="{'padding-left': (level * 1.5) + 'rem'}" class="transition-all duration-200 ease-in-out"
   (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
-  <div [dropTarget]="topicTarget" (click)="toggleTopic(topic.id)"
-    class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2">
+  <div [dropTarget]="topicTarget" [dragSource]="topicSource"
+    class="flex items-center justify-between py-2 cursor-pointer hover:bg-portage/20 rounded-md px-2"
+    (click)="toggleTopic(topic.id)">
     <div class="flex items-center gap-2">
       <span *ngIf="topic.children?.length || topic.cards?.length"
         class="text-portage text-lg transition-transform duration-200 ease-in-out"
@@ -22,14 +23,12 @@
   </div>
 
   <div *ngIf="isExpanded(topic.id)" class="overflow-hidden transition-all duration-300 ease-in-out">
-
     <app-topic-item *ngFor="let childTopic of topic.children" [topic]="childTopic" [level]="level + 1"
-      [expandedTopics]="expandedTopics" (toggle)="toggle.emit($event)"
-      (cardDroppedOnTopic)="cardDroppedOnTopic.emit($event)"> </app-topic-item>
+      [expandedTopics]="expandedTopics" [topics]="topics" (toggle)="toggle.emit($event)"
+      (cardDroppedOnTopic)="cardDroppedOnTopic.emit($event)" (topicDropped)="topicDropped.emit($event)" />
     <div *ngIf="topic.cards?.length" [ngStyle]="{'padding-left': '1.5rem'}"
       class="mt-1 flex flex-col justify-center items-stretch gap-3">
-      <app-card-drag-drop *ngFor="let card of topic.cards" [card]="card"
-        [originalTopicId]="topic.id"></app-card-drag-drop>
+      <app-card-drag-drop *ngFor="let card of topic.cards" [card]="card" [originalTopicId]="topic.id" />
     </div>
   </div>
 </div>

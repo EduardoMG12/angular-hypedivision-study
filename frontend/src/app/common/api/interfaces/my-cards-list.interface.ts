@@ -50,6 +50,7 @@ export interface CardDropEvent {
 export interface MoveTagDto {
 	tagId: string;
 	targetParentId: string | undefined | null;
+	originalParentId?: string | undefined | null;
 }
 
 export interface TagDto {
@@ -89,3 +90,24 @@ export interface TagDropEvent {
 }
 
 export type ItemDropEvent = CardDropEvent | TagDropEvent;
+
+// src/app/common/api/interfaces/my-cards-list.interface.ts
+export const TOPIC_TYPE = "TOPIC";
+
+export interface DraggedCardItem {
+	card: Card | CardSimple;
+	originalTopicId?: string | undefined;
+}
+
+export interface DraggedTopicItem {
+	topicId: string;
+	originalParentId?: string | undefined; // Changed to originalParentId
+}
+
+export interface MoveTopicDto {
+	topicId: string;
+	originalParentId?: string | undefined; // Changed to originalParentId
+	targetParentId?: string | undefined | null; // Changed to targetParentId
+}
+
+// Other interfaces (Card, CardSimple, etc.) remain unchanged
