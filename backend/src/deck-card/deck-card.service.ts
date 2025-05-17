@@ -7,7 +7,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { DeckCard } from "src/entities/deckCards.entity";
+import { DeckCard } from "src/entities/deck-cards.entity";
 import { DeckService } from "src/deck/deck.service";
 import { CardService } from "src/card/card.service";
 import { AddCardToDeckDto } from "./dto/add-card-to-deck.dto";

@@ -3,8 +3,8 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { TermsOfUseService } from "./terms-of-use.service";
 import { TermsOfUseController } from "./terms-of-use.controller";
 
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
-import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
+import { UserTermsAcceptance } from "src/entities/user-terms-acceptance.entity";
 import { UsersModule } from "src/users/users.module";
 
 @Module({

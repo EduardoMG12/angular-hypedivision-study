@@ -8,7 +8,7 @@ import {
 	OneToMany,
 } from "typeorm";
 import { User } from "./user.entity";
-import { GroupDecksStatus } from "./common/enums/groupDecksStatus.enum";
+import { GroupDecksStatus } from "./common/enums/group-decks-status.enum";
 import { Deck } from "./decks.entity";
 
 @Entity("group_decks")

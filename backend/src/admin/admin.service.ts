@@ -5,7 +5,7 @@ import { BcryptAdapter } from "src/common/adapter/bcrypt.adapter";
 import { User } from "src/entities/user.entity";
 import { Repository } from "typeorm";
 import { CreateTermsOfUseDto } from "src/terms-of-use/dto/create-terms-of-use.dto";
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
 import { TermsOfUseService } from "src/terms-of-use/terms-of-use.service";
 
 @Injectable()

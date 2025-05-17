@@ -14,12 +14,12 @@ import { GroupDecksService } from "src/group-decks/group-decks.service";
 import { DeckCardService } from "src/deck-card/deck-card.service";
 import { CreateDeckDto } from "./dto/create.dto";
 import { DeckDto } from "./dto/deck.dto";
-import { DeckWithCardsDto } from "./dto/deckWithCards.dto";
-import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
+import { DeckWithCardsDto } from "./dto/deck-with-cards.dto";
+import { ChangeDeckStatusDto } from "./dto/change-status.dto";
 import { UpdateDeckDto } from "./dto/update.dto";
-import { UpdateDeckReferenceGroupDecksDto } from "./dto/updateDeckReferenceGroupDecks.dto";
-import { DeckStatus } from "src/entities/common/enums/deckStatus.enum";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { UpdateDeckReferenceGroupDecksDto } from "./dto/update-deckReferenceGroupDecks.dto";
+import { DeckStatus } from "src/entities/common/enums/deck-status.enum";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { GroupDecks } from "src/entities/group_decks.entity";
 
 @Injectable()

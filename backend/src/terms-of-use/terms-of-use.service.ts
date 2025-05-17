@@ -5,11 +5,11 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
 import { CreateTermsOfUseDto } from "./dto/create-terms-of-use.dto";
 import { errorMessages } from "src/common/errors/errors-message";
 import { AcceptTermsDto } from "./dto/accept-terms.dto";
-import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { UserTermsAcceptance } from "src/entities/user-terms-acceptance.entity";
 import { UsersService } from "src/users/users.service";
 
 @Injectable()

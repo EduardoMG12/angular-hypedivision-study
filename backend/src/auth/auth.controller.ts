@@ -1,5 +1,5 @@
-import { GetUserId } from "./../common/decorators/getUserId.decorator";
-import { SafeUserWithJwt } from "./dto/safeUserWithJwt";
+import { GetUserId } from "../common/decorators/get-user-id.decorator";
+import { SafeUserWithJwt } from "./dto/safe-user-with-jwt.dto";
 import {
 	Controller,
 	Post,
@@ -12,8 +12,8 @@ import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { Public } from "../common/decorators/public.decorator";
-import { toPlainToInstance } from "../common/utils/toPlainToInstance";
-import { AccessToken } from "./dto/accessToken.dto";
+import { toPlainToInstance } from "../common/utils/to-plain-to-instance";
+import { AccessToken } from "./dto/access-token.dto";
 import {
 	ApiOperation,
 	ApiResponse,
@@ -22,8 +22,8 @@ import {
 	ApiBearerAuth,
 	ApiHeader,
 } from "@nestjs/swagger";
-import { ValidateTokenDto } from "./dto/validateToken.dto";
-import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { ValidateTokenDto } from "./dto/validate-token.dto";
+import { UserTermsAcceptance } from "src/entities/user-terms-acceptance.entity";
 import { AcceptTermsDto } from "./dto/user-terms-acceptance.dto";
 
 // TODO: Implement rate limiting with @nestjs/throttler to limit requests (e.g., 100 requests per 15 minutes)

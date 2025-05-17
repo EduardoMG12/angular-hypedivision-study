@@ -1,5 +1,5 @@
 import { IsString, MinLength } from "class-validator";
-import { BaseUser } from "./baseUser.dto";
+import { BaseUser } from "./base-user.dto";
 import { Expose } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
 

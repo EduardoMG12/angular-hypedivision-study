@@ -8,11 +8,11 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
-import { AccessToken } from "./dto/accessToken.dto";
-import { SafeUserWithJwt } from "./dto/safeUserWithJwt";
-import { ValidateTokenDto } from "./dto/validateToken.dto";
-import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { AccessToken } from "./dto/access-token.dto";
+import { SafeUserWithJwt } from "./dto/safe-user-with-jwt.dto";
+import { ValidateTokenDto } from "./dto/validate-token.dto";
+import { UserTermsAcceptance } from "src/entities/user-terms-acceptance.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
 import { User } from "src/entities/user.entity";
 import { AcceptTermsDto } from "./dto/user-terms-acceptance.dto";
 

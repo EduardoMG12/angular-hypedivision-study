@@ -1,5 +1,5 @@
 import { Controller, Post, Delete, Patch, Body, Get } from "@nestjs/common";
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { DeckCardService } from "./deck-card.service";
 import { AddCardToDeckDto } from "./dto/add-card-to-deck.dto";
 import { RemoveCardFromDeckDto } from "./dto/remove-card-from-deck.dto";
@@ -14,7 +14,7 @@ import {
 } from "@nestjs/swagger";
 import { DeckCardDto } from "./dto/deck-card-dto.dto";
 import { FindAllCardsOfDeckDto } from "./dto/find-deck.dto";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 
 @ApiTags("deck-card")
 @ApiBearerAuth()

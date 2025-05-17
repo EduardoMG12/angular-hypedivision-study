@@ -14,7 +14,7 @@ import { ChangeGroupDecksStatusDto } from "./dto/change-status.dto";
 import { UpdateGroupDecksDto } from "./dto/update.dto";
 import { GroupDecksStatus } from "./common/enums/group-decksStatus.enum";
 import { GroupDecksWithDecksDto } from "./dto/group-decks-with-decks";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 
 @Injectable()
 export class GroupDecksService {

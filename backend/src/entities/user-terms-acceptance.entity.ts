@@ -6,7 +6,7 @@ import {
 	ManyToOne,
 	JoinColumn,
 } from "typeorm";
-import { TermsOfUse } from "./termsOfUse.entity";
+import { TermsOfUse } from "./terms-of-use.entity";
 import { User } from "./user.entity";
 
 @Entity("user_terms_acceptance")

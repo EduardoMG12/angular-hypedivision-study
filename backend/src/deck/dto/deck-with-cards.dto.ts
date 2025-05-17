@@ -2,7 +2,7 @@ import { Expose, Type } from "class-transformer";
 
 import { DeckDto } from "./deck.dto";
 import { ApiProperty } from "@nestjs/swagger";
-import { CardType } from "src/card/common/enum/cardType.enum";
+import { CardType } from "src/card/common/enum/card-type.enum";
 import { DeckCardDto } from "src/deck-card/dto/deck-card-dto.dto";
 
 export class DeckWithCardsDto extends DeckDto {

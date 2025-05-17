@@ -9,9 +9,9 @@ import { Tag } from "src/entities/tags.entity";
 
 import { Card } from "src/entities/cards.entity";
 import { GetAllTagsDto, SimpleCardDto, TagNodeDto } from "./dto/tag-node.dto";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { CardDto } from "src/card/dto/card.dto";
-import { CardTag } from "src/entities/cardTags.entity";
+import { CardTag } from "src/entities/card-tags.entity";
 import { MoveTagDto } from "./dto/move-tag.dto";
 import { TagDto } from "./dto/tag.dto";
 

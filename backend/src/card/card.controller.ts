@@ -1,4 +1,4 @@
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { CardService } from "./card.service";
 import {
 	Body,
@@ -10,7 +10,7 @@ import {
 	Put,
 } from "@nestjs/common";
 
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { CreateCardDto } from "./dto/create-card.dto";
 import { CardDto } from "./dto/card.dto";
 import { FindCardDto } from "./dto/find.dto";

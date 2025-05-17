@@ -7,7 +7,7 @@ import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { errorMessages } from "src/common/errors/errors-message";
 import { SanitizerUtils } from "src/common/utils/sanitize";
 import { makeUser } from "src/common/mock/test/mock-users.mock";
-import { ValidateUniquenessDto } from "./dto/validateUniqueness.dto";
+import { ValidateUniquenessDto } from "./dto/validate-uniqueness.dto";
 
 describe("UserService", () => {
 	let service: UsersService;

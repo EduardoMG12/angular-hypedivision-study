@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Put } from "@nestjs/common";
 import { TagService } from "./tags.service";
 import { GetAllTagsDto } from "./dto/tag-node.dto";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { MoveTagDto } from "./dto/move-tag.dto";
 import { TagDto } from "./dto/tag.dto";

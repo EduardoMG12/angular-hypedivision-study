@@ -11,7 +11,7 @@ import { Card } from "src/entities/cards.entity";
 import { UsersService } from "src/users/users.service";
 import { EntityManager, In, IsNull, Repository } from "typeorm";
 
-import { CardType } from "./common/enum/cardType.enum";
+import { CardType } from "./common/enum/card-type.enum";
 import { CardDto } from "./dto/card.dto";
 
 import { CreateCardDto } from "./dto/create-card.dto";
@@ -20,7 +20,7 @@ import { plainToInstance } from "class-transformer";
 import { CardContentOrchestratorService } from "./content-create/card-content.orchestrator.service";
 import { User } from "src/entities/user.entity";
 import { FindCardDto } from "./dto/find.dto";
-import { CardTag } from "src/entities/cardTags.entity";
+import { CardTag } from "src/entities/card-tags.entity";
 import { RemoveSpecificCardOnTag } from "./dto/remove-specific-card-on-tag.dto";
 import { MoveCardToTopicDto } from "./dto/move-card-to-topic.dto";
 import { Tag } from "src/entities/tags.entity";

@@ -1,8 +1,8 @@
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { Controller, Get, Post, Body, Param } from "@nestjs/common";
 import { TermsOfUseService } from "./terms-of-use.service";
 import { CreateTermsOfUseDto } from "./dto/create-terms-of-use.dto";
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
 import {
 	ApiTags,
 	ApiOperation,
@@ -12,7 +12,7 @@ import {
 	ApiBearerAuth,
 } from "@nestjs/swagger";
 import { AcceptTermsDto } from "./dto/accept-terms.dto";
-import { UserTermsAcceptance } from "src/entities/userTermsAcceptance.entity";
+import { UserTermsAcceptance } from "src/entities/user-terms-acceptance.entity";
 
 @ApiTags("Terms of Use / Termos de Uso")
 @Controller("terms-of-use")

@@ -1,7 +1,7 @@
 import { User } from "src/entities/user.entity";
 
-import { SafeUser } from "src/auth/dto/safeUser.dto";
-import { ValidateUniquenessDto } from "../dto/validateUniqueness.dto";
+import { SafeUser } from "src/auth/dto/safe-user.dto";
+import { ValidateUniquenessDto } from "../dto/validate-uniqueness.dto";
 import { RegisterDto } from "src/auth/dto/register.dto";
 
 export interface IUserService {

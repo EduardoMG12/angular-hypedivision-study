@@ -8,7 +8,7 @@ import {
 	AbstractContentCreator,
 	CONTENT_CREATORS,
 } from "./content-creator.interface";
-import { CardType } from "../common/enum/cardType.enum";
+import { CardType } from "../common/enum/card-type.enum";
 import { CreateCardDto } from "../dto/create-card.dto";
 
 /**

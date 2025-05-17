@@ -11,8 +11,8 @@ import {
 import { User } from "./user.entity";
 import { GroupDecks } from "./group_decks.entity";
 import { Card } from "./cards.entity";
-import { DeckStatus } from "./common/enums/deckStatus.enum";
-import { DeckCard } from "./deckCards.entity";
+import { DeckStatus } from "./common/enums/deck-status.enum";
+import { DeckCard } from "./deck-cards.entity";
 
 @Entity("Decks")
 export class Deck {

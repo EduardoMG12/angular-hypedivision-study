@@ -3,7 +3,7 @@ import { UsersController } from "./users.controller";
 import { UsersService } from "./users.service";
 
 import { User } from "src/entities/user.entity";
-import { SafeUser } from "src/auth/dto/safeUser.dto";
+import { SafeUser } from "src/auth/dto/safe-user.dto";
 import { makeUser } from "src/common/mock/test/mock-users.mock";
 import { NotFoundException } from "@nestjs/common";
 

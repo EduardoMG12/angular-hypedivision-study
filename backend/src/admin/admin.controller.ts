@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { Admin } from "src/common/decorators/admin.decorator";
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { AdminService } from "./admin.service";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { ApiBody, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { CreateTermsOfUseDto } from "src/terms-of-use/dto/create-terms-of-use.dto";
-import { TermsOfUse } from "src/entities/termsOfUse.entity";
+import { TermsOfUse } from "src/entities/terms-of-use.entity";
 
 @Controller("admin")
 export class AdminController {

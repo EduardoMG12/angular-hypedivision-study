@@ -6,9 +6,9 @@ import {
 	ApiResponse,
 	ApiTags,
 } from "@nestjs/swagger";
-import { SafeUser } from "../auth/dto/safeUser.dto";
-import { toPlainToInstance } from "../common/utils/toPlainToInstance";
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { SafeUser } from "../auth/dto/safe-user.dto";
+import { toPlainToInstance } from "../common/utils/to-plain-to-instance";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { IUsersController } from "./interfaces/IUsersController";
 
 @ApiTags("Users")

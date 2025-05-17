@@ -8,7 +8,7 @@ import {
 import { Expose, Type } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
 
-import { CardType } from "../common/enum/cardType.enum";
+import { CardType } from "../common/enum/card-type.enum";
 
 import {
 	CreateCardContentFlipDto,

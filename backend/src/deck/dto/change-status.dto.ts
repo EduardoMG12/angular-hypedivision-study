@@ -7,7 +7,7 @@ import {
 	IsUUID,
 	MaxLength,
 } from "class-validator";
-import { DeckStatus } from "../common/enums/deckStatus.enum";
+import { DeckStatus } from "../common/enums/deck-status.enum";
 
 export class ChangeDeckStatusDto {
 	@ApiProperty({

@@ -10,12 +10,12 @@ import {
 	JoinColumn,
 } from "typeorm";
 
-import { CardType } from "./common/enums/cardsType.enum";
+import { CardType } from "./common/enums/cards-type.enum";
 import { User } from "./user.entity";
-import { DeckCard } from "./deckCards.entity";
-import { CardContentFlip } from "./cardContentFlip.entity";
+import { DeckCard } from "./deck-cards.entity";
+import { CardContentFlip } from "./card-content-flip.entity";
 
-import { CardTag } from "./cardTags.entity";
+import { CardTag } from "./card-tags.entity";
 
 @Entity("cards")
 export class Card {

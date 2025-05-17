@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule, getRepositoryToken } from "@nestjs/typeorm";
 
-import { CardContentFlip } from "../entities/cardContentFlip.entity";
+import { CardContentFlip } from "../entities/card-content-flip.entity";
 
 import { CardService } from "./card.service";
 
@@ -17,7 +17,7 @@ import {
 } from "./content-create/content-creator.interface";
 import { FlipContentCreator } from "./content-create/flip-content.creator";
 import { CardController } from "./card.controller";
-import { CardTag } from "src/entities/cardTags.entity";
+import { CardTag } from "src/entities/card-tags.entity";
 import { TagsModule } from "src/tags/tags.module";
 
 @Module({

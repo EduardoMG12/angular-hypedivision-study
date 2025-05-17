@@ -7,7 +7,7 @@ import {
 	ManyToOne,
 } from "typeorm";
 
-import { CardType } from "./common/enums/cardsType.enum";
+import { CardType } from "./common/enums/cards-type.enum";
 import { Card } from "./cards.entity";
 
 @Entity("alternatives")

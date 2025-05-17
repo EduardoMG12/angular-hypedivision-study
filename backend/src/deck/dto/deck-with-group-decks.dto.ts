@@ -2,7 +2,7 @@ import { Expose, Type } from "class-transformer";
 
 import { DeckDto } from "./deck.dto";
 import { ApiProperty } from "@nestjs/swagger";
-import { CardType } from "src/card/common/enum/cardType.enum";
+import { CardType } from "src/card/common/enum/card-type.enum";
 import { GroupDecksDto } from "src/group-decks/dto/group-decks.dto";
 import { GroupDecks } from "src/entities/group_decks.entity";
 import { IsOptional, IsString } from "class-validator";

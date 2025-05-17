@@ -5,7 +5,7 @@ import { Tag } from "src/entities/tags.entity";
 import { Card } from "src/entities/cards.entity";
 import { TagService } from "./tags.service";
 import { TagsController } from "./tags.controller";
-import { CardTag } from "src/entities/cardTags.entity";
+import { CardTag } from "src/entities/card-tags.entity";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([Tag, CardTag, Card])],

@@ -7,15 +7,15 @@ import {
 	Put,
 	Controller,
 } from "@nestjs/common";
-import { GetUserId } from "src/common/decorators/getUserId.decorator";
+import { GetUserId } from "src/common/decorators/get-user-id.decorator";
 import { DeckService } from "./deck.service";
 import { CreateDeckDto } from "./dto/create.dto";
 import { DeckDto } from "./dto/deck.dto";
-import { DeckWithCardsDto } from "./dto/deckWithCards.dto";
-import { ChangeDeckStatusDto } from "./dto/changeStatus.dto";
+import { DeckWithCardsDto } from "./dto/deck-with-cards.dto";
+import { ChangeDeckStatusDto } from "./dto/change-status.dto";
 import { UpdateDeckDto } from "./dto/update.dto";
-import { UpdateDeckReferenceGroupDecksDto } from "./dto/updateDeckReferenceGroupDecks.dto";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { UpdateDeckReferenceGroupDecksDto } from "./dto/update-deckReferenceGroupDecks.dto";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import {
 	ApiTags,
 	ApiOperation,

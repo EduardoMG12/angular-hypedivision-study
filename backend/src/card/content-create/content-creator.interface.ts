@@ -1,5 +1,5 @@
 import { EntityManager } from "typeorm";
-import { CardType } from "../common/enum/cardType.enum";
+import { CardType } from "../common/enum/card-type.enum";
 import { Card } from "src/entities/cards.entity";
 import { CreateCardDto } from "../dto/create-card.dto";
 

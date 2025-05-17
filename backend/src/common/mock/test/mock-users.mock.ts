@@ -1,5 +1,5 @@
 import { RegisterDto } from "src/auth/dto/register.dto";
-import { SafeUser } from "../../../auth/dto/safeUser.dto";
+import { SafeUser } from "../../../auth/dto/safe-user.dto";
 import { User } from "src/entities/user.entity";
 
 // export type MockUsersServiceType = {

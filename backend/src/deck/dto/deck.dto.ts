@@ -1,6 +1,6 @@
 import { Expose } from "class-transformer";
 
-import { DeckStatus } from "../common/enums/deckStatus.enum";
+import { DeckStatus } from "../common/enums/deck-status.enum";
 import { IsUUID } from "class-validator";
 
 export class DeckDto {

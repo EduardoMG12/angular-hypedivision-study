@@ -1,9 +1,9 @@
 import { ChangeGroupDecksStatusDto } from "./dto/change-status.dto";
-import { GetUserId } from "../common/decorators/getUserId.decorator";
+import { GetUserId } from "../common/decorators/get-user-id.decorator";
 import { Body, Controller, Delete, Get, Post, Put } from "@nestjs/common";
 import { CreateGroupDecksDto } from "./dto/create.dto";
 import { GroupDecksDto } from "./dto/group-decks.dto";
-import { toPlainToInstance } from "src/common/utils/toPlainToInstance";
+import { toPlainToInstance } from "src/common/utils/to-plain-to-instance";
 import { UpdateGroupDecksDto } from "./dto/update.dto";
 import { GroupDecksService } from "./group-decks.service";
 import {

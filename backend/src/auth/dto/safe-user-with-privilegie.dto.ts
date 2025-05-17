@@ -1,5 +1,5 @@
 import { Expose } from "class-transformer";
-import { SafeUser } from "./safeUser.dto";
+import { SafeUser } from "./safe-user.dto";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class SafeUserWithPrivilege extends SafeUser {
