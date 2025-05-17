@@ -18,7 +18,7 @@ export class TopicService {
 	constructor(private http: HttpClient) {}
 
 	getTopics(): Observable<Topic[]> {
-		return this.http.get<TopicsApiResponse>(`${this.apiUrl}/getAllTags`).pipe(
+		return this.http.get<TopicsApiResponse>(`${this.apiUrl}/find-all`).pipe(
 			map((response) => response.tags),
 			tap((data) => console.log("Dados de tópicos carregados:", data)),
 			catchError(this.handleError),

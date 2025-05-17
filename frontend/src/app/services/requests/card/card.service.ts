@@ -46,7 +46,9 @@ export class CardService {
 	 */
 	findAllWithoutTags(): Observable<CardsWithoutTagsResponse> {
 		return this.http
-			.get<CardsWithoutTagsResponse>(`${this.apiUrl}/card/findAllWithoutTags`)
+			.get<CardsWithoutTagsResponse>(
+				`${this.apiUrl}/card/find-all-without-tags`,
+			)
 			.pipe(
 				tap((cards) => console.log("Cards sem tags carregados:", cards)),
 				catchError(this.handleError),
