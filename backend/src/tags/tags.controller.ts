@@ -11,7 +11,7 @@ import { TagDto } from "./dto/tag.dto";
 export class TagsController {
 	constructor(private readonly tagsService: TagService) {}
 
-	@Get("getAllTags")
+	@Get("find-all")
 	async getAllTags(@GetUserId() userId: string): Promise<GetAllTagsDto> {
 		return toPlainToInstance(
 			GetAllTagsDto,

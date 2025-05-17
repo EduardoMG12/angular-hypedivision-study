@@ -49,7 +49,7 @@ export class DeckController {
 		);
 	}
 
-	@Get("findAll")
+	@Get("find-all")
 	@ApiOperation({
 		summary: "Get all decks",
 		description: "Retrieves all decks owned by the user.",
@@ -60,7 +60,7 @@ export class DeckController {
 		return toPlainToInstance(DeckDto, await this.deckService.findAll(userId));
 	}
 
-	@Post("findById")
+	@Post("find-by-id")
 	@ApiOperation({
 		summary: "Get a deck by ID",
 		description: "Retrieves a specific deck by ID.",
@@ -78,7 +78,7 @@ export class DeckController {
 		);
 	}
 
-	@Post("findByIdWithCards")
+	@Post("find-by-id-with-cards")
 	@ApiOperation({
 		summary: "Get a deck with its cards",
 		description: "Retrieves a deck and its associated cards.",
@@ -100,7 +100,7 @@ export class DeckController {
 		);
 	}
 
-	@Patch("changeStatus")
+	@Patch("change-status")
 	@ApiOperation({
 		summary: "Change deck status",
 		description: "Updates the status of a deck.",
@@ -137,7 +137,7 @@ export class DeckController {
 		);
 	}
 
-	@Patch("updateReferenceGroupDecks")
+	@Patch("update-refence-group-decks")
 	@ApiOperation({
 		summary: "Update group deck reference",
 		description: "Assigns or removes a group deck from a deck.",

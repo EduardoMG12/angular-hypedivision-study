@@ -89,7 +89,7 @@ export class DeckCardController {
 		);
 	}
 
-	@Get("deck/")
+	@Get("find-all")
 	@ApiOperation({
 		summary: "Get all cards in a deck",
 		description: "Retrieves all cards in a deck, ordered by their position.",

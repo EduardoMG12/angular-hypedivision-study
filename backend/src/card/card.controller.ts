@@ -52,7 +52,7 @@ export class CardController {
 		);
 	}
 
-	@Post("/createBulk")
+	@Post("/create-bulk")
 	@ApiOperation({
 		summary: "Create multiple cards",
 		description:
@@ -94,7 +94,7 @@ export class CardController {
 	// 	);
 	// }
 
-	@Post("/findById")
+	@Post("/find-by-id")
 	@ApiOperation({
 		summary: "Find a card by ID",
 		description:
@@ -118,7 +118,7 @@ export class CardController {
 		);
 	}
 
-	@Get("/findAll")
+	@Get("/find-all")
 	@ApiOperation({
 		summary: "Find all cards",
 		description: "Retrieves all cards owned by the authenticated user.",
@@ -132,7 +132,7 @@ export class CardController {
 		return toPlainToInstance(CardDto, await this.cardService.findAll(userId));
 	}
 
-	@Get("/findAllWithoutTags")
+	@Get("/find-all-without-tags")
 	@ApiOperation({
 		summary: "Find all cards without tags",
 		description:
