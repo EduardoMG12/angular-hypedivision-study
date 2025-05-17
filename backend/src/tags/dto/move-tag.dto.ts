@@ -8,7 +8,7 @@ export class MoveTagDto {
 		example: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
 	})
 	@IsString()
-	@IsUUID() // Assumindo que IDs são UUIDs
+	@IsUUID()
 	@Expose()
 	tagId: string;
 
@@ -17,7 +17,7 @@ export class MoveTagDto {
 			"O ID da tag pai de destino. Nulo ou omitido para mover para a raiz.",
 		example: "f0e9d8c7-b6a5-4321-0987-654321fedcba",
 		required: false,
-		nullable: true, // Permite explicitamente null
+		nullable: true,
 	})
 	@IsString()
 	@IsUUID()

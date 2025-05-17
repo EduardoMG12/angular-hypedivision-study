@@ -23,8 +23,8 @@ export class UserTermsAcceptance {
 	termsOfUse: TermsOfUse;
 
 	@Column({ type: "varchar", length: 50 })
-	termsVersion: string; // Armazena a versão aceita (para auditoria)
+	termsVersion: string;
 
 	@CreateDateColumn()
-	acceptedAt: Date; // Quando o usuário aceitou os termos
+	acceptedAt: Date;
 }

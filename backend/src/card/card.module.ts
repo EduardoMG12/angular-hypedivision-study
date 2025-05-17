@@ -36,22 +36,10 @@ import { TagsModule } from "src/tags/tags.module";
 			useFactory: (
 				flipContentRepo: Repository<CardContentFlip>,
 			): AbstractContentCreator[] => {
-				console.log("--- Inside useFactory for CONTENT_CREATORS ---");
-				console.log("Received flipContentRepo:", flipContentRepo);
-				console.log(
-					"Is flipContentRepo a TypeORM Repository instance?",
-					flipContentRepo instanceof Repository,
-				);
-				console.log("--- End useFactory logs ---");
-
 				const creators: AbstractContentCreator[] = [
 					new FlipContentCreator(flipContentRepo),
 				];
 
-				console.log(
-					"[useFactory] Created array of creators:",
-					creators.map((c) => c.constructor.name),
-				);
 				return creators;
 			},
 			inject: [getRepositoryToken(CardContentFlip)],

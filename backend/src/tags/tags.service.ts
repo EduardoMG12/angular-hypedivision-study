@@ -152,10 +152,8 @@ export class TagService {
 			throw new BadRequestException("Cannot move a tag into itself.");
 		}
 
-		// Start a transaction
 		const movedTagEntity = await this.tagRepository.manager.transaction(
 			async (manager: EntityManager) => {
-				// Verify the tag to move exists and is not deleted
 				const tagToMove = await manager.findOne(Tag, {
 					where: { id: tagId, deletedAt: IsNull() },
 				});
@@ -164,15 +162,12 @@ export class TagService {
 						`Tag with ID "${tagId}" not found or deleted.`,
 					);
 				}
-				// Opcional: Verify ownership/permission here using verifyTagOwnership or logic customizada
 
-				// Get the target parent tag if targetParentId is provided and not null
 				let targetParentTag: Tag | null = null;
 				let newParentPath = "";
 				let newParentId: string | null = null;
 
 				if (targetParentId !== undefined && targetParentId !== null) {
-					// Use manager to find within the transaction
 					targetParentTag = await manager.findOne(Tag, {
 						where: { id: targetParentId, deletedAt: IsNull() },
 					});
@@ -182,9 +177,7 @@ export class TagService {
 							`Target parent tag with ID "${targetParentId}" not found or deleted.`,
 						);
 					}
-					// Opcional: Verify ownership/permission of target parent
 
-					// Prevent moving into a descendant
 					const targetPath = targetParentTag.path;
 					const tagToMovePath = tagToMove.path;
 					if (
@@ -199,19 +192,16 @@ export class TagService {
 					newParentPath = targetParentTag.path;
 					newParentId = targetParentId;
 				}
-				// If targetParentId is null/undefined, it moves to the root.
 
-				// Calculate the new path for the tag to move
 				const newTagPath = newParentPath
 					? `${newParentPath}::${tagToMove.name}`
 					: tagToMove.name;
 
-				// Check if the new path already exists for another tag (active ones)
 				const existingTagWithNewPath = await manager.findOne(Tag, {
 					where: {
 						path: newTagPath,
-						id: Not(tagToMove.id), // Ensure it's not the tag itself
-						deletedAt: IsNull(), // Only check against active tags
+						id: Not(tagToMove.id),
+						deletedAt: IsNull(),
 					},
 				});
 				if (existingTagWithNewPath) {
@@ -220,24 +210,18 @@ export class TagService {
 					);
 				}
 
-				// Store the old path for descendants
 				const oldTagPath = tagToMove.path;
 
 				// 1. Update the moved tag's parentId and path
-				tagToMove.parentId = newParentId; // Correct type assignment now
+				tagToMove.parentId = newParentId;
 				tagToMove.path = newTagPath;
 				await manager.save(tagToMove);
-				console.log(
-					`Tag "${tagToMove.name}" (ID: ${tagToMove.id}) moved. New Parent: ${newParentId || "Root"}, New Path: ${newTagPath}`,
-				);
 
 				// 2. Update the paths of all descendants
-				// Find all active descendants whose path starts with the old path prefix
 				const descendants = await manager.find(Tag, {
 					where: {
-						path: Like(`${oldTagPath}::%`), // Finds paths like "old::%"
-						deletedAt: IsNull(), // Only update active descendants
-						// If tags have owner, add owner filter here
+						path: Like(`${oldTagPath}::%`),
+						deletedAt: IsNull(),
 					},
 				});
 
@@ -247,34 +231,26 @@ export class TagService {
 					// path: 'old::part1::part2', oldTagPath: 'old::part1' -> suffix = '::part2'
 					const suffix = descendant.path.substring(oldTagPath.length);
 
-					// Construct the new path: new prefix + suffix
 					descendant.path = newTagPath + suffix;
 
-					await manager.save(descendant); // Save the descendant with the new path
-					console.log(
-						`Descendant "${descendant.name}" (ID: ${descendant.id}) path updated to: ${descendant.path}`,
-					);
+					await manager.save(descendant);
 				}
 
-				// Return the updated tag entity (potentially with relations loaded)
 				const updatedTag = await manager.findOne(Tag, {
-					where: { id: tagId, deletedAt: IsNull() }, // Find the active, moved tag
-					relations: ["parent", "children"], // Load relations if needed
+					where: { id: tagId, deletedAt: IsNull() },
+					relations: ["parent", "children"],
 				});
 
 				if (!updatedTag) {
-					// This should not happen if the save was successful and the tag is active
-					// But adding a check provides robustness.
 					throw new NotFoundException(
 						`Failed to load updated tag with ID "${tagId}" after the transaction.`,
 					);
 				}
 
-				return updatedTag; // Return the updated entity
+				return updatedTag;
 			},
 		);
 
-		// Return the DTO representation of the updated tag
-		return movedTagEntity; // Convert the entity to the new TagDto
+		return movedTagEntity;
 	}
 }

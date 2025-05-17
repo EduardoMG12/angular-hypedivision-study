@@ -42,9 +42,6 @@ export class User {
 	)
 	ownedCards: Card[];
 
-	// @OneToMany(() => Tag, tag => tag.owner)
-	// ownedTags: Tag[];
-
 	@CreateDateColumn()
 	created_at: Date;
 

@@ -55,10 +55,9 @@ export class CardService {
 					cardData,
 				);
 
-				// Associar tags, se fornecidas
+				// Associate tags, if exist
 				if (cardData.tagPaths && cardData.tagPaths.length > 0) {
 					for (const path of cardData.tagPaths) {
-						// Buscar ou criar a tag
 						let tag = await this.tagService.findByPath(path);
 						if (!tag) {
 							const segments = path.split("::");
@@ -78,7 +77,6 @@ export class CardService {
 							tag = await this.tagService.findByPath(path);
 						}
 
-						// Criar associação na tabela card_tags
 						const cardTag = manager.create(CardTag, {
 							cardId: savedCard.id,
 							tagId: tag?.id,
@@ -91,7 +89,6 @@ export class CardService {
 			},
 		);
 
-		// Carregar o cartão com conteúdo e tags
 		const cardWithContent = await this.cardRepository.findOne({
 			where: { id: createdCard.id },
 			relations: ["contentFlip", "card_tag", "card_tag.tag"],
@@ -379,85 +376,46 @@ export class CardService {
 
 		let targetTag: Tag | null = null;
 		if (targetTopicId) {
-			targetTag = await this.tagService.findById(targetTopicId); // Presume que TagService tem findById
+			targetTag = await this.tagService.findById(targetTopicId);
 			if (!targetTag) {
 				throw new NotFoundException(
 					`Target topic/tag with ID "${targetTopicId}" not found.`,
 				);
 			}
-			// Se tags tem owner, verifique a propriedade da tag:
-			// if (targetTag.ownerId !== userId) {
-			//     throw new ForbiddenException(`You do not have access to the target topic/tag with ID "${targetTopicId}".`);
-			// }
 		} else {
-			// Se targetTopicId for nulo/vazio (movendo para "Sem Tag"), você pode adicionar validação extra
-			// Por enquanto, a lógica abaixo assume que targetTopicId sempre virá preenchido
-			// para mover *para* uma tag. Se quiser mover *para* "Sem Tag", a lógica seria diferente (apenas remover associações existentes).
 			throw new BadRequestException("Target topic ID must be provided.");
 		}
 
-		// Iniciar uma transação de banco de dados para garantir atomicidade
+		// begin a transaction to database to guarantee atomicity
 		const updatedCard = await this.cardRepository.manager.transaction(
 			async (manager: EntityManager) => {
-				// 1. Remover o card do tópico/tag de origem (se houver)
 				if (originalTopicId) {
-					// Encontrar a associação CardTag específica para a origem
 					const cardTagToRemove = await manager.findOne(CardTag, {
 						where: { cardId: card.id, tagId: originalTopicId },
 					});
 
-					// Se a associação de origem for encontrada, delete-a
 					if (cardTagToRemove) {
 						await manager.delete(CardTag, { id: cardTagToRemove.id });
-						console.log(
-							`Removed CardTag association for card ${card.id} and original tag ${originalTopicId}`,
-						);
-					} else {
-						// Opcional: Logar um aviso se originalTopicId foi fornecido, mas a associação não foi encontrada
-						console.warn(
-							`Original tag association not found for card ${card.id} and tag ${originalTopicId}. Skipping removal.`,
-						);
 					}
 				}
 
 				// 2. Adicionar o card ao tópico/tag de destino
-				// Antes de adicionar, verificar se a associação já existe para evitar duplicatas
+
 				const existingTargetCardTag = await manager.findOne(CardTag, {
 					where: { cardId: card.id, tagId: targetTopicId },
 				});
 
 				if (!existingTargetCardTag) {
-					// Criar a nova associação CardTag para o destino
 					const newCardTag = manager.create(CardTag, {
 						cardId: card.id,
 						tagId: targetTopicId,
-						// Adicione campos de ordem se sua tabela CardTag os tiver
-						// order: ...
 					});
 					await manager.save(newCardTag);
-					console.log(
-						`Created CardTag association for card ${card.id} and target tag ${targetTopicId}`,
-					);
-				} else {
-					console.log(
-						`CardTag association for card ${card.id} and target tag ${targetTopicId} already exists. Skipping creation.`,
-					);
-					// Se a associação já existe, talvez você queira apenas atualizar a ordem se estiver usando ordenação
-					// if (targetTag tem ordem) { ... atualizar order aqui ... }
 				}
 
-				// Opcional: Atualizar o próprio objeto Card com o novo tópico principal, se você tiver um campo `topicId` direto na tabela `Card`.
-				// No seu schema atual, a relação é N:M via `card_tag`, então o "tópico principal" não é armazenado diretamente no Card.
-				// Se você quiser que o Card tenha uma referência ao seu tópico "primário" ou mais recente, adicione um campo como `primaryTopicId: string | null` na entidade Card
-				// e atualize-o aqui:
-				// card.primaryTopicId = targetTopicId;
-				// await manager.save(card);
-
-				// Retornar o card atualizado com as novas relações de tags
-				// Você pode precisar recarregar o card aqui para garantir que as relações estejam atualizadas
 				const cardAfterMove = await manager.findOne(Card, {
 					where: { id: card.id },
-					relations: ["contentFlip", "card_tag", "card_tag.tag"], // Recarregue as relações de tags
+					relations: ["contentFlip", "card_tag", "card_tag.tag"],
 				});
 
 				if (!cardAfterMove) {
@@ -466,11 +424,10 @@ export class CardService {
 					);
 				}
 
-				return cardAfterMove; // Retorna a entidade Card atualizada
+				return cardAfterMove;
 			},
 		);
 
-		// Converter a entidade Card atualizada para CardDto antes de retornar
 		return plainToInstance(CardDto, updatedCard);
 	}
 }

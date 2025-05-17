@@ -19,7 +19,7 @@ export class TagsController {
 		);
 	}
 
-	@Put("move") // Endpoint PUT /tags/move
+	@Put("move")
 	@ApiOperation({
 		summary: "Mover uma tag para uma nova tag pai ou para a raiz",
 	})
@@ -28,12 +28,12 @@ export class TagsController {
 		description:
 			"Dados para a movimentação da tag (ID da tag e ID da tag pai de destino)",
 	})
-	// Ajuste o tipo de retorno conforme o que o serviço retorna (entidade Tag, DTO, etc.)
+
 	@ApiResponse({
 		status: 200,
 		description: "Tag movida com sucesso",
 		type: TagDto,
-	}) // Exemplo retornando a entidade Tag
+	})
 	@ApiResponse({
 		status: 400,
 		description: "Dados de movimentação inválidos (ex: movimentação circular)",
