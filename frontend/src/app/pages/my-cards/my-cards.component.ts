@@ -269,7 +269,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 							console.log(
 								`Card ${cardId} removido do tópico ${originalTopicId}.`,
 							);
-							this.recalculateChildrenCardsCount(topic); // Update count
+							this.recalculateChildrenCardsCount(topic);
 							return card;
 						}
 						console.warn(
@@ -279,7 +279,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 					if (topic.children && topic.children.length > 0) {
 						const foundInChildren = findAndRemoveInTopics(topic.children);
 						if (foundInChildren) {
-							this.recalculateChildrenCardsCount(topic); // Update parent count
+							this.recalculateChildrenCardsCount(topic);
 							return foundInChildren;
 						}
 					}
@@ -326,7 +326,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Card ${card.id} adicionado ao tópico ${targetTopicId}.`,
 						);
-						this.recalculateChildrenCardsCount(topic); // Update count
+						this.recalculateChildrenCardsCount(topic);
 						return topic;
 					}
 					console.warn(
@@ -337,7 +337,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				if (topic.children && topic.children.length > 0) {
 					const foundInChildren = findTopicAndAdd(topic.children);
 					if (foundInChildren) {
-						this.recalculateChildrenCardsCount(topic); // Update parent count
+						this.recalculateChildrenCardsCount(topic);
 						return foundInChildren;
 					}
 				}
@@ -360,7 +360,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			if (foundIndex > -1) {
 				const [removed] = topics.splice(foundIndex, 1);
 				console.log(`Tópico ${tagId} removido de tópicos de nível superior.`);
-				this.updateAllChildrenCardsCount(topics); // Update counts
+				this.updateAllChildrenCardsCount(topics);
 				return removed;
 			}
 			console.warn(
@@ -378,7 +378,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Tópico ${tagId} removido do tópico pai ${originalParentId}.`,
 						);
-						this.recalculateChildrenCardsCount(topic); // Update parent count
+						this.recalculateChildrenCardsCount(topic);
 						return removed;
 					}
 					console.warn(
@@ -388,7 +388,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				if (topic.children && topic.children.length > 0) {
 					const foundInChildren = findAndRemoveInTopics(topic.children);
 					if (foundInChildren) {
-						this.recalculateChildrenCardsCount(topic); // Update parent count
+						this.recalculateChildrenCardsCount(topic);
 						return foundInChildren;
 					}
 				}
@@ -424,7 +424,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				console.log(
 					`Tópico ${topic.id} adicionado a tópicos de nível superior.`,
 				);
-				this.updateAllChildrenCardsCount(topics); // Update counts
+				this.updateAllChildrenCardsCount(topics);
 				return true;
 			}
 			console.warn(
@@ -451,7 +451,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						console.log(
 							`Tópico ${topic.id} adicionado ao tópico pai ${targetParentId}.`,
 						);
-						this.recalculateChildrenCardsCount(parent); // Update parent count
+						this.recalculateChildrenCardsCount(parent);
 						return parent;
 					}
 					console.warn(
@@ -462,7 +462,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				if (parent.children && parent.children.length > 0) {
 					const foundInChildren = findTopicAndAdd(parent.children);
 					if (foundInChildren) {
-						this.recalculateChildrenCardsCount(parent); // Update parent count
+						this.recalculateChildrenCardsCount(parent);
 						return foundInChildren;
 					}
 				}
@@ -474,6 +474,23 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			!!targetParent &&
 			targetParent.children?.some((t) => t.id === topic.id) === true
 		);
+	}
+
+	private preserveExpandedState(newTopics: Topic[]): void {
+		const previousExpanded = new Map(this.expandedTopics);
+		this.expandedTopics.clear();
+
+		const applyExpandedState = (topics: Topic[]) => {
+			for (const topic of topics) {
+				const wasExpanded = previousExpanded.get(topic.id) || false;
+				this.expandedTopics.set(topic.id, wasExpanded);
+				if (topic.children && topic.children.length > 0) {
+					applyExpandedState(topic.children);
+				}
+			}
+		};
+
+		applyExpandedState(newTopics);
 	}
 
 	handleCardDropped(event: MoveCardDto): void {
@@ -547,11 +564,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 				next: () => {
 					console.log("Movimento de card persistido com sucesso na API.");
 					this.pendingMove = null;
-					// Refresh topics to ensure childrenCardsCount is correct
 					this.topicService.getTopics().subscribe({
 						next: (topics) => {
 							this.topics = Array.isArray(topics) ? topics : [];
-							this.initializeExpandedState(this.topics);
+							this.preserveExpandedState(this.topics);
 							this.cdr.markForCheck();
 						},
 						error: (err) =>
@@ -601,7 +617,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 							this.topicService.getTopics().subscribe({
 								next: (topics) => {
 									this.topics = Array.isArray(topics) ? topics : [];
-									this.initializeExpandedState(this.topics);
+									this.preserveExpandedState(this.topics);
 								},
 								error: (err) =>
 									console.error("Erro durante a recarga de fallback:", err),
@@ -672,11 +688,10 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 			next: () => {
 				console.log("Movimento de tópico persistido com sucesso na API.");
 				this.pendingMove = null;
-				// Refresh topics to ensure childrenCardsCount is correct
 				this.topicService.getTopics().subscribe({
 					next: (topics) => {
 						this.topics = Array.isArray(topics) ? topics : [];
-						this.initializeExpandedState(this.topics);
+						this.preserveExpandedState(this.topics);
 						this.cdr.markForCheck();
 					},
 					error: (err) =>
@@ -721,7 +736,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 						this.topicService.getTopics().subscribe({
 							next: (topics) => {
 								this.topics = Array.isArray(topics) ? topics : [];
-								this.initializeExpandedState(this.topics);
+								this.preserveExpandedState(this.topics);
 								this.cdr.markForCheck();
 							},
 							error: (err) =>
@@ -768,7 +783,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 		this.topicService.getTopics().subscribe({
 			next: (topics) => {
 				this.topics = Array.isArray(topics) ? topics : [];
-				this.initializeExpandedState(this.topics);
+				this.preserveExpandedState(this.topics);
 				this.cdr.markForCheck();
 			},
 			error: (error: any) =>
@@ -809,13 +824,12 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 	}
 
 	private setExpandedStateForAll(topics: Topic[], state: boolean): void {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		topics.forEach((topic) => {
+		for (const topic of topics) {
 			this.expandedTopics.set(topic.id, state);
 			if (topic.children && topic.children.length > 0) {
 				this.setExpandedStateForAll(topic.children, state);
 			}
-		});
+		}
 	}
 
 	onCardSaved(): void {
@@ -824,7 +838,7 @@ export class MyCardsComponent implements OnInit, OnDestroy {
 		this.topicService.getTopics().subscribe({
 			next: (topics) => {
 				this.topics = Array.isArray(topics) ? topics : [];
-				this.initializeExpandedState(this.topics);
+				this.preserveExpandedState(this.topics);
 				this.cdr.markForCheck();
 			},
 			error: (error: any) => {
