@@ -25,7 +25,7 @@ import {
 	DraggedTopicItem,
 	MoveCardDto,
 	MoveTopicDto,
-} from "../../common/api/interfaces/my-cards-list.interface";
+} from "../../../../common/api/interfaces/my-cards-list.interface";
 import { CardDragDropComponent } from "../card-drag-drop/card-drag-drop.component";
 
 type TopicDropResult = { targetTopicId: string };

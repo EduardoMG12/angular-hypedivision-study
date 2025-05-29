@@ -8,12 +8,12 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from "@angular/forms";
-import { EyeIconComponent } from "../icons/eye-icon/eye-icon.component";
-import { PlusIconComponent } from "../icons/plus-icon/plus-icon.component";
+import { EyeIconComponent } from "../../../icons/eye-icon/eye-icon.component";
+import { PlusIconComponent } from "../../../icons/plus-icon/plus-icon.component";
 
-import { CardService } from "../../services/requests/card/card.service";
-import { InfoIconComponent } from "../icons/info-icon/info-icon.component";
-import { Card } from "../../common/api/interfaces/my-cards-list.interface";
+import { CardService } from "../../../../services/requests/card/card.service";
+import { InfoIconComponent } from "../../../icons/info-icon/info-icon.component";
+import { Card } from "../../../../common/api/interfaces/my-cards-list.interface";
 
 @Component({
 	selector: "app-formulary-create-card",

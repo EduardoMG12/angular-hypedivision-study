@@ -13,7 +13,8 @@ import {
 	type Card,
 	type CardSimple,
 	type DraggedCardItem,
-} from "../../common/api/interfaces/my-cards-list.interface";
+} from "../../../../common/api/interfaces/my-cards-list.interface";
+
 
 type CardDropResult = { moved: boolean } | undefined;
 

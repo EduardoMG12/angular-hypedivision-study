@@ -1,0 +1,46 @@
+<div class="px-[6rem] pr-[3rem] min-[850px]:px-[10rem] 2xl:px-[21.5rem] pt-10 pb-8 flex flex-col gap-8 z-10">
+    <div *ngIf="showListContent" @fadeAnimation (@fadeAnimation.done)="onAnimationDone($event, 'list')"
+      [dropTarget]="containerDropTarget" [ngClass]="{
+        'border-2 border-dashed border-portage/50 rounded-lg p-4': isContainerHovered
+      }">
+      <div class="flex flex-col justify-center mb-8">
+        <div class="flex justify-between items-center">
+          <h1 class="text-3xl font-bold text-portage textPurpleShadow">Minha Biblioteca de Cards</h1>
+          <button (click)="goToCreateCardForm()"
+            class="textPurpleShadow bg-portage hover:bg-portage/80 text-alabaster font-bold py-2 px-4 rounded-lg flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Criar Card
+          </button>
+        </div>
+        <p class="text-santas-gray">Organize, gerencie e estude sua coleção de Cards</p>
+      </div>
+      <ng-container>
+        <app-card-list *ngIf="(topics && topics.length) || (cardsWithoutTags && cardsWithoutTags.length > 0)"
+          @fadeAnimation [topics]="topics" [expandedTopics]="expandedTopics" [allExpanded]="allExpanded"
+          [cardsWithoutTags]="cardsWithoutTags" [expandAllCardsWithoutTags]="expandCardsWithoutTags"
+          (toggleTopic)="toggleTopic($event)" (toggleAllTopics)="toggleAllTopics()"
+          (cardDroppedOnTopic)="handleCardDropped($event)" (topicDropped)="handleTopicDropped($event)" />
+        <app-empty-card-library
+          *ngIf="(!topics || topics.length === 0) && (!cardsWithoutTags || cardsWithoutTags.length === 0)"
+          (openCreateCard)="goToCreateCardForm()" />
+      </ng-container>
+    </div>
+
+    <div *ngIf="showFormContent" @fadeAnimation (@fadeAnimation.done)="onAnimationDone($event, 'form')">
+      <div class="w-full flex flex-row justify-start items-center gap-7 pl-3 mb-8">
+        <button (click)="goBackMyCards()" class="cursor-pointer">
+          <app-arrow-left-icon />
+        </button>
+        <div class="w-full flex flex-col justify-baseline items-start gap-2">
+          <div class="flex justify-baseline items-center gap-2">
+            <h1 class="text-portage text-ultra textPurpleShadow font-bold">Criar novo Card</h1>
+          </div>
+          <p class="text-santas-gray">Preencha os detalhes para criar um novo flashcard.</p>
+        </div>
+      </div>
+      <app-formulary-create-card (goBack)="goBackMyCards()" (cardSaved)="onCardSaved()" />
+    </div>
+  </div>

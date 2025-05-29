@@ -17,7 +17,7 @@ import type {
 	MoveCardDto,
 	MoveTopicDto,
 	DraggedTopicItem,
-} from "../../common/api/interfaces/my-cards-list.interface";
+} from "../../../../common/api/interfaces/my-cards-list.interface";
 import {
 	DndService,
 	DropTarget,
@@ -25,7 +25,7 @@ import {
 	DropTargetMonitor,
 } from "@ng-dnd/core";
 import { Subject } from "rxjs";
-import { TOPIC_TYPE } from "../../common/api/interfaces/my-cards-list.interface";
+import { TOPIC_TYPE } from "../../../../common/api/interfaces/my-cards-list.interface";
 
 @Component({
 	selector: "app-card-list",
