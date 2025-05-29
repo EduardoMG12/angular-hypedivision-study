@@ -5,14 +5,14 @@ import { CardLibraryComponent } from "../../components/card-library/card-library
 
 
 @Component({
-	selector: "app-my-cards",
+	selector: "app-my-library-of-cards",
 	standalone: true,
 	imports: [
     CommonModule,
     SideBarComponent,
     CardLibraryComponent,
 ],
-	templateUrl: "./my-cards.component.html",
-	styleUrl: "./my-cards.component.css",
+	templateUrl: "./my-library-of-cards.component.html",
+	styleUrl: "./my-library-of-cards.component.css",
 })
-export class MyCardsComponent{}
+export class MyLibraryOfCardsComponent{}

@@ -64,8 +64,8 @@ export const routes: Routes = [
 	{
 		path: "my-cards",
 		loadComponent: () =>
-			import("./pages/my-cards/my-cards.component").then(
-				(m) => m.MyCardsComponent,
+			import("./pages/my-library-of-cards/my-library-of-cards.component").then(
+				(m) => m.MyLibraryOfCardsComponent,
 			),
 		resolve: {
 			seo: MyCardsSeoResolver,
